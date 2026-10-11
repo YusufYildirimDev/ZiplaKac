@@ -102,6 +102,22 @@ namespace ZiplaKac.Utils
             }
         }
 
+        private static Material s_safeSpriteMat;
+        public static Material GetSafeSpriteMaterial()
+        {
+            if (s_safeSpriteMat != null) return s_safeSpriteMat;
+
+            Shader s = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit");
+            if (s == null) s = Shader.Find("Universal Render Pipeline/2D/Sprite-Lit-Default");
+            if (s == null) s = Shader.Find("Sprites/Default");
+            if (s != null)
+            {
+                s_safeSpriteMat = new Material(s);
+                return s_safeSpriteMat;
+            }
+            return null;
+        }
+
         private void SetupGround()
         {
             GameObject ground = GameObject.Find("Ground");
@@ -111,10 +127,13 @@ namespace ZiplaKac.Utils
                 ground.transform.position = new Vector3(0f, -4.5f, 0f);
 
                 SpriteRenderer sr = ground.AddComponent<SpriteRenderer>();
-                sr.sprite = ProceduralSpriteGenerator.CreateRectangleSprite(new Color(0.17f, 0.23f, 0.39f), 1024, 64); // #2b3a63 (Modern Zemin)
+                sr.sprite = ProceduralSpriteGenerator.CreateRectangleSprite(new Color(0.17f, 0.23f, 0.39f), 1024, 128); // #2b3a63 (Modern Zemin)
+                sr.sortingOrder = 2;
+                Material safeMat = GetSafeSpriteMaterial();
+                if (safeMat != null) sr.material = safeMat;
 
                 BoxCollider2D col = ground.AddComponent<BoxCollider2D>();
-                col.size = new Vector2(30f, 2f);
+                col.size = new Vector2(40f, 2f); // Üst yüzey Y = -3.5f
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
                 if (groundLayer != -1) ground.layer = groundLayer;
@@ -127,44 +146,56 @@ namespace ZiplaKac.Utils
             if (player == null)
             {
                 player = new GameObject("Player");
-                player.tag = "Player";
-                player.transform.position = new Vector3(-6f, -3f, 0f);
+                try { player.tag = "Player"; } catch { }
+
+                float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+                float halfWidth = 5.0f * aspect;
+                // Ekranın sol kenarından %22 içeride konumlandır
+                float playerX = -halfWidth + (halfWidth * 2f) * 0.22f;
+                player.transform.position = new Vector3(playerX, -2.5f, 0f);
+
+                Material safeMat = GetSafeSpriteMaterial();
 
                 // Gövde Görseli (Daire)
                 SpriteRenderer bodySr = player.AddComponent<SpriteRenderer>();
-                bodySr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(Color.white, 64);
-                bodySr.sortingOrder = 5;
+                bodySr.sprite = ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 64);
+                bodySr.sortingOrder = 10;
+                if (safeMat != null) bodySr.material = safeMat;
 
                 // Parıltı (Glow) Alt Nesnesi
                 GameObject glowObj = new GameObject("Glow");
                 glowObj.transform.SetParent(player.transform, false);
-                glowObj.transform.localScale = Vector3.one * 1.3f;
+                glowObj.transform.localScale = Vector3.one * 1.25f;
                 SpriteRenderer glowSr = glowObj.AddComponent<SpriteRenderer>();
-                glowSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(Color.yellow, 64);
-                glowSr.sortingOrder = 4;
+                glowSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 0.85f, 0.3f, 0.6f), 64);
+                glowSr.sortingOrder = 9;
+                if (safeMat != null) glowSr.material = safeMat;
 
                 // Kalkan Halkası (Shield Ring) Alt Nesnesi
                 GameObject shieldObj = new GameObject("ShieldRing");
                 shieldObj.transform.SetParent(player.transform, false);
-                shieldObj.transform.localScale = Vector3.one * 1.6f;
+                shieldObj.transform.localScale = Vector3.one * 1.5f;
                 SpriteRenderer shieldSr = shieldObj.AddComponent<SpriteRenderer>();
                 shieldSr.sprite = ProceduralSpriteGenerator.CreateRingSprite(Color.cyan, 64, 0.8f);
-                shieldSr.sortingOrder = 6;
+                shieldSr.sortingOrder = 11;
+                if (safeMat != null) shieldSr.material = safeMat;
                 shieldObj.SetActive(false);
 
                 // Zemin Kontrol Noktası (GroundCheck)
                 GameObject groundCheckObj = new GameObject("GroundCheck");
                 groundCheckObj.transform.SetParent(player.transform, false);
-                groundCheckObj.transform.localPosition = new Vector3(0f, -0.6f, 0f);
+                groundCheckObj.transform.localPosition = new Vector3(0f, -0.45f, 0f);
 
                 // Fizik & Kontrolcü
                 CircleCollider2D col = player.AddComponent<CircleCollider2D>();
-                col.radius = 0.5f;
+                col.radius = 0.45f;
 
                 Rigidbody2D rb = player.AddComponent<Rigidbody2D>();
                 rb.gravityScale = 3.5f;
+                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
                 PlayerController pc = player.AddComponent<PlayerController>();
+                pc.fixedXPosition = playerX;
                 pc.bodySpriteRenderer = bodySr;
                 pc.glowSpriteRenderer = glowSr;
                 pc.shieldRingObject = shieldObj;
@@ -173,7 +204,7 @@ namespace ZiplaKac.Utils
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
                 if (groundLayer != -1) pc.groundLayerMask = 1 << groundLayer;
-                else pc.groundLayerMask = ~0; // Everything fallback
+                else pc.groundLayerMask = ~0;
             }
         }
 
@@ -203,24 +234,24 @@ namespace ZiplaKac.Utils
         {
             if (ObjectPooler.Instance == null) return;
 
-            // 1. Kaktüs (Cactus)
-            GameObject cactusPrefab = CreateObstaclePrefab("Cactus", new Vector2(0.8f, 1.8f), new Color(0.2f, 0.7f, 0.2f), false);
+            // 1. Kaktüs (Cactus) - Doğal orantı (Scale 1,1,1)
+            GameObject cactusPrefab = CreateObstaclePrefab("Cactus");
             ObjectPooler.Instance.RegisterPool("Cactus", cactusPrefab, 8);
 
-            // 2. Kaya (Rock)
-            GameObject rockPrefab = CreateObstaclePrefab("Rock", new Vector2(1.6f, 0.9f), new Color(0.5f, 0.5f, 0.5f), false);
+            // 2. Kaya (Rock) - Doğal orantı (Scale 1,1,1)
+            GameObject rockPrefab = CreateObstaclePrefab("Rock");
             ObjectPooler.Instance.RegisterPool("Rock", rockPrefab, 8);
 
-            // 3. Diken (Spike)
-            GameObject spikePrefab = CreateObstaclePrefab("Spike", new Vector2(1.0f, 2.2f), new Color(0.8f, 0.2f, 0.2f), true);
+            // 3. Diken (Spike) - Doğal orantı (Scale 1,1,1)
+            GameObject spikePrefab = CreateObstaclePrefab("Spike");
             ObjectPooler.Instance.RegisterPool("Spike", spikePrefab, 8);
 
-            // 4. Alçak Kuş (LowBird)
-            GameObject lowBirdPrefab = CreateObstaclePrefab("LowBird", new Vector2(1.2f, 0.8f), new Color(0.9f, 0.7f, 0.1f), false);
+            // 4. Alçak Kuş (LowBird) - Doğal orantı (Scale 1,1,1)
+            GameObject lowBirdPrefab = CreateObstaclePrefab("LowBird");
             ObjectPooler.Instance.RegisterPool("LowBird", lowBirdPrefab, 6);
 
-            // 5. Yüksek Kuş (HighBird)
-            GameObject highBirdPrefab = CreateObstaclePrefab("HighBird", new Vector2(1.2f, 0.8f), new Color(0.8f, 0.1f, 0.8f), false);
+            // 5. Yüksek Kuş (HighBird) - Doğal orantı (Scale 1,1,1)
+            GameObject highBirdPrefab = CreateObstaclePrefab("HighBird");
             ObjectPooler.Instance.RegisterPool("HighBird", highBirdPrefab, 6);
 
             // Power-up Prefabları
@@ -238,31 +269,48 @@ namespace ZiplaKac.Utils
             ObjectPooler.Instance.RegisterPool("FloatingText", ftPrefab, 5);
         }
 
-        private GameObject CreateObstaclePrefab(string name, Vector2 size, Color color, bool isTriangle)
+        private GameObject CreateObstaclePrefab(string name)
         {
             GameObject obj = new GameObject(name);
-            obj.tag = "Obstacle";
+            try { obj.tag = "Obstacle"; } catch { }
 
             SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
-            
+            sr.sortingOrder = 5;
+            Material safeMat = GetSafeSpriteMaterial();
+            if (safeMat != null) sr.material = safeMat;
+
             Color obsColor = new Color(0.94f, 0.28f, 0.44f); // #ef476f (HTML Obstacle Coral)
             Color airColor = new Color(0.35f, 0.28f, 0.5f);  // #30264a (HTML Air Bird Violet)
 
-            if (name == "Cactus")
-                sr.sprite = ProceduralSpriteGenerator.CreateCactusSprite(obsColor);
-            else if (name == "Rock")
-                sr.sprite = ProceduralSpriteGenerator.CreateRockSprite(obsColor);
-            else if (name == "Spike")
-                sr.sprite = ProceduralSpriteGenerator.CreateSpikeSprite(obsColor);
-            else if (name.Contains("Bird"))
-                sr.sprite = ProceduralSpriteGenerator.CreateBirdSprite(airColor);
-            else
-                sr.sprite = ProceduralSpriteGenerator.CreateRectangleSprite(obsColor, (int)(size.x * 64), (int)(size.y * 64));
-
-            obj.transform.localScale = new Vector3(size.x, size.y, 1f);
-
             BoxCollider2D col = obj.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
+
+            if (name == "Cactus")
+            {
+                sr.sprite = ProceduralSpriteGenerator.CreateCactusSprite(obsColor);
+                col.size = new Vector2(0.55f, 0.85f);
+                col.offset = new Vector2(0f, 0.45f);
+            }
+            else if (name == "Rock")
+            {
+                sr.sprite = ProceduralSpriteGenerator.CreateRockSprite(obsColor);
+                col.size = new Vector2(0.75f, 0.50f);
+                col.offset = new Vector2(0f, 0.25f);
+            }
+            else if (name == "Spike")
+            {
+                sr.sprite = ProceduralSpriteGenerator.CreateSpikeSprite(obsColor);
+                col.size = new Vector2(0.50f, 1.0f);
+                col.offset = new Vector2(0f, 0.52f);
+            }
+            else if (name.Contains("Bird"))
+            {
+                sr.sprite = ProceduralSpriteGenerator.CreateBirdSprite(airColor);
+                col.size = new Vector2(0.75f, 0.50f);
+                col.offset = Vector2.zero;
+            }
+
+            obj.transform.localScale = Vector3.one;
 
             Obstacle obs = obj.AddComponent<Obstacle>();
             obs.poolTag = name;
@@ -274,14 +322,19 @@ namespace ZiplaKac.Utils
         private GameObject CreatePowerUpPrefab(string name, PowerUpType type, Color color, string label)
         {
             GameObject obj = new GameObject(name);
-            obj.tag = "PowerUp";
+            try { obj.tag = "PowerUp"; } catch { }
 
             SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
             sr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(color, 64);
             sr.sortingOrder = 7;
+            Material safeMat = GetSafeSpriteMaterial();
+            if (safeMat != null) sr.material = safeMat;
 
             CircleCollider2D col = obj.AddComponent<CircleCollider2D>();
+            col.radius = 0.35f;
             col.isTrigger = true;
+
+            obj.transform.localScale = Vector3.one;
 
             PowerUp p = obj.AddComponent<PowerUp>();
             p.powerUpType = type;

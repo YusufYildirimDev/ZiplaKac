@@ -46,7 +46,11 @@ namespace ZiplaKac.Player
         {
             rb = GetComponent<Rigidbody2D>();
             rb.gravityScale = gravityScale;
-            fixedXPosition = transform.position.x;
+
+            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            float halfWidth = 5.0f * aspect;
+            fixedXPosition = -halfWidth + (halfWidth * 2f) * 0.22f;
+            transform.position = new Vector3(fixedXPosition, -2.5f, 0f);
 
             try
             {
@@ -80,13 +84,13 @@ namespace ZiplaKac.Player
 
         private void Update()
         {
+            // Sabit X pozisyonunu daima koru
+            transform.position = new Vector3(fixedXPosition, transform.position.y, transform.position.z);
+
             if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
             {
                 return;
             }
-
-            // Sabit X pozisyonunu koru
-            transform.position = new Vector3(fixedXPosition, transform.position.y, transform.position.z);
 
             // Zemin kontrolü
             CheckGroundedStatus();
@@ -113,9 +117,20 @@ namespace ZiplaKac.Player
 
         private void CheckGroundedStatus()
         {
-            Vector2 checkPosition = groundCheckTransform != null ? (Vector2)groundCheckTransform.position : (Vector2)transform.position + Vector2.down * 0.5f;
+            Vector2 checkPosition = groundCheckTransform != null ? (Vector2)groundCheckTransform.position : (Vector2)transform.position + Vector2.down * 0.45f;
             bool wasGrounded = isGrounded;
-            isGrounded = Physics2D.OverlapCircle(checkPosition, groundCheckRadius, groundLayerMask);
+            
+            Collider2D[] hits = Physics2D.OverlapCircleAll(checkPosition, groundCheckRadius, groundLayerMask);
+            bool foundGround = false;
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].gameObject != gameObject && !hits[i].isTrigger)
+                {
+                    foundGround = true;
+                    break;
+                }
+            }
+            isGrounded = foundGround;
 
             if (isGrounded && !wasGrounded)
             {
@@ -276,7 +291,8 @@ namespace ZiplaKac.Player
                 return;
             }
 
-            if (other.CompareTag("Obstacle"))
+            bool isObstacle = other.CompareTag("Obstacle") || other.GetComponent<Obstacles.Obstacle>() != null;
+            if (isObstacle)
             {
                 if (GameManager.Instance.isShieldActive)
                 {
@@ -306,8 +322,12 @@ namespace ZiplaKac.Player
         {
             if (newState == GameState.Playing)
             {
-                // Başlangıç pozisyonuna sıfırla
-                transform.position = new Vector3(fixedXPosition, 0f, 0f);
+                // Başlangıç pozisyonuna sıfırla (Zeminin üzerinden başlar)
+                float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+                float halfWidth = 5.0f * aspect;
+                fixedXPosition = -halfWidth + (halfWidth * 2f) * 0.22f;
+
+                transform.position = new Vector3(fixedXPosition, -2.5f, 0f);
                 rb.linearVelocity = Vector2.zero;
                 canDoubleJump = true;
                 isInvulnerable = false;

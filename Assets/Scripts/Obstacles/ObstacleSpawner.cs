@@ -12,8 +12,8 @@ namespace ZiplaKac.Obstacles
     public class ObstacleSpawner : MonoBehaviour
     {
         [Header("Spawn Konumu Ayarları")]
-        public float spawnX = 12.0f;
-        public float groundY = -3.0f;
+        public float spawnX = 4.0f;
+        public float groundY = -3.5f;
 
         [Header("Zamanlama Ayarları")]
         [Tooltip("Başlangıç iki engel arası süre (saniye)")]
@@ -26,6 +26,14 @@ namespace ZiplaKac.Obstacles
         public List<TierData> tiers = new List<TierData>();
 
         private float spawnTimer = 0f;
+
+        private void Awake()
+        {
+            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            float halfWidth = 5.0f * aspect;
+            spawnX = halfWidth + 1.2f;
+            groundY = -3.5f;
+        }
 
         private void Start()
         {
@@ -66,11 +74,12 @@ namespace ZiplaKac.Obstacles
             }
             else if (chosen.obstacleType == ObstacleType.HighBird)
             {
-                spawnY = groundY + 3.2f; // Yüksek uçuş
+                spawnY = groundY + 3.0f; // Yüksek uçuş
             }
-            else if (chosen.obstacleType == ObstacleType.Spike)
+            else
             {
-                spawnY = groundY + 0.3f;
+                // Cactus, Spike, Rock: tabanları zemin yüzeyi Y = -3.5f üzerinde durur
+                spawnY = groundY;
             }
 
             Vector3 spawnPosition = new Vector3(spawnX, spawnY, 0f);

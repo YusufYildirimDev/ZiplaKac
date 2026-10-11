@@ -14,11 +14,20 @@ namespace ZiplaKac.PowerUps
         public float maxSpawnTime = 14.0f;
 
         [Header("Konumlandırma Ayarları")]
-        public float spawnX = 12.0f;
-        public float minSpawnY = -1.0f;
-        public float maxSpawnY = 2.5f;
+        public float spawnX = 4.0f;
+        public float minSpawnY = -2.2f;
+        public float maxSpawnY = 0.5f;
 
         private float spawnTimer = 0f;
+
+        private void Awake()
+        {
+            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            float halfWidth = 5.0f * aspect;
+            spawnX = halfWidth + 1.2f;
+            minSpawnY = -2.2f;
+            maxSpawnY = 0.5f;
+        }
 
         private void Start()
         {

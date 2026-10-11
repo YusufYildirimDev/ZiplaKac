@@ -12,15 +12,28 @@ namespace ZiplaKac.PowerUps
         public PowerUpType powerUpType = PowerUpType.Shield;
         public float bobbingSpeed = 3.0f;
         public float bobbingAmount = 0.25f;
-        public float offscreenX = -12.0f;
+        public float offscreenX = -4.0f;
 
         private float startY;
         private float bobbingTimer = 0f;
 
+        private void Awake()
+        {
+            UpdateOffscreenBoundary();
+        }
+
         private void OnEnable()
         {
+            UpdateOffscreenBoundary();
             startY = transform.position.y;
             bobbingTimer = Random.Range(0f, 6.28f); // Rastgele faz ile başla
+        }
+
+        private void UpdateOffscreenBoundary()
+        {
+            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            float halfWidth = 5.0f * aspect;
+            offscreenX = -halfWidth - 1.5f;
         }
 
         private void Update()

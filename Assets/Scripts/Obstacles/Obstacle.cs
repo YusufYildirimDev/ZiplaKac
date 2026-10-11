@@ -10,19 +10,32 @@ namespace ZiplaKac.Obstacles
     public class Obstacle : MonoBehaviour
     {
         public string poolTag = "Cactus";
-        public float offscreenX = -12.0f;
+        public float offscreenX = -4.0f;
 
         private bool hasBeenPassed = false;
         private Transform playerTransform;
 
+        private void Awake()
+        {
+            UpdateOffscreenBoundary();
+        }
+
         private void OnEnable()
         {
+            UpdateOffscreenBoundary();
             hasBeenPassed = false;
             if (playerTransform == null && GameManager.Instance != null)
             {
                 Player.PlayerController player = FindObjectOfType<Player.PlayerController>();
                 if (player != null) playerTransform = player.transform;
             }
+        }
+
+        private void UpdateOffscreenBoundary()
+        {
+            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            float halfWidth = 5.0f * aspect;
+            offscreenX = -halfWidth - 1.5f;
         }
 
         private void Update()

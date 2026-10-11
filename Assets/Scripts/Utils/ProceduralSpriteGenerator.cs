@@ -56,7 +56,7 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 64f);
         }
 
-        public static Sprite CreateCactusSprite(Color color, int w = 48, int h = 72)
+        public static Sprite CreateCactusSprite(Color color, int w = 44, int h = 64)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
@@ -74,32 +74,32 @@ namespace ZiplaKac.Utils
             }
 
             // Sol kol
-            int arm1Y = (int)(h * 0.4f);
-            for (int x = cx - stemWidth / 2 - 10; x <= cx - stemWidth / 2; x++)
+            int arm1Y = (int)(h * 0.38f);
+            for (int x = cx - stemWidth / 2 - 9; x <= cx - stemWidth / 2; x++)
             {
-                for (int y = arm1Y; y < arm1Y + 8; y++) tex.SetPixel(x, y, color);
+                for (int y = arm1Y; y < arm1Y + 7; y++) tex.SetPixel(x, y, color);
             }
-            for (int x = cx - stemWidth / 2 - 10; x < cx - stemWidth / 2 - 4; x++)
+            for (int x = cx - stemWidth / 2 - 9; x < cx - stemWidth / 2 - 3; x++)
             {
-                for (int y = arm1Y; y < arm1Y + 22; y++) tex.SetPixel(x, y, color);
+                for (int y = arm1Y; y < arm1Y + 18; y++) tex.SetPixel(x, y, color);
             }
 
             // Sağ kol
-            int arm2Y = (int)(h * 0.55f);
-            for (int x = cx + stemWidth / 2; x <= cx + stemWidth / 2 + 10; x++)
+            int arm2Y = (int)(h * 0.52f);
+            for (int x = cx + stemWidth / 2; x <= cx + stemWidth / 2 + 9; x++)
             {
-                for (int y = arm2Y; y < arm2Y + 8; y++) tex.SetPixel(x, y, color);
+                for (int y = arm2Y; y < arm2Y + 7; y++) tex.SetPixel(x, y, color);
             }
-            for (int x = cx + stemWidth / 2 + 4; x <= cx + stemWidth / 2 + 10; x++)
+            for (int x = cx + stemWidth / 2 + 3; x <= cx + stemWidth / 2 + 9; x++)
             {
-                for (int y = arm2Y; y < arm2Y + 20; y++) tex.SetPixel(x, y, color);
+                for (int y = arm2Y; y < arm2Y + 18; y++) tex.SetPixel(x, y, color);
             }
 
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 64f);
         }
 
-        public static Sprite CreateSpikeSprite(Color color, int w = 48, int h = 90)
+        public static Sprite CreateSpikeSprite(Color color, int w = 42, int h = 72)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
@@ -123,7 +123,7 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 64f);
         }
 
-        public static Sprite CreateRockSprite(Color color, int w = 64, int h = 42)
+        public static Sprite CreateRockSprite(Color color, int w = 56, int h = 38)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
@@ -150,7 +150,7 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 64f);
         }
 
-        public static Sprite CreateBirdSprite(Color color, int w = 64, int h = 48)
+        public static Sprite CreateBirdSprite(Color color, int w = 56, int h = 38)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
