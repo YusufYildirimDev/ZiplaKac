@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zıpla Kaç</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg-top: #1e2a4a;
+    --bg-bottom: #0d1220;
+    --ground: #2b3a63;
+    --player: #ffd166;
+    --player-glow: #ffe8a8;
+    --obstacle: #ef476f;
+    --obstacle-air: #30264a;
+    --accent: #06d6a0;
+    --text: #f4f6fb;
+    --card-bg: rgba(20, 26, 48, 0.85);
+    --card-border: rgba(255,255,255,0.12);
+    --shield: #4cc9f0;
+    --slow: #90e0ef;
+    --multi: #ffd60a;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg-top: #aee7ff;
+      --bg-bottom: #e9f7ff;
+      --ground: #5a8fd6;
+      --text: #10213a;
+      --card-bg: rgba(255,255,255,0.88);
+      --card-border: rgba(0,0,0,0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg-top: #1e2a4a;
+    --bg-bottom: #0d1220;
+    --ground: #2b3a63;
+    --text: #f4f6fb;
+    --card-bg: rgba(20, 26, 48, 0.85);
+    --card-border: rgba(255,255,255,0.12);
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    overscroll-behavior: none;
+    background: var(--bg-bottom);
+  }
+  * { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #wrap {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  #hud {
+    position: absolute;
+    top: calc(14px + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 16px;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  #statusRow {
+    position: absolute;
+    top: calc(44px + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .badge {
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    text-shadow: none;
+  }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5,8,18,0.55);
+    backdrop-filter: blur(2px);
+  }
+  #overlay.hidden { display: none; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 28px 26px;
+    text-align: center;
+    color: var(--text);
+    width: 82%;
+    max-width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .card h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+  }
+  .card p {
+    margin: 6px 0 18px;
+    opacity: 0.8;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .big-score {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 4px 0 2px;
+  }
+  .best {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .history {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-bottom: 18px;
+  }
+  button#startBtn, button#retryBtn {
+    background: var(--accent);
+    color: #0a1a14;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(6,214,160,0.35);
+  }
+  button#startBtn:active, button#retryBtn:active {
+    transform: scale(0.97);
+  }
+  #hint {
+    position: absolute;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--text);
+    opacity: 0.55;
+    font-size: 13px;
+    pointer-events: none;
+  }
+  .char-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    opacity: 0.7;
+    margin: 2px 0 8px;
+  }
+  .char-grid {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 0 18px;
+    flex-wrap: wrap;
+  }
+  .char-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .char-swatch {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 3px solid transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    transition: transform .15s, border-color .15s;
+  }
+  .char-option.selected .char-swatch {
+    border-color: var(--accent);
+    transform: scale(1.08);
+  }
+  .char-option span {
+    font-size: 10px;
+    color: var(--text);
+    opacity: 0.75;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <div id="scoreLabel">Skor: 0</div>
+    <div id="bestLabel">En iyi: 0</div>
+  </div>
+  <div id="statusRow"></div>
+  <div id="hint">Dokun: zıpla · havadayken tekrar dokun: çift zıpla</div>
+
+  <div id="overlay">
+    <div class="card">
+      <h1>Zıpla Kaç</h1>
+      <p>Engellerden zıpla, havada tekrar dokunarak çift zıpla! Kalkan/yavaşlatma/x2 puan güçlendirmelerini topla.</p>
+      <div class="char-label">Karakterini seç</div>
+      <div class="char-grid" id="charGrid"></div>
+      <button id="startBtn">Başla</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var canvas = document.getElementById("game");
+  var ctx = canvas.getContext("2d");
+  var wrap = document.getElementById("wrap");
+  var overlay = document.getElementById("overlay");
+  var scoreLabel = document.getElementById("scoreLabel");
+  var bestLabel = document.getElementById("bestLabel");
+  var statusRow = document.getElementById("statusRow");
+
+  var DPR = Math.max(1, window.devicePixelRatio || 1);
+  var W = 0, H = 0;
+  var groundY = 0, groundHeight = 64;
+
+  function resize() {
+    var rect = wrap.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    groundY = H - groundHeight;
+    if (player && player.onGround) {
+      player.y = groundY - player.h;
+    }
+  }
+  window.addEventListener("resize", resize);
+
+  // ---- persistent best score + history (per-viewer, safe) ----
+  var BEST_KEY = "zipla-kac-best";
+  var HISTORY_KEY = "zipla-kac-history";
+  var best = 0;
+  var history = [];
+  try {
+    var saved = window.localStorage.getItem(BEST_KEY);
+    if (saved) best = parseInt(saved, 10) || 0;
+    var savedHist = window.localStorage.getItem(HISTORY_KEY);
+    if (savedHist) {
+      var parsed = JSON.parse(savedHist);
+      if (Array.isArray(parsed)) history = parsed.slice(0, 5);
+    }
+  } catch (e) { /* storage unavailable, ignore */ }
+
+  function saveBest() {
+    try { window.localStorage.setItem(BEST_KEY, String(best)); }
+    catch (e) { /* ignore */ }
+  }
+  function saveHistory(s) {
+    history.unshift(Math.floor(s));
+    history = history.slice(0, 5);
+    try { window.localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+    catch (e) { /* ignore */ }
+  }
+
+  // ---- character selection ----
+  var CHARACTERS = [
+    { id: "classic", name: "Klasik", body: "#ffd166", glow: "#ffe8a8" },
+    { id: "fire", name: "Ateş", body: "#ff6b35", glow: "#ffb199" },
+    { id: "ice", name: "Buz", body: "#4cc9f0", glow: "#bde0fe" },
+    { id: "toxic", name: "Zehir", body: "#7cf29c", glow: "#c8ffd8" },
+    { id: "shadow", name: "Gece", body: "#9b5de5", glow: "#d8b4fe" }
+  ];
+  var CHAR_KEY = "zipla-kac-char";
+  var selectedCharId = "classic";
+  try {
+    var savedChar = window.localStorage.getItem(CHAR_KEY);
+    if (savedChar && CHARACTERS.some(function (c) { return c.id === savedChar; })) {
+      selectedCharId = savedChar;
+    }
+  } catch (e) { /* ignore */ }
+
+  function getCharacter() {
+    for (var i = 0; i < CHARACTERS.length; i++) {
+      if (CHARACTERS[i].id === selectedCharId) return CHARACTERS[i];
+    }
+    return CHARACTERS[0];
+  }
+
+  function buildCharGrid() {
+    var grid = document.getElementById("charGrid");
+    if (!grid) return;
+    grid.innerHTML = CHARACTERS.map(function (c) {
+      var sel = c.id === selectedCharId ? " selected" : "";
+      return (
+        '<div class="char-option' + sel + '" data-char="' + c.id + '">' +
+        '<div class="char-swatch" style="background:' + c.body + ';"></div>' +
+        "<span>" + c.name + "</span></div>"
+      );
+    }).join("");
+    var opts = grid.querySelectorAll(".char-option");
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].addEventListener("click", function (e) {
+        e.stopPropagation();
+        selectedCharId = this.getAttribute("data-char");
+        try { window.localStorage.setItem(CHAR_KEY, selectedCharId); } catch (err) { /* ignore */ }
+        buildCharGrid();
+      });
+    }
+  }
+
+  // ---- audio (synth, no assets) ----
+  var audioCtx = null;
+  function ensureAudio() {
+    try {
+      if (!audioCtx) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    } catch (e) { audioCtx = null; }
+  }
+  function beep(freq, dur, type, vol, freqTo) {
+    if (!audioCtx) return;
+    try {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      if (freqTo) osc.frequency.linearRampToValueAtTime(freqTo, audioCtx.currentTime + dur);
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(vol || 0.2, audioCtx.currentTime + 0.01);
+      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur + 0.02);
+    } catch (e) { /* ignore */ }
+  }
+  function arpeggio(freqs, dur) {
+    for (var i = 0; i < freqs.length; i++) {
+      (function (f, idx) {
+        setTimeout(function () { beep(f, dur, "triangle", 0.16); }, idx * 85);
+      })(freqs[i], i);
+    }
+  }
+  function vibrate(ms) {
+    try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* ignore */ }
+  }
+
+  // ---- game state ----
+  var state = "idle"; // idle | running | dead
+  var player = { x: 60, y: 0, w: 34, h: 34, vy: 0, onGround: true, squash: 0, jumpsUsed: 0, shielded: false };
+  var obstacles = [];
+  var powerups = [];
+  var particles = [];
+  var score = 0, speed = 0, spawnTimer = 0, powerupTimer = 6, gravity = 0, gameTime = 0;
+  var tLast = 0;
+  var ignoreCollisionUntil = 0;
+  var comboCount = 0, comboPopupText = "", comboPopupTimer = 0;
+  var effects = { slowUntil: 0, multiUntil: 0 };
+  var wasNewBest = false;
+
+  function resetGame() {
+    groundY = H - groundHeight;
+    player = {
+      x: Math.max(50, W * 0.18),
+      y: groundY - 34,
+      w: 34,
+      h: 34,
+      vy: 0,
+      onGround: true,
+      squash: 0,
+      jumpsUsed: 0,
+      shielded: false
+    };
+    gravity = H * 2.6;
+    obstacles = [];
+    powerups = [];
+    particles = [];
+    score = 0;
+    speed = W * 0.42;
+    spawnTimer = 0;
+    powerupTimer = 6;
+    gameTime = 0;
+    ignoreCollisionUntil = 0;
+    comboCount = 0;
+    comboPopupText = "";
+    comboPopupTimer = 0;
+    effects = { slowUntil: 0, multiUntil: 0 };
+    wasNewBest = false;
+    state = "running";
+    overlay.classList.add("hidden");
+    updateHud();
+  }
+
+  function getTier(s) {
+    if (s < 40) return 0;
+    if (s < 100) return 1;
+    if (s < 200) return 2;
+    return 3;
+  }
+
+  function updateHud() {
+    scoreLabel.textContent = "Skor: " + Math.floor(score);
+    bestLabel.textContent = "En iyi: " + Math.floor(best);
+
+    var badges = [];
+    if (player.shielded) badges.push('<span class="badge" style="background:var(--shield);color:#06283a;">Kalkan</span>');
+    if (effects.slowUntil > gameTime) badges.push('<span class="badge" style="background:var(--slow);color:#06283a;">Yavaş ' + Math.ceil(effects.slowUntil - gameTime) + "s</span>");
+    if (effects.multiUntil > gameTime) badges.push('<span class="badge" style="background:var(--multi);color:#3a2a00;">x2 Puan ' + Math.ceil(effects.multiUntil - gameTime) + "s</span>");
+    statusRow.innerHTML = badges.join("");
+  }
+
+  function jump() {
+    ensureAudio();
+    if (state === "idle") { resetGame(); return; }
+    if (state === "dead") return;
+    if (player.jumpsUsed < 2) {
+      player.vy = player.jumpsUsed === 0 ? -H * 1.15 : -H * 0.95;
+      player.onGround = false;
+      player.squash = 1;
+      player.jumpsUsed++;
+      beep(player.jumpsUsed === 1 ? 520 : 700, 0.08, "sine", 0.18);
+    }
+  }
+
+  function weightedPick(weights) {
+    var total = 0, k;
+    for (k in weights) total += weights[k];
+    var r = Math.random() * total;
+    for (k in weights) {
+      if (r < weights[k]) return k;
+      r -= weights[k];
+    }
+    return Object.keys(weights)[0];
+  }
+
+  var TIER_WEIGHTS = [
+    { cactus: 70, rock: 30 },
+    { cactus: 50, rock: 25, spiketall: 25 },
+    { cactus: 35, rock: 20, spiketall: 25, birdlow: 20 },
+    { cactus: 25, rock: 15, spiketall: 20, birdlow: 20, birdhigh: 20 }
+  ];
+
+  function spawnObstacle() {
+    var tier = getTier(score);
+    var kind = weightedPick(TIER_WEIGHTS[tier]);
+    var w, h, y;
+    if (kind === "cactus") {
+      w = 18 + Math.random() * 10; h = 30 + Math.random() * 16; y = groundY - h;
+    } else if (kind === "rock") {
+      w = 30 + Math.random() * 16; h = 22 + Math.random() * 12; y = groundY - h;
+    } else if (kind === "spiketall") {
+      w = 16 + Math.random() * 8; h = 55 + Math.random() * 23; y = groundY - h;
+    } else if (kind === "birdlow") {
+      w = 30; h = 22; y = groundY - 70;
+    } else {
+      w = 30; h = 22; y = groundY - 112;
+    }
+    obstacles.push({ x: W + 20, y: y, w: w, h: h, kind: kind, phase: Math.random() * 10 });
+  }
+
+  var POWERUP_WEIGHTS = { shield: 34, slow: 33, multi: 33 };
+  function spawnPowerup() {
+    var kind = weightedPick(POWERUP_WEIGHTS);
+    var y = groundY - (40 + Math.random() * 110);
+    powerups.push({ x: W + 20, y: y, r: 15, kind: kind, phase: Math.random() * 10 });
+  }
+
+  function rectsOverlap(a, b) {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  }
+
+  function applyPowerup(kind) {
+    vibrate(30);
+    if (kind === "shield") {
+      player.shielded = true;
+      beep(880, 0.12, "triangle", 0.2);
+    } else if (kind === "slow") {
+      effects.slowUntil = gameTime + 4;
+      beep(300, 0.14, "sine", 0.2);
+    } else {
+      effects.multiUntil = gameTime + 5;
+      arpeggio([880, 1100], 0.1);
+    }
+  }
+
+  function gameOver() {
+    state = "dead";
+    wasNewBest = score > best;
+    if (wasNewBest) {
+      best = score;
+      saveBest();
+    }
+    saveHistory(score);
+    updateHud();
+    vibrate(120);
+    if (wasNewBest) {
+      arpeggio([523, 659, 784, 1046], 0.12);
+    } else {
+      beep(260, 0.3, "sawtooth", 0.2, 110);
+    }
+    showOverlay();
+  }
+
+  function showOverlay() {
+    overlay.innerHTML = buildOverlayHtml();
+    overlay.classList.remove("hidden");
+    var btn = document.getElementById("retryBtn") || document.getElementById("startBtn");
+    if (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        resetGame();
+      });
+    }
+  }
+
+  function buildOverlayHtml() {
+    var histLine = history.length ? "Son skorlar: " + history.join(", ") : "";
+    var newBestLine = wasNewBest ? "<div style=\"color:var(--multi);font-weight:700;font-size:13px;margin-bottom:4px;\">Yeni rekor!</div>" : "";
+    return (
+      '<div class="card">' +
+      "<h1>Oyun Bitti</h1>" +
+      newBestLine +
+      '<div class="big-score">' + Math.floor(score) + "</div>" +
+      '<div class="best">En iyi skor: ' + Math.floor(best) + "</div>" +
+      '<div class="history">' + histLine + "</div>" +
+      '<button id="retryBtn">Tekrar Oyna</button>' +
+      "</div>"
+    );
+  }
+
+  // ---- input ----
+  function onPress(e) {
+    e.preventDefault();
+    jump();
+  }
+  wrap.addEventListener("pointerdown", onPress, { passive: false });
+  overlay.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+  window.addEventListener("keydown", function (e) {
+    if (e.code === "Space" || e.code === "ArrowUp") {
+      e.preventDefault();
+      jump();
+    }
+  });
+
+  // ---- loop ----
+  function loop(ts) {
+    if (!tLast) tLast = ts;
+    var dt = Math.min(0.033, (ts - tLast) / 1000);
+    tLast = ts;
+
+    var tier = getTier(score);
+    ctx.clearRect(0, 0, W, H);
+    drawBackground(tier);
+
+    if (state === "running") {
+      step(dt);
+    }
+    drawGround(tier);
+    drawPowerups();
+    drawObstacles();
+    drawPlayer();
+    drawParticles(dt);
+    drawComboPopup();
+
+    requestAnimationFrame(loop);
+  }
+
+  function step(dt) {
+    gameTime += dt;
+    var slowActive = effects.slowUntil > gameTime;
+    var multiActive = effects.multiUntil > gameTime;
+    var effSpeed = speed * (slowActive ? 0.5 : 1);
+
+    speed += dt * 14;
+    score += dt * 22 * (multiActive ? 2 : 1);
+    updateHud();
+
+    // physics
+    player.vy += gravity * dt;
+    player.y += player.vy * dt;
+    var floorY = groundY - player.h;
+    if (player.y >= floorY) {
+      player.y = floorY;
+      player.vy = 0;
+      if (!player.onGround) {
+        player.onGround = true;
+        player.jumpsUsed = 0;
+        for (var i = 0; i < 6; i++) {
+          particles.push({
+            x: player.x + player.w / 2,
+            y: groundY,
+            vx: (Math.random() - 0.5) * 120,
+            vy: -Math.random() * 80,
+            life: 0.4,
+            color: null
+          });
+        }
+      }
+    }
+    if (player.squash > 0) player.squash -= dt * 4;
+
+    if (comboPopupTimer > 0) comboPopupTimer -= dt;
+
+    // spawn obstacles
+    spawnTimer -= dt;
+    if (spawnTimer <= 0) {
+      spawnObstacle();
+      spawnTimer = Math.max(0.5, 1.4 - speed / (W * 1.6));
+    }
+
+    // spawn powerups
+    powerupTimer -= dt;
+    if (powerupTimer <= 0 && powerups.length < 1) {
+      spawnPowerup();
+      powerupTimer = 8 + Math.random() * 6;
+    }
+
+    var pBox = { x: player.x + 5, y: player.y + 5, w: player.w - 10, h: player.h - 10 };
+
+    // move + collide obstacles
+    for (var j = obstacles.length - 1; j >= 0; j--) {
+      var o = obstacles[j];
+      o.x -= effSpeed * dt;
+      if (o.x + o.w < -10) {
+        obstacles.splice(j, 1);
+        comboCount++;
+        if (comboCount % 5 === 0) {
+          score += 10;
+          comboPopupText = "Kombo x" + comboCount + "! +10";
+          comboPopupTimer = 1.2;
+          arpeggio([660, 880], 0.08);
+        }
+        continue;
+      }
+      if (gameTime < ignoreCollisionUntil) continue;
+      if (rectsOverlap(pBox, o)) {
+        if (player.shielded) {
+          player.shielded = false;
+          ignoreCollisionUntil = gameTime + 0.3;
+          obstacles.splice(j, 1);
+          comboCount = 0;
+          beep(200, 0.15, "square", 0.25);
+          vibrate(80);
+        } else {
+          gameOver();
+          return;
+        }
+      }
+    }
+
+    // move + collect powerups
+    for (var k = powerups.length - 1; k >= 0; k--) {
+      var pu = powerups[k];
+      pu.x -= effSpeed * dt;
+      if (pu.x + pu.r * 2 < -10) { powerups.splice(k, 1); continue; }
+      var puBox = { x: pu.x - pu.r, y: pu.y - pu.r, w: pu.r * 2, h: pu.r * 2 };
+      if (rectsOverlap(pBox, puBox)) {
+        applyPowerup(pu.kind);
+        powerups.splice(k, 1);
+      }
+    }
+  }
+
+  var TIER_BG = [
+    null, // tier 0 uses CSS vars (theme-aware)
+    { top: "#ffb86b", bottom: "#ff7e5f", ground: "#8a4a2d" },
+    { top: "#6b5b95", bottom: "#2d2350", ground: "#3a2a55" },
+    { top: "#0b0f2a", bottom: "#000000", ground: "#141430" }
+  ];
+
+  function drawBackground(tier) {
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    if (tier === 0) {
+      g.addColorStop(0, getVar("--bg-top"));
+      g.addColorStop(1, getVar("--bg-bottom"));
+    } else {
+      var c = TIER_BG[tier];
+      g.addColorStop(0, c.top);
+      g.addColorStop(1, c.bottom);
+    }
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    if (tier === 3) {
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      for (var i = 0; i < 18; i++) {
+        var sx = (i * 53.7) % W;
+        var sy = (i * 97.3) % (groundY * 0.7);
+        ctx.globalAlpha = 0.3 + (i % 3) * 0.2;
+        ctx.fillRect(sx, sy, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawGround(tier) {
+    ctx.fillStyle = tier === 0 ? getVar("--ground") : TIER_BG[tier].ground;
+    ctx.fillRect(0, groundY, W, H - groundY);
+  }
+
+  function drawObstacles() {
+    for (var i = 0; i < obstacles.length; i++) {
+      var o = obstacles[i];
+      var isAir = o.kind === "birdlow" || o.kind === "birdhigh";
+      var bob = isAir ? Math.sin(gameTime * 6 + o.phase) * 4 : 0;
+      var oy = o.y + bob;
+      ctx.fillStyle = isAir ? getVar("--obstacle-air") : getVar("--obstacle");
+
+      if (o.kind === "spiketall") {
+        roundRect(o.x, oy + 10, o.w, o.h - 10, 4);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(o.x, oy + 10);
+        ctx.lineTo(o.x + o.w / 2, oy - 6);
+        ctx.lineTo(o.x + o.w, oy + 10);
+        ctx.closePath();
+        ctx.fill();
+      } else if (o.kind === "cactus") {
+        roundRect(o.x, oy, o.w, o.h, 5);
+        ctx.fill();
+        ctx.fillRect(o.x - 6, oy + o.h * 0.25, 7, 6);
+        ctx.fillRect(o.x + o.w - 1, oy + o.h * 0.45, 7, 6);
+      } else if (isAir) {
+        roundRect(o.x, oy, o.w, o.h, 10);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(o.x + o.w * 0.2, oy);
+        ctx.lineTo(o.x - 6, oy - 8);
+        ctx.lineTo(o.x + o.w * 0.4, oy + 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(o.x + o.w * 0.6, oy);
+        ctx.lineTo(o.x + o.w + 6, oy - 8);
+        ctx.lineTo(o.x + o.w * 0.8, oy + 2);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        roundRect(o.x, oy, o.w, o.h, 8);
+        ctx.fill();
+      }
+    }
+  }
+
+  var PU_COLORS = { shield: "--shield", slow: "--slow", multi: "--multi" };
+  var PU_LABELS = { shield: "S", slow: "T", multi: "2X" };
+  function drawPowerups() {
+    for (var i = 0; i < powerups.length; i++) {
+      var p = powerups[i];
+      var by = p.y + Math.sin(gameTime * 4 + p.phase) * 5;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(p.x, by, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = getVar(PU_COLORS[p.kind]);
+      ctx.shadowColor = getVar(PU_COLORS[p.kind]);
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = "#07263a";
+      ctx.font = "bold 12px -apple-system, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(PU_LABELS[p.kind], p.x, by + 1);
+    }
+  }
+
+  function drawPlayer() {
+    var squashAmt = Math.max(0, player.squash);
+    var w = player.w * (1 + squashAmt * 0.18);
+    var h = player.h * (1 - squashAmt * 0.18);
+    var x = player.x - (w - player.w) / 2;
+    var y = player.y + (player.h - h);
+    var charInfo = getCharacter();
+
+    ctx.save();
+    if (player.shielded) {
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y + h / 2, Math.max(w, h) * 0.75, 0, Math.PI * 2);
+      ctx.strokeStyle = getVar("--shield");
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+    ctx.shadowColor = charInfo.glow;
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = charInfo.body;
+    roundRect(x, y, w, h, 8);
+    ctx.fill();
+    ctx.restore();
+
+    // simple face
+    ctx.fillStyle = "#1a1a2e";
+    ctx.beginPath();
+    ctx.arc(x + w * 0.62, y + h * 0.38, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + w * 0.82, y + h * 0.38, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawParticles(dt) {
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.life -= dt;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += gravity * dt * 0.6;
+      ctx.globalAlpha = Math.max(0, p.life / 0.4);
+      ctx.fillStyle = p.color || getVar("--ground");
+      ctx.fillRect(p.x, p.y, 4, 4);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawComboPopup() {
+    if (comboPopupTimer <= 0 || !comboPopupText) return;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, comboPopupTimer / 1.2);
+    ctx.fillStyle = getVar("--multi");
+    ctx.font = "bold 18px -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(comboPopupText, W / 2, H * 0.22);
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y + w, y, r);
+    ctx.closePath();
+  }
+
+  var cssVarCache = {};
+  function getVar(name) {
+    if (!cssVarCache[name]) {
+      cssVarCache[name] = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+    return cssVarCache[name];
+  }
+  window.addEventListener("resize", function () { cssVarCache = {}; });
+
+  // ---- boot ----
+  resize();
+  bestLabel.textContent = "En iyi: " + Math.floor(best);
+  buildCharGrid();
+  document.getElementById("startBtn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    ensureAudio();
+    resetGame();
+  });
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
