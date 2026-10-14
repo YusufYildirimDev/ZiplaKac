@@ -278,6 +278,54 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 64f);
         }
 
+        /// <summary>
+        /// index.html drawPowerUps(): Parlayan küre ve tepe parıltılı güçlendirme orbu
+        /// </summary>
+        public static Sprite CreatePowerUpOrb(Color color, string label = "", int resolution = 64)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            int cx = resolution / 2;
+            int cy = resolution / 2;
+            float r = resolution * 0.40f;
+
+            // Dış yumuşak parıltı halesi (Glow aura)
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(cx, cy));
+                    if (d <= resolution * 0.48f)
+                    {
+                        float alpha = Mathf.Clamp01(1f - (d / (resolution * 0.48f))) * 0.45f;
+                        tex.SetPixel(x, y, new Color(color.r, color.g, color.b, alpha));
+                    }
+                }
+            }
+
+            // Ana iç küre (Filled AA Circle)
+            DrawFilledCircleAA(tex, cx, cy, (int)r, color);
+
+            // İç tepe parlaklığı (Highlight reflection)
+            for (int y = cy; y < cy + (int)(r * 0.8f); y++)
+            {
+                for (int x = cx - (int)(r * 0.6f); x <= cx + (int)(r * 0.6f); x++)
+                {
+                    float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(cx, cy + r * 0.35f));
+                    if (d < r * 0.45f)
+                    {
+                        Color cur = tex.GetPixel(x, y);
+                        float hl = (1f - d / (r * 0.45f)) * 0.35f;
+                        tex.SetPixel(x, y, Color.Lerp(cur, Color.white, hl));
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 64f);
+        }
+
         public static Sprite CreateRingSprite(Color color, int resolution = 64, float innerRatio = 0.75f)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
