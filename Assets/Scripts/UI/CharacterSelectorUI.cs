@@ -36,6 +36,12 @@ namespace ZiplaKac.UI
             RefreshSelectionVisuals();
         }
 
+        private void OnEnable()
+        {
+            currentSelectedId = SaveSystem.GetSelectedCharacterId("classic");
+            RefreshSelectionVisuals();
+        }
+
         private static Font GetSafeFont()
         {
             try
@@ -72,10 +78,22 @@ namespace ZiplaKac.UI
                     cardObj.transform.SetParent(transform, false);
                     RectTransform rt = cardObj.AddComponent<RectTransform>();
                     rt.anchoredPosition = new Vector2(startX + i * cardSpacing, 0f);
-                    rt.sizeDelta = new Vector2(120f, 160f);
+                    rt.sizeDelta = new Vector2(130f, 160f);
+
+                    // Tıklanabilir zemin kartı (raycastTarget = true)
+                    Image cardBg = cardObj.AddComponent<Image>();
+                    cardBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(1f, 1f, 1f, 0.04f), new Color(1f, 1f, 1f, 0.08f), 1f, 18);
+                    cardBg.type = Image.Type.Sliced;
+                    cardBg.raycastTarget = true;
 
                     Button btn = cardObj.AddComponent<Button>();
-                    btn.transition = Selectable.Transition.None;
+                    btn.targetGraphic = cardBg;
+                    btn.transition = Selectable.Transition.ColorTint;
+                    ColorBlock cb = btn.colors;
+                    cb.normalColor = Color.white;
+                    cb.highlightedColor = new Color(1.2f, 1.2f, 1.2f);
+                    cb.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+                    btn.colors = cb;
                     card.selectButton = btn;
 
                     // Swatch (Yuvarlatılmış Renk Kutusu)
@@ -133,13 +151,21 @@ namespace ZiplaKac.UI
             RefreshSelectionVisuals();
 
             // Oyundaki karakter görselini güncelle
-            Player.PlayerController player = FindObjectOfType<Player.PlayerController>();
-            if (player != null)
+            if (Player.PlayerController.Instance != null)
             {
-                player.UpdateCharacterAppearance();
+                Player.PlayerController.Instance.UpdateCharacterAppearance();
+            }
+            else
+            {
+                Player.PlayerController player = FindObjectOfType<Player.PlayerController>();
+                if (player != null)
+                {
+                    player.UpdateCharacterAppearance();
+                }
             }
 
             AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.TriggerHapticFeedback();
         }
 
         private void RefreshSelectionVisuals()
@@ -157,6 +183,17 @@ namespace ZiplaKac.UI
                 {
                     Vector3 targetScale = isSelected ? new Vector3(1.10f, 1.10f, 1.0f) : Vector3.one;
                     card.selectButton.transform.localScale = targetScale;
+
+                    Image bg = card.selectButton.GetComponent<Image>();
+                    if (bg != null)
+                    {
+                        bg.color = isSelected ? new Color(0.024f, 0.839f, 0.627f, 0.22f) : new Color(1f, 1f, 1f, 0.04f);
+                    }
+                }
+
+                if (card.nameText != null)
+                {
+                    card.nameText.color = isSelected ? new Color(0.024f, 0.839f, 0.627f) : new Color(0.96f, 0.96f, 0.98f, 0.85f);
                 }
             }
         }
