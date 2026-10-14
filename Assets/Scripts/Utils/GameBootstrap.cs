@@ -167,17 +167,17 @@ namespace ZiplaKac.Utils
                 if (UIManager.Instance != null) UIManager.Instance.starsContainer = starsObj;
             }
 
-            // 3. Parlayan Göksel Güneş / Ay (Z = 5.0f, sortingOrder = -16)
+            // 3. Dingin Göksel Ay / Işık Halesi (Z = 5.0f, sortingOrder = -16)
             GameObject sunObj = GameObject.Find("CelestialSun");
             if (sunObj == null)
             {
                 sunObj = new GameObject("CelestialSun");
-                sunObj.transform.position = new Vector3(1.20f, 2.70f, 5.0f);
-                sunObj.transform.localScale = Vector3.one * 1.15f;
+                sunObj.transform.position = new Vector3(1.35f, 3.10f, 5.0f);
+                sunObj.transform.localScale = Vector3.one * 0.90f;
 
                 SpriteRenderer sunSr = sunObj.AddComponent<SpriteRenderer>();
                 sunSr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/bg_celestial_sun", 
-                    () => ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 0.84f, 0.04f, 0.9f), 128));
+                    () => ProceduralSpriteGenerator.CreateCircleSprite(new Color(0.9f, 0.95f, 1f, 0.5f), 128));
                 sunSr.sortingOrder = -16;
                 Material safeMat = GetSafeSpriteMaterial();
                 if (safeMat != null) sunSr.material = safeMat;

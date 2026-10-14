@@ -24,10 +24,10 @@ namespace ZiplaKac.Utils
         public SpriteRenderer[] midHillRenderers;
 
         [Header("Hız Çarpanları")]
-        public float farMountainFactor = 0.06f;
-        public float midHillFactor = 0.20f;
-        public float cloudFactor = 0.08f;
-        public float ambientCloudSpeed = 0.12f;
+        public float farMountainFactor = 0.03f;
+        public float midHillFactor = 0.10f;
+        public float cloudFactor = 0.04f;
+        public float ambientCloudSpeed = 0.05f;
 
         [Header("Karolar Arası Genişlik & Eşik")]
         public float tileWidth = 10.24f;
@@ -102,10 +102,10 @@ namespace ZiplaKac.Utils
                 UpdateLayerPair(cloudTiles[0], cloudTiles[1], cloudMove);
             }
 
-            // 4. Güneş / Ay Hafif Nabız Animasyonu
+            // 4. Göksel Ay / Işık Halisi Çok Hafif Nefes Alma Animasyonu
             if (sunTransform != null)
             {
-                float pulse = 1.0f + Mathf.Sin(Time.time * 1.5f) * 0.04f;
+                float pulse = 1.0f + Mathf.Sin(Time.time * 0.8f) * 0.015f;
                 sunTransform.localScale = sunInitialScale * pulse;
             }
         }
