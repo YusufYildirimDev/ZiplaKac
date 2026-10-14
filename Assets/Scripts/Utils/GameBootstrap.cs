@@ -51,6 +51,7 @@ namespace ZiplaKac.Utils
         {
             SetupCamera();
             SetupManagers();
+            SetupBackground();
             SetupGround();
             SetupPlayer();
             SetupSpawnersAndPools();
@@ -72,7 +73,7 @@ namespace ZiplaKac.Utils
             mainCam.orthographic = true;
             mainCam.orthographicSize = 5.0f;
             mainCam.clearFlags = CameraClearFlags.SolidColor;
-            mainCam.backgroundColor = new Color(0.12f, 0.16f, 0.29f); // #1e2a4a (Modern Gece Mavisi)
+            mainCam.backgroundColor = new Color(0.05f, 0.07f, 0.13f); // #0d1220
         }
 
         private void SetupManagers()
@@ -118,6 +119,54 @@ namespace ZiplaKac.Utils
             return null;
         }
 
+        private void SetupBackground()
+        {
+            GameObject bgObj = GameObject.Find("GradientBackground");
+            if (bgObj == null)
+            {
+                bgObj = new GameObject("GradientBackground");
+                bgObj.transform.position = new Vector3(0f, 0f, 5f);
+                bgObj.transform.localScale = new Vector3(20f, 16f, 1f);
+
+                SpriteRenderer bgSr = bgObj.AddComponent<SpriteRenderer>();
+                bgSr.sprite = ProceduralSpriteGenerator.CreateGradientSkySprite(new Color(0.12f, 0.16f, 0.29f), new Color(0.05f, 0.07f, 0.13f));
+                bgSr.sortingOrder = -10;
+                Material safeMat = GetSafeSpriteMaterial();
+                if (safeMat != null) bgSr.material = safeMat;
+
+                if (UIManager.Instance != null) UIManager.Instance.gradientBgRenderer = bgSr;
+            }
+
+            // Tier 3 yıldızlı gece için yıldızlar
+            GameObject starsObj = GameObject.Find("StarsContainer");
+            if (starsObj == null)
+            {
+                starsObj = new GameObject("StarsContainer");
+                starsObj.transform.position = new Vector3(0f, 0f, 4f);
+
+                for (int i = 0; i < 18; i++)
+                {
+                    GameObject star = new GameObject($"Star_{i}");
+                    star.transform.SetParent(starsObj.transform, false);
+
+                    float sx = -3.5f + (i * 2.37f) % 7.0f;
+                    float sy = -0.5f + (i * 1.83f) % 4.8f;
+                    star.transform.position = new Vector3(sx, sy, 4f);
+                    star.transform.localScale = Vector3.one * (0.08f + (i % 3) * 0.04f);
+
+                    SpriteRenderer starSr = star.AddComponent<SpriteRenderer>();
+                    float alpha = 0.35f + (i % 3) * 0.25f;
+                    starSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 1f, 1f, alpha), 16);
+                    starSr.sortingOrder = -9;
+                    Material safeMat = GetSafeSpriteMaterial();
+                    if (safeMat != null) starSr.material = safeMat;
+                }
+
+                starsObj.SetActive(false);
+                if (UIManager.Instance != null) UIManager.Instance.starsContainer = starsObj;
+            }
+        }
+
         private void SetupGround()
         {
             GameObject ground = GameObject.Find("Ground");
@@ -127,7 +176,7 @@ namespace ZiplaKac.Utils
                 ground.transform.position = new Vector3(0f, -4.5f, 0f);
 
                 SpriteRenderer sr = ground.AddComponent<SpriteRenderer>();
-                sr.sprite = ProceduralSpriteGenerator.CreateRectangleSprite(new Color(0.17f, 0.23f, 0.39f), 1024, 128); // #2b3a63 (Modern Zemin)
+                sr.sprite = ProceduralSpriteGenerator.CreateGroundSprite(new Color(0.17f, 0.23f, 0.39f)); // #2b3a63 (Modern Zemin)
                 sr.sortingOrder = 2;
                 Material safeMat = GetSafeSpriteMaterial();
                 if (safeMat != null) sr.material = safeMat;
@@ -137,6 +186,8 @@ namespace ZiplaKac.Utils
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
                 if (groundLayer != -1) ground.layer = groundLayer;
+
+                if (UIManager.Instance != null) UIManager.Instance.groundRenderer = sr;
             }
         }
 
@@ -156,27 +207,27 @@ namespace ZiplaKac.Utils
 
                 Material safeMat = GetSafeSpriteMaterial();
 
-                // Gövde Görseli (Daire)
+                // Gövde Görseli (Cute rounded square with eyes & catchlight)
                 SpriteRenderer bodySr = player.AddComponent<SpriteRenderer>();
-                bodySr.sprite = ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 64);
+                bodySr.sprite = ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 96);
                 bodySr.sortingOrder = 10;
                 if (safeMat != null) bodySr.material = safeMat;
 
                 // Parıltı (Glow) Alt Nesnesi
                 GameObject glowObj = new GameObject("Glow");
                 glowObj.transform.SetParent(player.transform, false);
-                glowObj.transform.localScale = Vector3.one * 1.25f;
+                glowObj.transform.localScale = Vector3.one * 1.35f;
                 SpriteRenderer glowSr = glowObj.AddComponent<SpriteRenderer>();
-                glowSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 0.85f, 0.3f, 0.6f), 64);
+                glowSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 0.85f, 0.3f, 0.35f), 96);
                 glowSr.sortingOrder = 9;
                 if (safeMat != null) glowSr.material = safeMat;
 
                 // Kalkan Halkası (Shield Ring) Alt Nesnesi
                 GameObject shieldObj = new GameObject("ShieldRing");
                 shieldObj.transform.SetParent(player.transform, false);
-                shieldObj.transform.localScale = Vector3.one * 1.5f;
+                shieldObj.transform.localScale = Vector3.one * 1.45f;
                 SpriteRenderer shieldSr = shieldObj.AddComponent<SpriteRenderer>();
-                shieldSr.sprite = ProceduralSpriteGenerator.CreateRingSprite(Color.cyan, 64, 0.8f);
+                shieldSr.sprite = ProceduralSpriteGenerator.CreateRingSprite(new Color(0.30f, 0.79f, 0.94f), 96, 0.84f);
                 shieldSr.sortingOrder = 11;
                 if (safeMat != null) shieldSr.material = safeMat;
                 shieldObj.SetActive(false);
@@ -184,18 +235,17 @@ namespace ZiplaKac.Utils
                 // Zemin Kontrol Noktası (GroundCheck)
                 GameObject groundCheckObj = new GameObject("GroundCheck");
                 groundCheckObj.transform.SetParent(player.transform, false);
-                groundCheckObj.transform.localPosition = new Vector3(0f, -0.45f, 0f);
+                groundCheckObj.transform.localPosition = new Vector3(0f, -0.42f, 0f);
 
-                // Fizik & Kontrolcü
-                CircleCollider2D col = player.AddComponent<CircleCollider2D>();
-                col.radius = 0.45f;
+                // Fizik & Kontrolcü (index.html ile tam uyumlu BoxCollider2D ve gravityScale 2.8f)
+                BoxCollider2D col = player.AddComponent<BoxCollider2D>();
+                col.size = new Vector2(0.72f, 0.72f);
 
                 Rigidbody2D rb = player.AddComponent<Rigidbody2D>();
-                rb.gravityScale = 3.5f;
+                rb.gravityScale = 2.8f;
                 rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
                 PlayerController pc = player.AddComponent<PlayerController>();
-                pc.fixedXPosition = playerX;
                 pc.bodySpriteRenderer = bodySr;
                 pc.glowSpriteRenderer = glowSr;
                 pc.shieldRingObject = shieldObj;
@@ -254,14 +304,14 @@ namespace ZiplaKac.Utils
             GameObject highBirdPrefab = CreateObstaclePrefab("HighBird");
             ObjectPooler.Instance.RegisterPool("HighBird", highBirdPrefab, 6);
 
-            // Power-up Prefabları
-            GameObject pShield = CreatePowerUpPrefab("PowerUp_Shield", PowerUpType.Shield, Color.cyan, "S");
+            // Power-up Prefabları (index.html renkleri: #4cc9f0, #90e0ef, #ffd60a)
+            GameObject pShield = CreatePowerUpPrefab("PowerUp_Shield", PowerUpType.Shield, new Color(0.30f, 0.79f, 0.94f), "S");
             ObjectPooler.Instance.RegisterPool("PowerUp_Shield", pShield, 3);
 
-            GameObject pSlow = CreatePowerUpPrefab("PowerUp_Slow", PowerUpType.Slow, Color.blue, "T");
+            GameObject pSlow = CreatePowerUpPrefab("PowerUp_Slow", PowerUpType.Slow, new Color(0.56f, 0.88f, 0.94f), "T");
             ObjectPooler.Instance.RegisterPool("PowerUp_Slow", pSlow, 3);
 
-            GameObject pMulti = CreatePowerUpPrefab("PowerUp_Multi", PowerUpType.ScoreMultiplier, Color.yellow, "2X");
+            GameObject pMulti = CreatePowerUpPrefab("PowerUp_Multi", PowerUpType.ScoreMultiplier, new Color(1.0f, 0.84f, 0.04f), "2X");
             ObjectPooler.Instance.RegisterPool("PowerUp_Multi", pMulti, 3);
 
             // Floating Text Prefabı
@@ -325,7 +375,7 @@ namespace ZiplaKac.Utils
             try { obj.tag = "PowerUp"; } catch { }
 
             SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
-            sr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(color, 64);
+            sr.sprite = ProceduralSpriteGenerator.CreatePowerUpOrb(color, label);
             sr.sortingOrder = 7;
             Material safeMat = GetSafeSpriteMaterial();
             if (safeMat != null) sr.material = safeMat;
@@ -440,6 +490,53 @@ namespace ZiplaKac.Utils
             uiMod.AssignDefaultActions();
         }
 
+        private static GameObject CreateCardContainer(Transform parent, string name, Vector2 size)
+        {
+            GameObject card = new GameObject(name);
+            card.transform.SetParent(parent, false);
+            RectTransform rt = card.AddComponent<RectTransform>();
+            rt.sizeDelta = size;
+            rt.anchoredPosition = Vector2.zero;
+
+            Image img = card.AddComponent<Image>();
+            // #141a30 (%88 alpha) + subtle border (%14 alpha)
+            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.08f, 0.10f, 0.19f, 0.88f),
+                new Color(1f, 1f, 1f, 0.14f),
+                2f, 24, 128, 128);
+            img.type = Image.Type.Sliced;
+            img.raycastTarget = true;
+
+            return card;
+        }
+
+        private static GameObject CreatePillButton(Transform parent, string name, string label, Vector2 position, Vector2 size, Color bgColor, Color textColor, int fontSize = 32)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            RectTransform rt = obj.AddComponent<RectTransform>();
+            rt.anchoredPosition = position;
+            rt.sizeDelta = size;
+
+            Image img = obj.AddComponent<Image>();
+            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, Color.clear, 0f, 24, 128, 64);
+            img.type = Image.Type.Sliced;
+            img.raycastTarget = true;
+
+            Button btn = obj.AddComponent<Button>();
+            ColorBlock colors = btn.colors;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            colors.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            btn.colors = colors;
+
+            Text labelTxt = CreateText(obj.transform, "Label", label, fontSize, Vector2.zero, textColor, false, FontStyle.Bold);
+            RectTransform labelRt = labelTxt.GetComponent<RectTransform>();
+            labelRt.sizeDelta = size;
+
+            return obj;
+        }
+
         private void CreateMainMenuPanel(Transform parent)
         {
             GameObject panel = new GameObject("MainMenuPanel");
@@ -448,36 +545,40 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = panel.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.4f);
+            bg.color = new Color(0f, 0f, 0f, 0.45f);
 
-            // Ekrana herhangi bir yere dokunarak da başlatma desteği
-            Button panelBtn = panel.AddComponent<Button>();
-            panelBtn.transition = Selectable.Transition.None;
-            panelBtn.onClick.AddListener(() => {
-                if (GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
-                {
-                    GameManager.Instance.StartGame();
-                }
-            });
+            // Centered Glassmorphic Card (840x940)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(840f, 940f));
 
-            // Başlık
-            CreateText(panel.transform, "TitleText", "ZIPLA KAÇ", 64, new Vector2(0f, 600f), Color.yellow);
+            // Başlık "ZIPLA KAÇ"
+            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 62, new Vector2(0f, 370f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
 
-            // Başla Butonu
-            GameObject btnObj = CreateButton(panel.transform, "StartButton", "BAŞLA", new Vector2(0f, -500f), new Vector2(360f, 120f));
+            // Alt Başlık "tek dokunuş, sonsuz kaçış"
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 26, new Vector2(0f, 305f), new Color(0.6f, 0.7f, 0.85f), false);
+
+            // "KARAKTER SEÇ" etiketi
+            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 22, new Vector2(0f, 175f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
+
+            // Karakter Galerisi UI (Swatches)
+            GameObject galleryObj = new GameObject("CharacterGallery");
+            galleryObj.transform.SetParent(card.transform, false);
+            RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
+            galleryRt.anchoredPosition = new Vector2(0f, 55f);
+            galleryRt.sizeDelta = new Vector2(760f, 160f);
+
+            galleryObj.AddComponent<CharacterSelectorUI>();
+
+            // Neon Mint "BAŞLA" Butonu (#06d6a0)
+            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
+            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -145f), new Vector2(440f, 96f), mintColor, darkNavy, 36);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // Karakter Galerisi UI
-            GameObject galleryObj = new GameObject("CharacterGallery");
-            galleryObj.transform.SetParent(panel.transform, false);
-            RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 50f);
-            galleryRt.sizeDelta = new Vector2(800f, 400f);
-
-            CharacterSelectorUI csUI = galleryObj.AddComponent<CharacterSelectorUI>();
+            // Alt İpucu
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 22, new Vector2(0f, -310f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
@@ -489,34 +590,55 @@ namespace ZiplaKac.Utils
             RectTransform rt = panel.AddComponent<RectTransform>();
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
+            // 1. Fullscreen Jump Trigger (Ekrana herhangi bir yere dokunulduğunda anında zıplama)
+            GameObject jumpTrigger = new GameObject("FullscreenJumpTrigger");
+            jumpTrigger.transform.SetParent(panel.transform, false);
+            RectTransform jtRt = jumpTrigger.AddComponent<RectTransform>();
+            jtRt.anchorMin = Vector2.zero; jtRt.anchorMax = Vector2.one;
+            jtRt.offsetMin = Vector2.zero; jtRt.offsetMax = Vector2.zero;
+            Image jtImg = jumpTrigger.AddComponent<Image>();
+            jtImg.color = Color.clear;
+            jtImg.raycastTarget = true;
+            Button jtBtn = jumpTrigger.AddComponent<Button>();
+            jtBtn.transition = Selectable.Transition.None;
+            jtBtn.onClick.AddListener(() => {
+                if (PlayerController.Instance != null) PlayerController.Instance.Jump();
+            });
+
             HUDController hud = panel.AddComponent<HUDController>();
 
-            // Anlık Skor (Sol Üst)
-            hud.currentScoreText = CreateText(panel.transform, "CurrentScoreText", "SKOR: 0", 40, new Vector2(-350f, 800f), Color.white);
+            // Top Header Bar
+            // Anlık Skor (Sol Üst Pill Rozeti)
+            GameObject scoreCard = CreateCardContainer(panel.transform, "ScorePill", new Vector2(260f, 74f));
+            scoreCard.GetComponent<RectTransform>().anchoredPosition = new Vector2(-360f, 820f);
+            hud.currentScoreText = CreateText(scoreCard.transform, "CurrentScoreText", "Skor: 0", 28, Vector2.zero, Color.white, false, FontStyle.Bold);
 
-            // En İyi Skor (Sağ Üst)
-            hud.highScoreText = CreateText(panel.transform, "HighScoreText", "EN İYİ: 0", 40, new Vector2(350f, 800f), Color.yellow);
+            // En İyi Skor (Sağ Üst Pill Rozeti)
+            GameObject highCard = CreateCardContainer(panel.transform, "HighScorePill", new Vector2(260f, 74f));
+            highCard.GetComponent<RectTransform>().anchoredPosition = new Vector2(360f, 820f);
+            hud.highScoreText = CreateText(highCard.transform, "HighScoreText", "En iyi: 0", 28, Vector2.zero, new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
 
-            // Kontrol İpucu (Alt)
-            hud.controlTipText = CreateText(panel.transform, "ControlTipText", "Zıplamak İçin Dokun / Boşluk", 32, new Vector2(0f, -800f), Color.white);
-
-            // Active PowerUp Badges
+            // Active PowerUp Badges Bar (Üst Orta)
             GameObject badgeBar = new GameObject("PowerUpBadgeBar");
             badgeBar.transform.SetParent(panel.transform, false);
             RectTransform barRt = badgeBar.AddComponent<RectTransform>();
-            barRt.anchoredPosition = new Vector2(0f, 800f);
+            barRt.anchoredPosition = new Vector2(0f, 820f);
+            barRt.sizeDelta = new Vector2(600f, 80f);
 
-            hud.shieldBadgeText = CreateText(badgeBar.transform, "ShieldBadge", "KALKAN", 28, new Vector2(-200f, 0f), Color.cyan);
+            hud.shieldBadgeText = CreateText(badgeBar.transform, "ShieldBadge", "Kalkan", 26, new Vector2(-190f, 0f), new Color(0.30f, 0.79f, 0.94f), false, FontStyle.Bold);
             hud.shieldBadgeObject = hud.shieldBadgeText.gameObject;
             hud.shieldBadgeObject.SetActive(false);
 
-            hud.slowBadgeText = CreateText(badgeBar.transform, "SlowBadge", "YAVAŞ", 28, new Vector2(0f, 0f), Color.blue);
+            hud.slowBadgeText = CreateText(badgeBar.transform, "SlowBadge", "Yavaş", 26, new Vector2(0f, 0f), new Color(0.56f, 0.88f, 0.94f), false, FontStyle.Bold);
             hud.slowBadgeObject = hud.slowBadgeText.gameObject;
             hud.slowBadgeObject.SetActive(false);
 
-            hud.multiBadgeText = CreateText(badgeBar.transform, "MultiBadge", "x2 PUAN", 28, new Vector2(200f, 0f), Color.yellow);
+            hud.multiBadgeText = CreateText(badgeBar.transform, "MultiBadge", "x2 Puan", 26, new Vector2(190f, 0f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
             hud.multiBadgeObject = hud.multiBadgeText.gameObject;
             hud.multiBadgeObject.SetActive(false);
+
+            // Alt Kontrol İpucu
+            hud.controlTipText = CreateText(panel.transform, "ControlTipText", "Zıpla: Dokun / Space", 24, new Vector2(0f, -840f), new Color(0.6f, 0.7f, 0.85f, 0.7f), false);
 
             panel.SetActive(false);
             if (UIManager.Instance != null) UIManager.Instance.hudPanel = panel;
@@ -530,40 +652,48 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = panel.AddComponent<Image>();
-            bg.color = new Color(0.1f, 0.05f, 0.05f, 0.85f);
+            bg.color = new Color(0f, 0f, 0f, 0.65f);
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Başlık
-            CreateText(panel.transform, "GameOverTitle", "OYUN BİTTİ", 54, new Vector2(0f, 650f), Color.red);
+            // Centered Glassmorphic Card (840x940)
+            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(840f, 940f));
 
-            // Final Skor
-            goUI.finalScoreText = CreateText(panel.transform, "FinalScoreText", "0", 80, new Vector2(0f, 450f), Color.white);
+            // Başlık "OYUN BİTTİ" (Coral #ef476f)
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 56, new Vector2(0f, 370f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
+
+            // Alt Bilgi "Bir engele çarptın!"
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 24, new Vector2(0f, 305f), new Color(0.65f, 0.72f, 0.85f), false);
+
+            // Skor Büyük Rakam
+            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 86, new Vector2(0f, 205f), Color.white, false, FontStyle.Bold);
 
             // En İyi Skor
-            goUI.highScoreText = CreateText(panel.transform, "HighScoreText", "EN İYİ SKOR: 0", 36, new Vector2(0f, 320f), Color.yellow);
+            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 30, new Vector2(0f, 115f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
 
             // Yeni Rekor Rozeti
-            Text newRecText = CreateText(panel.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 40, new Vector2(0f, 220f), Color.green);
+            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 32, new Vector2(0f, 50f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
             goUI.newRecordBadge = newRecText.gameObject;
             goUI.newRecordBadge.SetActive(false);
 
-            // Son 5 Skor Listesi
-            goUI.scoreHistoryListText = CreateText(panel.transform, "HistoryListText", "", 28, new Vector2(0f, -50f), Color.white);
+            // Son 5 Skor Listesi (Kompakt Tek Satır)
+            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 24, new Vector2(0f, -30f), new Color(0.7f, 0.78f, 0.9f), false);
 
-            // Tekrar Oyna Butonu
-            GameObject restartBtn = CreateButton(panel.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -450f), new Vector2(360f, 100f));
+            // Tekrar Oyna Butonu (Neon Mint #06d6a0)
+            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
+            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -155f), new Vector2(440f, 96f), mintColor, darkNavy, 34);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
-            // Ana Menü Butonu
-            GameObject menuBtn = CreateButton(panel.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -600f), new Vector2(300f, 80f));
+            // Ana Menü Butonu (Sleek ikincil buton)
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -275f), new Vector2(340f, 80f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 26);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);
             if (UIManager.Instance != null) UIManager.Instance.gameOverPanel = panel;
         }
 
-        private Text CreateText(Transform parent, string name, string content, int fontSize, Vector2 position, Color color, bool raycastTarget = false)
+        private static Text CreateText(Transform parent, string name, string content, int fontSize, Vector2 position, Color color, bool raycastTarget = false, FontStyle fontStyle = FontStyle.Normal)
         {
             GameObject obj = new GameObject(name);
             obj.transform.SetParent(parent, false);
@@ -577,34 +707,17 @@ namespace ZiplaKac.Utils
             txt.fontSize = fontSize;
             txt.alignment = TextAnchor.MiddleCenter;
             txt.color = color;
+            txt.fontStyle = fontStyle;
             txt.raycastTarget = raycastTarget;
 
             return txt;
         }
 
-        private GameObject CreateButton(Transform parent, string name, string label, Vector2 position, Vector2 size)
+        private static GameObject CreateButton(Transform parent, string name, string label, Vector2 position, Vector2 size)
         {
-            GameObject obj = new GameObject(name);
-            obj.transform.SetParent(parent, false);
-            RectTransform rt = obj.AddComponent<RectTransform>();
-            rt.anchoredPosition = position;
-            rt.sizeDelta = size;
-
-            Image img = obj.AddComponent<Image>();
-            img.color = new Color(0.2f, 0.6f, 1.0f);
-            img.raycastTarget = true;
-
-            Button btn = obj.AddComponent<Button>();
-            ColorBlock colors = btn.colors;
-            colors.highlightedColor = new Color(0.4f, 0.8f, 1.0f);
-            colors.pressedColor = new Color(0.1f, 0.4f, 0.8f);
-            btn.colors = colors;
-
-            Text labelTxt = CreateText(obj.transform, "Label", label, 32, Vector2.zero, Color.white, false);
-            RectTransform labelRt = labelTxt.GetComponent<RectTransform>();
-            labelRt.sizeDelta = size;
-
-            return obj;
+            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
+            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
+            return CreatePillButton(parent, name, label, position, size, mintColor, darkNavy, 32);
         }
     }
 }

@@ -86,23 +86,17 @@ namespace ZiplaKac.UI
                 AudioManager.Instance?.PlayNewRecordSound();
             }
 
-            // Son 5 Skor Listesi
+            // Son 5 Skor Listesi (index.html: Son skorlar: 45, 32, 28)
             List<int> history = SaveSystem.GetLastFiveScores();
             if (scoreHistoryListText != null)
             {
                 if (history == null || history.Count == 0)
                 {
-                    scoreHistoryListText.text = "Henüz kayıtlı skor bulunmuyor.";
+                    scoreHistoryListText.text = "";
                 }
                 else
                 {
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    sb.AppendLine("SON SKORLAR:");
-                    for (int i = 0; i < history.Count; i++)
-                    {
-                        sb.AppendLine($"{i + 1}.  {history[i]} Puan");
-                    }
-                    scoreHistoryListText.text = sb.ToString();
+                    scoreHistoryListText.text = "Son skorlar: " + string.Join(", ", history);
                 }
             }
         }

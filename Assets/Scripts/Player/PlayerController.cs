@@ -15,13 +15,13 @@ namespace ZiplaKac.Player
     {
         [Header("Zıplama Fizik Ayarları")]
         [Tooltip("İlk zıplama gücü")]
-        public float jumpForce = 12.0f;
+        public float jumpForce = 11.5f;
 
         [Tooltip("Çift zıplama (daha kısa) gücü")]
         public float doubleJumpForce = 9.5f;
 
-        [Tooltip("Yerçekimi ölçeği (daha seri düşüş için)")]
-        public float gravityScale = 3.5f;
+        [Tooltip("Yerçekimi ölçeği (daha seri ve tok düşüş için)")]
+        public float gravityScale = 2.8f;
 
         [Header("Zemin Algılama Ayarları")]
         public Transform groundCheckTransform;
@@ -42,8 +42,11 @@ namespace ZiplaKac.Player
 
         private float fixedXPosition;
 
+        public static PlayerController Instance { get; private set; }
+
         private void Awake()
         {
+            Instance = this;
             rb = GetComponent<Rigidbody2D>();
             rb.gravityScale = gravityScale;
 
@@ -73,6 +76,8 @@ namespace ZiplaKac.Player
 
         private void OnDestroy()
         {
+            if (Instance == this) Instance = null;
+
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
@@ -95,17 +100,18 @@ namespace ZiplaKac.Player
             // Zemin kontrolü
             CheckGroundedStatus();
 
-            // Squash & Stretch esneme/yaylanma animasyonu
+            // Squash & Stretch esneme/yaylanma animasyonu (index.html oranı: 0.18f)
             if (squashTimer > 0f)
             {
-                squashTimer -= Time.deltaTime * 4f;
-                float sx = 1f + Mathf.Max(0f, squashTimer) * 0.22f;
-                float sy = 1f - Mathf.Max(0f, squashTimer) * 0.22f;
+                squashTimer -= Time.deltaTime * 4.0f;
+                float sq = Mathf.Max(0f, squashTimer);
+                float sx = 1f + sq * 0.18f;
+                float sy = 1f - sq * 0.18f;
                 transform.localScale = new Vector3(sx, sy, 1f);
             }
             else
             {
-                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * 8f);
+                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * 10f);
             }
 
             // Dokunma (Mobile) veya Boşluk Tuşu (Keyboard) girişi
@@ -134,10 +140,53 @@ namespace ZiplaKac.Player
 
             if (isGrounded && !wasGrounded)
             {
-                // Yere değince çift zıplama hakkı sıfırlanır ve yere inişte esner
+                // Yere değince çift zıplama hakkı sıfırlanır, yaylanır ve toz parçacıkları çıkar
                 canDoubleJump = true;
-                squashTimer = 0.8f;
+                squashTimer = 1.0f;
+                SpawnLandingDust(checkPosition);
             }
+        }
+
+        private void SpawnLandingDust(Vector2 groundPos)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                GameObject dust = new GameObject("LandingDust");
+                dust.transform.position = new Vector3(groundPos.x + Random.Range(-0.15f, 0.15f), groundPos.y + 0.05f, 0f);
+                dust.transform.localScale = Vector3.one * Random.Range(0.08f, 0.14f);
+
+                SpriteRenderer sr = dust.AddComponent<SpriteRenderer>();
+                sr.sprite = Utils.ProceduralSpriteGenerator.CreateCircleSprite(new Color(0.35f, 0.45f, 0.7f, 0.8f), 32);
+                sr.sortingOrder = 4;
+                Material safeMat = Utils.GameBootstrap.GetSafeSpriteMaterial();
+                if (safeMat != null) sr.material = safeMat;
+
+                Vector2 vel = new Vector2(Random.Range(-1.6f, 1.6f), Random.Range(1.0f, 2.6f));
+                StartCoroutine(AnimateDust(dust, vel));
+            }
+        }
+
+        private IEnumerator AnimateDust(GameObject dust, Vector2 vel)
+        {
+            float life = 0.35f;
+            float elapsed = 0f;
+            Vector3 pos = dust.transform.position;
+            SpriteRenderer sr = dust.GetComponent<SpriteRenderer>();
+            Color initCol = sr.color;
+
+            while (elapsed < life && dust != null)
+            {
+                elapsed += Time.deltaTime;
+                vel.y -= 12f * Time.deltaTime;
+                pos += (Vector3)vel * Time.deltaTime;
+                dust.transform.position = pos;
+
+                float alpha = Mathf.Max(0f, 1f - (elapsed / life));
+                sr.color = new Color(initCol.r, initCol.g, initCol.b, alpha * 0.75f);
+                yield return null;
+            }
+
+            if (dust != null) Destroy(dust);
         }
 
         private bool IsJumpInputTriggered()
@@ -220,6 +269,14 @@ namespace ZiplaKac.Player
             }
         }
 
+        public void Jump()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.State == GameState.Playing)
+            {
+                PerformJump();
+            }
+        }
+
         public void UpdateCharacterAppearance()
         {
             string characterId = SaveSystem.GetSelectedCharacterId("classic");
@@ -229,7 +286,7 @@ namespace ZiplaKac.Player
             {
                 if (bodySpriteRenderer != null)
                 {
-                    bodySpriteRenderer.sprite = Utils.ProceduralSpriteGenerator.CreatePlayerSprite(data.bodyColor, data.glowColor, 64);
+                    bodySpriteRenderer.sprite = Utils.ProceduralSpriteGenerator.CreatePlayerSprite(data.bodyColor, data.glowColor, 96);
                     bodySpriteRenderer.color = Color.white; // Renk sprite içine çizildi
                 }
                 if (glowSpriteRenderer != null) glowSpriteRenderer.color = data.glowColor;
@@ -297,6 +354,7 @@ namespace ZiplaKac.Player
                 if (GameManager.Instance.isShieldActive)
                 {
                     // Kalkan aktif: Engeli yok et, kalkanı harca ve kısa dokunulmazlık ver
+                    UI.UIManager.Instance?.TriggerCameraShake(0.15f, 0.08f);
                     GameManager.Instance.GameOver(); // GameManager içinde isShieldActive kontrol edilip kaldırılır
                     StartCoroutine(GrantInvulnerability(0.3f));
 
@@ -306,6 +364,7 @@ namespace ZiplaKac.Player
                 else
                 {
                     // Çarpışma: Oyun Biter
+                    UI.UIManager.Instance?.TriggerCameraShake(0.24f, 0.14f);
                     GameManager.Instance.GameOver();
                 }
             }

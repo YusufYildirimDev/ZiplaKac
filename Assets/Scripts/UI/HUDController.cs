@@ -32,10 +32,10 @@ namespace ZiplaKac.UI
                 return;
             }
 
-            // 1. Skor Güncellemeleri
+            // 1. Skor Güncellemeleri (index.html: Skor: X, En iyi: Y)
             int scoreInt = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
-            if (currentScoreText != null) currentScoreText.text = $"SKOR: {scoreInt}";
-            if (highScoreText != null) highScoreText.text = $"EN İYİ: {GameManager.Instance.HighScore}";
+            if (currentScoreText != null) currentScoreText.text = $"Skor: {scoreInt}";
+            if (highScoreText != null) highScoreText.text = $"En iyi: {GameManager.Instance.HighScore}";
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler
             UpdatePowerUpBadges();
@@ -43,25 +43,27 @@ namespace ZiplaKac.UI
 
         private void UpdatePowerUpBadges()
         {
-            // Kalkan Rozeti
+            // Kalkan Rozeti (index.html: Kalkan)
             bool shield = GameManager.Instance.isShieldActive;
             if (shieldBadgeObject != null) shieldBadgeObject.SetActive(shield);
-            if (shieldBadgeText != null && shield) shieldBadgeText.text = "KALKAN (S)";
+            if (shieldBadgeText != null && shield) shieldBadgeText.text = "Kalkan";
 
-            // Yavaşlatma Rozeti
+            // Yavaşlatma Rozeti (index.html: Yavaş 4s)
             bool slow = GameManager.Instance.isSlowActive;
             if (slowBadgeObject != null) slowBadgeObject.SetActive(slow);
             if (slowBadgeText != null && slow)
             {
-                slowBadgeText.text = $"YAVAŞ (T): {GameManager.Instance.slowTimer:F1}s";
+                int sec = Mathf.CeilToInt(GameManager.Instance.slowTimer);
+                slowBadgeText.text = $"Yavaş {sec}s";
             }
 
-            // x2 Skor Rozeti
+            // x2 Skor Rozeti (index.html: x2 Puan 5s)
             bool multi = GameManager.Instance.isDoubleScoreActive;
             if (multiBadgeObject != null) multiBadgeObject.SetActive(multi);
             if (multiBadgeText != null && multi)
             {
-                multiBadgeText.text = $"x2 PUAN (2X): {GameManager.Instance.doubleScoreTimer:F1}s";
+                int sec = Mathf.CeilToInt(GameManager.Instance.doubleScoreTimer);
+                multiBadgeText.text = $"x2 Puan {sec}s";
             }
         }
     }

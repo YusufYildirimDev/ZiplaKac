@@ -59,7 +59,8 @@ namespace ZiplaKac.UI
                 CreateDefaultCardsData();
             }
 
-            float startX = -((characterCards.Count - 1) * 140f) * 0.5f;
+            float cardSpacing = 145f;
+            float startX = -((characterCards.Count - 1) * cardSpacing) * 0.5f;
 
             for (int i = 0; i < characterCards.Count; i++)
             {
@@ -70,37 +71,50 @@ namespace ZiplaKac.UI
                     GameObject cardObj = new GameObject($"Card_{card.characterId}");
                     cardObj.transform.SetParent(transform, false);
                     RectTransform rt = cardObj.AddComponent<RectTransform>();
-                    rt.anchoredPosition = new Vector2(startX + i * 140f, 0f);
-                    rt.sizeDelta = new Vector2(110f, 150f);
-
-                    Image cardBg = cardObj.AddComponent<Image>();
-                    cardBg.color = new Color(0.15f, 0.15f, 0.2f, 0.85f);
-                    card.borderHighlight = cardBg;
+                    rt.anchoredPosition = new Vector2(startX + i * cardSpacing, 0f);
+                    rt.sizeDelta = new Vector2(120f, 160f);
 
                     Button btn = cardObj.AddComponent<Button>();
+                    btn.transition = Selectable.Transition.None;
                     card.selectButton = btn;
 
-                    GameObject iconObj = new GameObject("Icon");
-                    iconObj.transform.SetParent(cardObj.transform, false);
-                    RectTransform iconRt = iconObj.AddComponent<RectTransform>();
-                    iconRt.anchoredPosition = new Vector2(0f, 20f);
-                    iconRt.sizeDelta = new Vector2(60f, 60f);
-                    Image iconImg = iconObj.AddComponent<Image>();
-                    iconImg.sprite = Utils.ProceduralSpriteGenerator.CreateCircleSprite(card.bodyColor, 64);
-                    iconImg.raycastTarget = false;
-                    card.iconImage = iconImg;
+                    // Swatch (Yuvarlatılmış Renk Kutusu)
+                    GameObject swatchObj = new GameObject("Swatch");
+                    swatchObj.transform.SetParent(cardObj.transform, false);
+                    RectTransform swatchRt = swatchObj.AddComponent<RectTransform>();
+                    swatchRt.anchoredPosition = new Vector2(0f, 25f);
+                    swatchRt.sizeDelta = new Vector2(85f, 85f);
+                    Image swatchImg = swatchObj.AddComponent<Image>();
+                    swatchImg.type = Image.Type.Sliced;
+                    swatchImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(card.bodyColor, Color.clear, 0f, 24);
+                    swatchImg.raycastTarget = false;
+                    card.iconImage = swatchImg;
 
+                    // Dış Vurgu Çerçevesi (Border)
+                    GameObject borderObj = new GameObject("Border");
+                    borderObj.transform.SetParent(swatchObj.transform, false);
+                    RectTransform borderRt = borderObj.AddComponent<RectTransform>();
+                    borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
+                    borderRt.offsetMin = new Vector2(-4f, -4f); borderRt.offsetMax = new Vector2(4f, 4f);
+                    Image borderImg = borderObj.AddComponent<Image>();
+                    borderImg.type = Image.Type.Sliced;
+                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.02f, 0.84f, 0.63f), 4f, 26);
+                    borderImg.raycastTarget = false;
+                    card.borderHighlight = borderImg;
+
+                    // Karakter İsmi
                     GameObject nameObj = new GameObject("Name");
                     nameObj.transform.SetParent(cardObj.transform, false);
                     RectTransform nameRt = nameObj.AddComponent<RectTransform>();
-                    nameRt.anchoredPosition = new Vector2(0f, -40f);
-                    nameRt.sizeDelta = new Vector2(100f, 30f);
+                    nameRt.anchoredPosition = new Vector2(0f, -45f);
+                    nameRt.sizeDelta = new Vector2(110f, 32f);
                     Text nameTxt = nameObj.AddComponent<Text>();
                     nameTxt.font = GetSafeFont();
                     nameTxt.text = card.characterName;
-                    nameTxt.fontSize = 20;
+                    nameTxt.fontSize = 22;
+                    nameTxt.fontStyle = FontStyle.Bold;
                     nameTxt.alignment = TextAnchor.MiddleCenter;
-                    nameTxt.color = Color.white;
+                    nameTxt.color = new Color(0.96f, 0.96f, 0.98f, 0.85f);
                     nameTxt.raycastTarget = false;
                     card.nameText = nameTxt;
                 }
@@ -135,14 +149,12 @@ namespace ZiplaKac.UI
 
                 if (card.borderHighlight != null)
                 {
-                    card.borderHighlight.enabled = isSelected;
-                    card.borderHighlight.color = isSelected ? Color.white : new Color(1f, 1f, 1f, 0.2f);
+                    card.borderHighlight.gameObject.SetActive(isSelected);
                 }
 
                 if (card.selectButton != null)
                 {
-                    // Seçili kart için hafif büyüme ölçek animasyonu
-                    Vector3 targetScale = isSelected ? new Vector3(1.1f, 1.1f, 1.0f) : Vector3.one;
+                    Vector3 targetScale = isSelected ? new Vector3(1.10f, 1.10f, 1.0f) : Vector3.one;
                     card.selectButton.transform.localScale = targetScale;
                 }
             }
@@ -152,11 +164,11 @@ namespace ZiplaKac.UI
         {
             characterCards = new List<CharacterCardUI>
             {
-                new CharacterCardUI { characterId = "classic", characterName = "Klasik", bodyColor = new Color(1f, 0.85f, 0.1f) },
-                new CharacterCardUI { characterId = "fire", characterName = "Ateş", bodyColor = new Color(1f, 0.4f, 0f) },
-                new CharacterCardUI { characterId = "ice", characterName = "Buz", bodyColor = new Color(0.2f, 0.7f, 1f) },
-                new CharacterCardUI { characterId = "poison", characterName = "Zehir", bodyColor = new Color(0.2f, 0.9f, 0.3f) },
-                new CharacterCardUI { characterId = "night", characterName = "Gece", bodyColor = new Color(0.6f, 0.2f, 0.9f) }
+                new CharacterCardUI { characterId = "classic", characterName = "Klasik", bodyColor = new Color(1.0f, 0.82f, 0.40f) }, // #ffd166
+                new CharacterCardUI { characterId = "fire", characterName = "Ateş", bodyColor = new Color(1.0f, 0.42f, 0.21f) },    // #ff6b35
+                new CharacterCardUI { characterId = "ice", characterName = "Buz", bodyColor = new Color(0.30f, 0.79f, 0.94f) },     // #4cc9f0
+                new CharacterCardUI { characterId = "toxic", characterName = "Zehir", bodyColor = new Color(0.49f, 0.95f, 0.61f) }, // #7cf29c
+                new CharacterCardUI { characterId = "shadow", characterName = "Gece", bodyColor = new Color(0.61f, 0.36f, 0.90f) }  // #9b5de5
             };
         }
     }

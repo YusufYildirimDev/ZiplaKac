@@ -21,13 +21,13 @@ namespace ZiplaKac.Core
 
         [Header("Temel Hız ve Zorluk Ayarları")]
         [Tooltip("Oyunun başlangıç engel/zemin kayma hızı")]
-        public float baseSpeed = 8.0f;
+        public float baseSpeed = 4.2f;
         
         [Tooltip("Saniye başına hız artış miktarı")]
-        public float speedAcceleration = 0.08f;
+        public float speedAcceleration = 0.05f;
         
         [Tooltip("Maksimum hız sınırı")]
-        public float maxSpeed = 22.0f;
+        public float maxSpeed = 8.5f;
 
         [Header("Skor Ayarları")]
         [Tooltip("Saniye başına verilen taban puan (Yaklaşık 22 puan/sn)")]

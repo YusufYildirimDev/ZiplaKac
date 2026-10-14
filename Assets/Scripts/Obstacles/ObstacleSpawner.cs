@@ -17,10 +17,10 @@ namespace ZiplaKac.Obstacles
 
         [Header("Zamanlama Ayarları")]
         [Tooltip("Başlangıç iki engel arası süre (saniye)")]
-        public float initialSpawnInterval = 2.4f;
+        public float initialSpawnInterval = 1.75f;
 
         [Tooltip("Sıkışabileceği minimum spawn aralığı sınırı (Adil zorluk için)")]
-        public float minSpawnInterval = 1.05f;
+        public float minSpawnInterval = 0.95f;
 
         [Header("Tier Yapılandırmaları")]
         public List<TierData> tiers = new List<TierData>();
