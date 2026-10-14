@@ -174,6 +174,15 @@ namespace ZiplaKac.Core
             }
         }
 
+        public void AddBonusScore(float amount)
+        {
+            CurrentScore += amount;
+            if (Mathf.FloorToInt(CurrentScore) > HighScore)
+            {
+                HighScore = Mathf.FloorToInt(CurrentScore);
+            }
+        }
+
         public void ActivateShield()
         {
             isShieldActive = true;

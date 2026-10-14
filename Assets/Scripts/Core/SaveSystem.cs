@@ -92,5 +92,40 @@ namespace ZiplaKac.Core
             string json = JsonUtility.ToJson(wrapper);
             PlayerPrefs.SetString(KEY_SCORE_HISTORY, json);
         }
+
+        private const string KEY_LAST_DAILY_REWARD = "ZiplaKac_LastDailyRewardDate";
+        private const string KEY_UNLOCKED_CHARACTERS = "ZiplaKac_UnlockedCharacters";
+
+        public static bool CanClaimDailyReward()
+        {
+            string today = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
+            string lastClaim = PlayerPrefs.GetString(KEY_LAST_DAILY_REWARD, "");
+            return lastClaim != today;
+        }
+
+        public static void ClaimDailyReward()
+        {
+            string today = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
+            PlayerPrefs.SetString(KEY_LAST_DAILY_REWARD, today);
+            PlayerPrefs.Save();
+        }
+
+        public static bool IsCharacterUnlocked(string id)
+        {
+            if (id == "classic") return true;
+            string unlocked = PlayerPrefs.GetString(KEY_UNLOCKED_CHARACTERS, "classic");
+            return unlocked.Contains(id);
+        }
+
+        public static void UnlockCharacter(string id)
+        {
+            string unlocked = PlayerPrefs.GetString(KEY_UNLOCKED_CHARACTERS, "classic");
+            if (!unlocked.Contains(id))
+            {
+                unlocked += "," + id;
+                PlayerPrefs.SetString(KEY_UNLOCKED_CHARACTERS, unlocked);
+                PlayerPrefs.Save();
+            }
+        }
     }
 }

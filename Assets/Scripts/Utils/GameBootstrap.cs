@@ -458,6 +458,9 @@ namespace ZiplaKac.Utils
 
                 // 3. Oyun Bitti Paneli
                 CreateGameOverPanel(canvasObj.transform);
+
+                // 4. Günlük Ödül Sandığı Modalı
+                CreateDailyRewardModal(canvasObj.transform);
             }
 
             // EventSystem Kontrolü (iOS & New Input System tam uyumluluk)
@@ -539,24 +542,24 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.45f);
 
-            // Centered Glassmorphic Card (760x760, Y: +130 so player is clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(760f, 760f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 130f);
+            // Centered Glassmorphic Card (760x840, Y: +120 so player is clearly visible below)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(760f, 840f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 120f);
 
             // Başlık "ZIPLA KAÇ"
-            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 54, new Vector2(0f, 275f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
+            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 54, new Vector2(0f, 315f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
 
             // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 24, new Vector2(0f, 220f), new Color(0.6f, 0.7f, 0.85f), false);
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 24, new Vector2(0f, 260f), new Color(0.6f, 0.7f, 0.85f), false);
 
             // "KARAKTER SEÇ" etiketi
-            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 20, new Vector2(0f, 125f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
+            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 20, new Vector2(0f, 160f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
 
             // Karakter Galerisi UI (Swatches)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 20f);
+            galleryRt.anchoredPosition = new Vector2(0f, 55f);
             galleryRt.sizeDelta = new Vector2(700f, 130f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
@@ -564,14 +567,25 @@ namespace ZiplaKac.Utils
             // Neon Mint "BAŞLA" Butonu (#06d6a0)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -165f), new Vector2(400f, 84f), mintColor, darkNavy, 32);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -125f), new Vector2(400f, 82f), mintColor, darkNavy, 32);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
+            // 🎁 Günlük Ödül Sandığı Butonu (#ffd166 / Amber Vurgusu)
+            Color goldColor = new Color(1.0f, 0.82f, 0.40f);
+            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -225f), new Vector2(440f, 74f), goldColor, darkNavy, 24);
+            Button rewardBtn = rewardBtnObj.GetComponent<Button>();
+            rewardBtn.onClick.AddListener(() => {
+                if (DailyRewardModalUI.Instance != null)
+                {
+                    DailyRewardModalUI.Instance.gameObject.SetActive(true);
+                }
+            });
+
             // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 20, new Vector2(0f, -285f), new Color(0.55f, 0.65f, 0.8f), false);
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 20, new Vector2(0f, -330f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
@@ -634,42 +648,101 @@ namespace ZiplaKac.Utils
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Centered Glassmorphic Card (760x760, Y: +100)
-            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(760f, 760f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 100f);
+            // Centered Glassmorphic Card (760x860, Y: +80)
+            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(760f, 860f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 80f);
 
             // Başlık "OYUN BİTTİ" (Coral #ef476f)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 52, new Vector2(0f, 280f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 52, new Vector2(0f, 325f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
 
             // Alt Bilgi "Bir engele çarptın!"
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 24, new Vector2(0f, 225f), new Color(0.65f, 0.72f, 0.85f), false);
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 24, new Vector2(0f, 270f), new Color(0.65f, 0.72f, 0.85f), false);
 
             // Skor Büyük Rakam
-            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 80, new Vector2(0f, 135f), Color.white, false, FontStyle.Bold);
+            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 80, new Vector2(0f, 185f), Color.white, false, FontStyle.Bold);
 
             // En İyi Skor
-            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 28, new Vector2(0f, 55f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
+            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 28, new Vector2(0f, 110f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
 
             // Yeni Rekor Rozeti
-            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 28, new Vector2(0f, 0f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 28, new Vector2(0f, 55f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
             goUI.newRecordBadge = newRecText.gameObject;
             goUI.newRecordBadge.SetActive(false);
 
             // Son 5 Skor Listesi (Kompakt Tek Satır)
-            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 22, new Vector2(0f, -55f), new Color(0.7f, 0.78f, 0.9f), false);
+            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 22, new Vector2(0f, 5f), new Color(0.7f, 0.78f, 0.9f), false);
 
             // Tekrar Oyna Butonu (Neon Mint #06d6a0)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -160f), new Vector2(400f, 84f), mintColor, darkNavy, 32);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -95f), new Vector2(400f, 80f), mintColor, darkNavy, 30);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
+            // 🎁 Ödüllü Reklam İzle Butonu (#ffd166 / Altın Amber Vurgusu)
+            Color goldColor = new Color(1.0f, 0.82f, 0.40f);
+            GameObject adBtn = CreatePillButton(card.transform, "RewardedAdButton", "🎁 REKLAM İZLE: +50 PUAN", new Vector2(0f, -195f), new Vector2(440f, 74f), goldColor, darkNavy, 24);
+            goUI.rewardedAdButton = adBtn.GetComponent<Button>();
+            goUI.rewardedAdButtonText = adBtn.GetComponentInChildren<Text>();
+
             // Ana Menü Butonu (Sleek ikincil buton)
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -265f), new Vector2(320f, 72f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 24);
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -295f), new Vector2(320f, 68f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 24);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);
             if (UIManager.Instance != null) UIManager.Instance.gameOverPanel = panel;
+        }
+
+        private void CreateDailyRewardModal(Transform parent)
+        {
+            GameObject modal = new GameObject("DailyRewardModal");
+            modal.transform.SetParent(parent, false);
+            RectTransform rt = modal.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+
+            Image bg = modal.AddComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0.75f);
+
+            UI.DailyRewardModalUI modalUI = modal.AddComponent<UI.DailyRewardModalUI>();
+
+            // Modal Card (720x820)
+            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(720f, 820f));
+            card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+            // Başlık
+            modalUI.titleText = CreateText(card.transform, "Title", "GÜNLÜK ÖDÜL SANDIĞI", 44, new Vector2(0f, 320f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+
+            // Sandık Görseli (220x220)
+            GameObject chestObj = new GameObject("ChestImage");
+            chestObj.transform.SetParent(card.transform, false);
+            RectTransform chestRt = chestObj.AddComponent<RectTransform>();
+            chestRt.anchoredPosition = new Vector2(0f, 130f);
+            chestRt.sizeDelta = new Vector2(220f, 220f);
+            Image chestImg = chestObj.AddComponent<Image>();
+            chestImg.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
+            chestImg.preserveAspect = true;
+            chestImg.raycastTarget = false;
+            modalUI.chestImage = chestImg;
+
+            // Açıklama
+            modalUI.descriptionText = CreateText(card.transform, "Desc", "Her gün oyuna gir, sandığını aç ve bonus puanları topla!", 24, new Vector2(0f, -15f), new Color(0.75f, 0.85f, 0.98f), false);
+
+            // Durum Mesajı
+            modalUI.statusText = CreateText(card.transform, "Status", "🎁 Bugünün sandığı açılmaya hazır!", 28, new Vector2(0f, -90f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+
+            // Sandığı Aç Butonu
+            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
+            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
+            GameObject claimBtnObj = CreatePillButton(card.transform, "ClaimButton", "SANDIĞI AÇ", new Vector2(0f, -195f), new Vector2(380f, 80f), mintColor, darkNavy, 30);
+            modalUI.claimButton = claimBtnObj.GetComponent<Button>();
+            modalUI.claimButtonText = claimBtnObj.GetComponentInChildren<Text>();
+            modalUI.claimButton.onClick.AddListener(modalUI.OnClaimButtonClicked);
+
+            // Kapat Butonu
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -295f), new Vector2(280f, 64f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 22);
+            modalUI.closeButton = closeBtnObj.GetComponent<Button>();
+            modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
+
+            modal.SetActive(false);
         }
 
         private static Text CreateText(Transform parent, string name, string content, int fontSize, Vector2 position, Color color, bool raycastTarget = false, FontStyle fontStyle = FontStyle.Normal)

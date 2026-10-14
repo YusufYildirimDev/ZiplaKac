@@ -23,6 +23,8 @@ namespace ZiplaKac.UI
         [Header("Butonlar")]
         public Button restartButton;
         public Button mainMenuButton;
+        public Button rewardedAdButton;
+        public Text rewardedAdButtonText;
 
         private void OnEnable()
         {
@@ -38,7 +40,36 @@ namespace ZiplaKac.UI
                 mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
             }
 
+            if (rewardedAdButton != null)
+            {
+                rewardedAdButton.interactable = true;
+                rewardedAdButton.onClick.RemoveAllListeners();
+                rewardedAdButton.onClick.AddListener(OnRewardedAdButtonClicked);
+                if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎁 REKLAM İZLE: +50 PUAN";
+            }
+
             RefreshGameOverStats();
+        }
+
+        private void OnRewardedAdButtonClicked()
+        {
+            MonetizationManager.Instance?.ShowRewardedAd(
+                () => {
+                    if (GameManager.Instance != null)
+                    {
+                        GameManager.Instance.AddBonusScore(50f);
+                        SaveSystem.SaveScore(Mathf.FloorToInt(GameManager.Instance.CurrentScore));
+                    }
+                    RefreshGameOverStats();
+                    AudioManager.Instance?.PlayNewRecordSound();
+                    AudioManager.Instance?.TriggerHapticFeedback();
+                    if (rewardedAdButton != null) rewardedAdButton.interactable = false;
+                    if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎉 +50 PUAN EKLENDİ!";
+                },
+                () => {
+                    Debug.Log("Reklam gösterilemedi.");
+                }
+            );
         }
 
         private void Update()
