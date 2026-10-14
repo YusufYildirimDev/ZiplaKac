@@ -579,21 +579,6 @@ namespace ZiplaKac.Utils
             RectTransform rt = panel.AddComponent<RectTransform>();
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
-            // 1. Fullscreen Jump Trigger (Ekrana herhangi bir yere dokunulduğunda anında zıplama)
-            GameObject jumpTrigger = new GameObject("FullscreenJumpTrigger");
-            jumpTrigger.transform.SetParent(panel.transform, false);
-            RectTransform jtRt = jumpTrigger.AddComponent<RectTransform>();
-            jtRt.anchorMin = Vector2.zero; jtRt.anchorMax = Vector2.one;
-            jtRt.offsetMin = Vector2.zero; jtRt.offsetMax = Vector2.zero;
-            Image jtImg = jumpTrigger.AddComponent<Image>();
-            jtImg.color = Color.clear;
-            jtImg.raycastTarget = true;
-            Button jtBtn = jumpTrigger.AddComponent<Button>();
-            jtBtn.transition = Selectable.Transition.None;
-            jtBtn.onClick.AddListener(() => {
-                if (PlayerController.Instance != null) PlayerController.Instance.Jump();
-            });
-
             HUDController hud = panel.AddComponent<HUDController>();
 
             // Top Header Bar

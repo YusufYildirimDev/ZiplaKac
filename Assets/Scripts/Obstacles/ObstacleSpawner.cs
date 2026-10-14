@@ -17,15 +17,15 @@ namespace ZiplaKac.Obstacles
 
         [Header("Zamanlama Ayarları")]
         [Tooltip("Başlangıç iki engel arası süre (saniye)")]
-        public float initialSpawnInterval = 1.75f;
+        public float initialSpawnInterval = 1.40f;
 
         [Tooltip("Sıkışabileceği minimum spawn aralığı sınırı (Adil zorluk için)")]
-        public float minSpawnInterval = 0.95f;
+        public float minSpawnInterval = 0.75f;
 
         [Header("Tier Yapılandırmaları")]
         public List<TierData> tiers = new List<TierData>();
 
-        private float spawnTimer = 0f;
+        private float spawnTimer = 1.25f;
 
         private void Awake()
         {
@@ -38,6 +38,26 @@ namespace ZiplaKac.Obstacles
         private void Start()
         {
             InitializeDefaultTiersIfEmpty();
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+            }
+        }
+
+        private void HandleGameStateChanged(GameState state)
+        {
+            if (state == GameState.Playing)
+            {
+                spawnTimer = 1.25f; // Oyun başlayınca oyuncuya ritmi yakalaması için 1.25s süre ver
+            }
         }
 
         private void Update()
@@ -102,9 +122,9 @@ namespace ZiplaKac.Obstacles
             float currentSpeed = GameManager.Instance.CurrentSpeed;
             float speedRatio = currentSpeed / GameManager.Instance.baseSpeed;
 
-            float calculatedInterval = initialSpawnInterval / speedRatio;
-            // Minimum sınır ile koru
-            spawnTimer = Mathf.Max(calculatedInterval, minSpawnInterval);
+            float baseInterval = initialSpawnInterval / speedRatio;
+            float jitter = Random.Range(-0.12f, 0.20f);
+            spawnTimer = Mathf.Max(baseInterval + jitter, minSpawnInterval);
         }
 
         private TierData GetTierData(int tierIndex)

@@ -15,13 +15,13 @@ namespace ZiplaKac.Player
     {
         [Header("Zıplama Fizik Ayarları")]
         [Tooltip("İlk zıplama gücü")]
-        public float jumpForce = 10.5f;
+        public float jumpForce = 11.2f;
 
         [Tooltip("Çift zıplama gücü")]
-        public float doubleJumpForce = 8.8f;
+        public float doubleJumpForce = 9.8f;
 
         [Tooltip("Yerçekimi ölçeği (akıcı ve tok düşüş)")]
-        public float gravityScale = 2.6f;
+        public float gravityScale = 2.7f;
 
         [Header("Zemin Algılama Ayarları")]
         public Transform groundCheckTransform;
@@ -39,6 +39,7 @@ namespace ZiplaKac.Player
         private bool isGrounded = true;
         private int jumpsUsed = 0;
         private int lastJumpFrame = -1;
+        private float lastJumpTime = -1f;
         private bool isInvulnerable = false;
 
         public const float FIXED_PLAYER_X = -1.35f;
@@ -52,6 +53,8 @@ namespace ZiplaKac.Player
             rb = GetComponent<Rigidbody2D>();
             rb.gravityScale = gravityScale;
             rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+            rb.interpolation = RigidbodyInterpolation2D.Interpolate;
 
             transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
 
@@ -89,9 +92,6 @@ namespace ZiplaKac.Player
 
         private void Update()
         {
-            // Sabit X pozisyonunu daima koru
-            transform.position = new Vector3(FIXED_PLAYER_X, transform.position.y, transform.position.z);
-
             if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
             {
                 return;
@@ -133,7 +133,10 @@ namespace ZiplaKac.Player
         {
             if (collision.gameObject.name.Contains("Ground") || collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
             {
-                OnLanded();
+                if (Time.time - lastJumpTime > 0.10f)
+                {
+                    OnLanded();
+                }
             }
         }
 
@@ -141,7 +144,7 @@ namespace ZiplaKac.Player
         {
             if (collision.gameObject.name.Contains("Ground") || collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
             {
-                if (rb.linearVelocity.y <= 0.05f)
+                if (rb.linearVelocity.y <= 0.1f && Time.time - lastJumpTime > 0.15f)
                 {
                     isGrounded = true;
                     jumpsUsed = 0;
@@ -258,12 +261,15 @@ namespace ZiplaKac.Player
                 return;
             }
 
-            // Aynı frame içinde hem UI hem direct input çift tetiklenmesini engelle
+            // Çift tetiklenme / release event / multi-source koruması (min 120ms aralık)
+            if (Time.time - lastJumpTime < 0.12f) return;
             if (Time.frameCount == lastJumpFrame) return;
-            lastJumpFrame = Time.frameCount;
 
             if (jumpsUsed < 2)
             {
+                lastJumpTime = Time.time;
+                lastJumpFrame = Time.frameCount;
+
                 float force = (jumpsUsed == 0) ? jumpForce : doubleJumpForce;
                 rb.linearVelocity = new Vector2(0f, force);
                 isGrounded = false;
@@ -397,6 +403,8 @@ namespace ZiplaKac.Player
             jumpsUsed = 0;
             isGrounded = true;
             isInvulnerable = false;
+            lastJumpTime = -1f;
+            lastJumpFrame = -1;
 
             if (newState == GameState.Playing)
             {
