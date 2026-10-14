@@ -87,7 +87,7 @@ namespace ZiplaKac.UI
                     Image swatchImg = swatchObj.AddComponent<Image>();
                     swatchImg.type = Image.Type.Simple;
                     swatchImg.preserveAspect = true;
-                    swatchImg.sprite = Utils.ProceduralSpriteGenerator.CreateMiniCharacterIcon(card.bodyColor, 128);
+                    swatchImg.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/{card.characterId}_hero", () => Utils.ProceduralSpriteGenerator.CreateMiniCharacterIcon(card.bodyColor, 128));
                     swatchImg.raycastTarget = false;
                     card.iconImage = swatchImg;
 

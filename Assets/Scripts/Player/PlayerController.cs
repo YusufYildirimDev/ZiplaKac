@@ -301,7 +301,10 @@ namespace ZiplaKac.Player
             {
                 if (bodySpriteRenderer != null)
                 {
-                    bodySpriteRenderer.sprite = Utils.ProceduralSpriteGenerator.CreatePlayerSprite(data.bodyColor, data.glowColor, 128);
+                    bodySpriteRenderer.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate(
+                        $"Sprites/{characterId}_hero",
+                        () => Utils.ProceduralSpriteGenerator.CreatePlayerSprite(data.bodyColor, data.glowColor, 128)
+                    );
                     bodySpriteRenderer.color = Color.white;
                 }
                 // Çamurlu kahverengi glow halkasını tamamen kapat

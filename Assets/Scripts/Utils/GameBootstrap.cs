@@ -207,7 +207,7 @@ namespace ZiplaKac.Utils
 
                 // Gövde Görseli (Cute rounded square with eyes & catchlight)
                 SpriteRenderer bodySr = player.AddComponent<SpriteRenderer>();
-                bodySr.sprite = ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 128);
+                bodySr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/classic_hero", () => ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 128));
                 bodySr.sortingOrder = 10;
                 if (safeMat != null) bodySr.material = safeMat;
 
@@ -325,25 +325,25 @@ namespace ZiplaKac.Utils
 
             if (name == "Cactus")
             {
-                sr.sprite = ProceduralSpriteGenerator.CreateCactusSprite(obsColor);
+                sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/cactus", () => ProceduralSpriteGenerator.CreateCactusSprite(obsColor));
                 col.size = new Vector2(0.34f, 0.54f);
                 col.offset = new Vector2(0f, 0.27f);
             }
             else if (name == "Rock")
             {
-                sr.sprite = ProceduralSpriteGenerator.CreateRockSprite(obsColor);
+                sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/rock", () => ProceduralSpriteGenerator.CreateRockSprite(obsColor));
                 col.size = new Vector2(0.48f, 0.30f);
                 col.offset = new Vector2(0f, 0.15f);
             }
             else if (name == "Spike")
             {
-                sr.sprite = ProceduralSpriteGenerator.CreateSpikeSprite(obsColor);
+                sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/spike", () => ProceduralSpriteGenerator.CreateSpikeSprite(obsColor));
                 col.size = new Vector2(0.28f, 0.72f);
                 col.offset = new Vector2(0f, 0.36f);
             }
             else if (name.Contains("Bird"))
             {
-                sr.sprite = ProceduralSpriteGenerator.CreateBirdSprite(airColor);
+                sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/bird", () => ProceduralSpriteGenerator.CreateBirdSprite(airColor));
                 col.size = new Vector2(0.40f, 0.26f);
                 col.offset = Vector2.zero;
             }
@@ -362,8 +362,12 @@ namespace ZiplaKac.Utils
             GameObject obj = new GameObject(name);
             try { obj.tag = "PowerUp"; } catch { }
 
+            string powerUpResource = "Sprites/shield_powerup";
+            if (type == PowerUpType.Slow) powerUpResource = "Sprites/slow_powerup";
+            else if (type == PowerUpType.ScoreMultiplier) powerUpResource = "Sprites/multi_powerup";
+
             SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
-            sr.sprite = ProceduralSpriteGenerator.CreatePowerUpOrb(color, label);
+            sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate(powerUpResource, () => ProceduralSpriteGenerator.CreatePowerUpOrb(color, label));
             sr.sortingOrder = 7;
             Material safeMat = GetSafeSpriteMaterial();
             if (safeMat != null) sr.material = safeMat;

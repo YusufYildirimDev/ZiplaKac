@@ -11,6 +11,20 @@ namespace ZiplaKac.Utils
         public const float GAME_PPU = 200f;
 
         /// <summary>
+        /// Resources/ klasöründeki gerçek sanat sprite'ını yükler; eğer yoksa prosedürel üreteci çağırır.
+        /// </summary>
+        public static Sprite GetSpriteOrGenerate(string resourcePath, System.Func<Sprite> fallbackGenerator)
+        {
+            try
+            {
+                Sprite s = Resources.Load<Sprite>(resourcePath);
+                if (s != null) return s;
+            }
+            catch { }
+            return fallbackGenerator?.Invoke();
+        }
+
+        /// <summary>
         /// Yüksek çözünürlüklü, sevimli (kawaii) küp kahraman avatarı:
         /// 3D jel/şeker degrade dolgu, tepe parlama çizgisi, parlak gözbebekleri, çift ışık yansıması ve pembe yanaklar.
         /// PPU: 200f -> Dünya boyutu: 0.52f x 0.52f
