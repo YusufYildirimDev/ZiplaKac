@@ -85,25 +85,25 @@ namespace ZiplaKac.UI
 
             switch (tierIndex)
             {
-                case 1: // Tier 1 (40-99): Günbatımı
-                    topColor = new Color(1.0f, 0.72f, 0.42f);   // #ffb86b
-                    bottomColor = new Color(1.0f, 0.49f, 0.37f);// #ff7e5f
-                    groundColor = new Color(0.54f, 0.29f, 0.18f);// #8a4a2d
+                case 1: // Tier 1 (40-99): Günbatımı (Sıcak & Dingin)
+                    topColor = new Color(0.98f, 0.68f, 0.45f);   // #fba973
+                    bottomColor = new Color(0.85f, 0.42f, 0.32f);// #d96b52
+                    groundColor = new Color(0.35f, 0.18f, 0.15f);// #592e26
                     break;
-                case 2: // Tier 2 (100-199): Alacakaranlık
-                    topColor = new Color(0.42f, 0.36f, 0.58f);   // #6b5b95
-                    bottomColor = new Color(0.18f, 0.14f, 0.31f);// #2d2350
-                    groundColor = new Color(0.23f, 0.16f, 0.33f);// #3a2a55
+                case 2: // Tier 2 (100-199): Alacakaranlık (Sakin Mor)
+                    topColor = new Color(0.38f, 0.32f, 0.52f);   // #615285
+                    bottomColor = new Color(0.16f, 0.12f, 0.27f);// #291f45
+                    groundColor = new Color(0.14f, 0.11f, 0.24f);// #241c3d
                     break;
-                case 3: // Tier 3 (200+): Yıldızlı Gece
-                    topColor = new Color(0.04f, 0.06f, 0.16f);   // #0b0f2a
-                    bottomColor = new Color(0.0f, 0.0f, 0.0f);   // #000000
-                    groundColor = new Color(0.08f, 0.08f, 0.19f);// #141430
+                case 3: // Tier 3 (200+): Yıldızlı Gece (Derin Uzay)
+                    topColor = new Color(0.05f, 0.07f, 0.16f);   // #0d1229
+                    bottomColor = new Color(0.02f, 0.03f, 0.08f);// #050814
+                    groundColor = new Color(0.04f, 0.05f, 0.11f);// #0a0d1c
                     break;
-                default: // Tier 0 (0-39): Modern Gece Mavisi
+                default: // Tier 0 (0-39): Modern Gece Mavisi (Sakin & Uyumlu)
                     topColor = new Color(0.12f, 0.16f, 0.29f);   // #1e2a4a
-                    bottomColor = new Color(0.05f, 0.07f, 0.13f);// #0d1220
-                    groundColor = new Color(0.17f, 0.23f, 0.39f);// #2b3a63
+                    bottomColor = new Color(0.06f, 0.08f, 0.15f);// #0f1426
+                    groundColor = new Color(0.09f, 0.12f, 0.22f);// #171f38
                     break;
             }
 

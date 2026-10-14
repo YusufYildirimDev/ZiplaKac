@@ -332,43 +332,35 @@ namespace ZiplaKac.Utils
         }
 
         /// <summary>
-        /// Zemin görseli (Üstünde parlak neon vurgu çizgisi olan modern zemin)
-        /// PPU: 100f -> Yükseklik: 2.56f, Genişlik: 5.12f, Pivot: (0.5f, 1.0f) Üst Kenar
+        /// Zemin görseli (Zemin ile gökyüzü arasında yapay/keskin sınır oluşturmayan,
+        /// titreşimsiz, ızgarasız ve arka plan ile organik bütünleşen derin mat zemin).
+        /// PPU: 100f -> Yükseklik: 4.0f, Genişlik: 5.12f, Pivot: (0.5f, 1.0f) Üst Kenar
         /// </summary>
-        public static Sprite CreateGroundSprite(Color groundColor, int w = 512, int h = 256)
+        public static Sprite CreateGroundSprite(Color groundColor, int w = 512, int h = 400)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
-            Color neonStripe = new Color(0.024f, 0.839f, 0.627f); // Neon Mint vurgusu #06d6a0
-            Color subStripe = Color.Lerp(groundColor, Color.white, 0.28f);
+            tex.filterMode = FilterMode.Bilinear;
+
+            Color topEdge = Color.Lerp(groundColor, Color.white, 0.10f);
+            Color deepBase = Color.Lerp(new Color(0.04f, 0.05f, 0.09f), groundColor, 0.40f);
 
             for (int y = 0; y < h; y++)
             {
                 Color c;
-                if (y >= h - 4)
+                if (y >= h - 2)
                 {
-                    c = neonStripe; // Üst 4px neon çizgi
-                }
-                else if (y >= h - 8)
-                {
-                    c = subStripe;
+                    // Oyuncunun bastığı yüzey için çok hafif, sakin temas çizgisi
+                    c = topEdge;
                 }
                 else
                 {
-                    float grad = (float)y / (h - 8);
-                    c = Color.Lerp(new Color(0.06f, 0.08f, 0.16f), groundColor, grad);
+                    float t = (float)y / (h - 2);
+                    c = Color.Lerp(deepBase, groundColor, t);
                 }
 
                 for (int x = 0; x < w; x++)
                 {
-                    // İnce dikey grid dokusu (hız hissi verir)
-                    if (y < h - 10 && (x % 64 == 0 || x % 64 == 1))
-                    {
-                        tex.SetPixel(x, y, Color.Lerp(c, Color.white, 0.06f));
-                    }
-                    else
-                    {
-                        tex.SetPixel(x, y, c);
-                    }
+                    tex.SetPixel(x, y, c);
                 }
             }
             tex.Apply();

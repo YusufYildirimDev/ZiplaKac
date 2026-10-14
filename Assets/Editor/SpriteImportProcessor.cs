@@ -18,6 +18,19 @@ namespace ZiplaKac.Editor
                 textureImporter.alphaIsTransparency = true;
                 textureImporter.mipmapEnabled = false;
                 textureImporter.filterMode = FilterMode.Bilinear;
+                textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
+                textureImporter.crunchedCompression = false;
+
+                TextureImporterPlatformSettings iosSettings = textureImporter.GetPlatformTextureSettings("iOS");
+                iosSettings.overridden = true;
+                iosSettings.format = TextureImporterFormat.RGBA32;
+                iosSettings.textureCompression = TextureImporterCompression.Uncompressed;
+                textureImporter.SetPlatformTextureSettings(iosSettings);
+
+                TextureImporterPlatformSettings defSettings = textureImporter.GetDefaultPlatformTextureSettings();
+                defSettings.textureCompression = TextureImporterCompression.Uncompressed;
+                defSettings.format = TextureImporterFormat.RGBA32;
+                textureImporter.SetPlatformTextureSettings(defSettings);
 
                 TextureImporterSettings settings = new TextureImporterSettings();
                 textureImporter.ReadTextureSettings(settings);

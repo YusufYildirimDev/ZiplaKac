@@ -73,7 +73,22 @@ namespace ZiplaKac.Utils
             mainCam.orthographic = true;
             mainCam.orthographicSize = 5.0f;
             mainCam.clearFlags = CameraClearFlags.SolidColor;
-            mainCam.backgroundColor = new Color(0.05f, 0.07f, 0.13f); // #0d1220
+            mainCam.backgroundColor = new Color(0.06f, 0.08f, 0.15f); // #0f1426
+
+            // 60/120 FPS akıcı yenileme hızı (Piksel titremesi ve hareket kırılmalarını önler)
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+
+            // URP Kamera verisi & Anti-Aliasing (kenar pikselleşmesini ve titreşimi önler)
+            var camData = mainCam.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            if (camData == null)
+            {
+                camData = mainCam.gameObject.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            }
+            if (camData != null)
+            {
+                camData.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.FastApproximateAntialiasing;
+            }
         }
 
         private void SetupManagers()
@@ -130,7 +145,7 @@ namespace ZiplaKac.Utils
                 bgObj.transform.localScale = new Vector3(25f, 18f, 1f);
 
                 SpriteRenderer bgSr = bgObj.AddComponent<SpriteRenderer>();
-                bgSr.sprite = ProceduralSpriteGenerator.CreateGradientSkySprite(new Color(0.12f, 0.16f, 0.29f), new Color(0.05f, 0.07f, 0.13f));
+                bgSr.sprite = ProceduralSpriteGenerator.CreateGradientSkySprite(new Color(0.12f, 0.16f, 0.29f), new Color(0.06f, 0.08f, 0.15f));
                 bgSr.sortingOrder = -20;
                 Material safeMat = GetSafeSpriteMaterial();
                 if (safeMat != null) bgSr.material = safeMat;
@@ -145,18 +160,18 @@ namespace ZiplaKac.Utils
                 starsObj = new GameObject("StarsContainer");
                 starsObj.transform.position = new Vector3(0f, 0f, 5.2f);
 
-                for (int i = 0; i < 24; i++)
+                for (int i = 0; i < 20; i++)
                 {
                     GameObject star = new GameObject($"Star_{i}");
                     star.transform.SetParent(starsObj.transform, false);
 
                     float sx = -3.5f + (i * 2.37f) % 7.0f;
-                    float sy = 0.2f + (i * 1.83f) % 4.5f;
+                    float sy = 0.5f + (i * 1.83f) % 4.0f;
                     star.transform.position = new Vector3(sx, sy, 5.2f);
-                    star.transform.localScale = Vector3.one * (0.08f + (i % 3) * 0.04f);
+                    star.transform.localScale = Vector3.one * (0.07f + (i % 3) * 0.03f);
 
                     SpriteRenderer starSr = star.AddComponent<SpriteRenderer>();
-                    float alpha = 0.35f + (i % 3) * 0.25f;
+                    float alpha = 0.25f + (i % 3) * 0.15f;
                     starSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 1f, 1f, alpha), 16);
                     starSr.sortingOrder = -18;
                     Material safeMat = GetSafeSpriteMaterial();
@@ -167,23 +182,7 @@ namespace ZiplaKac.Utils
                 if (UIManager.Instance != null) UIManager.Instance.starsContainer = starsObj;
             }
 
-            // 3. Dingin Göksel Ay / Işık Halesi (Z = 5.0f, sortingOrder = -16)
-            GameObject sunObj = GameObject.Find("CelestialSun");
-            if (sunObj == null)
-            {
-                sunObj = new GameObject("CelestialSun");
-                sunObj.transform.position = new Vector3(1.35f, 3.10f, 5.0f);
-                sunObj.transform.localScale = Vector3.one * 0.90f;
-
-                SpriteRenderer sunSr = sunObj.AddComponent<SpriteRenderer>();
-                sunSr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/bg_celestial_sun", 
-                    () => ProceduralSpriteGenerator.CreateCircleSprite(new Color(0.9f, 0.95f, 1f, 0.5f), 128));
-                sunSr.sortingOrder = -16;
-                Material safeMat = GetSafeSpriteMaterial();
-                if (safeMat != null) sunSr.material = safeMat;
-            }
-
-            // 4. Uzak Geometrik Dağlar (2 Karo Döngüsü, Z = 4.5f, sortingOrder = -14)
+            // 3. Uzak Dingin Dağ Silüeti (Tek, sade, göz yormayan katman, Z = 4.5f, sortingOrder = -14)
             float groundLevelY = -3.20f;
             float tileW = 10.22f;
 
@@ -212,7 +211,7 @@ namespace ZiplaKac.Utils
                 }
             }
 
-            // 5. Üst Gökyüzü Bulutları (2 Karo Döngüsü, Z = 4.0f, sortingOrder = -12)
+            // 4. Üst Gökyüzü Hafif Sis/Bulutları (2 Karo Döngüsü, Z = 4.0f, sortingOrder = -12)
             Sprite cloudSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/bg_clouds", null);
             Transform[] cloudTiles = new Transform[2];
 
@@ -236,44 +235,21 @@ namespace ZiplaKac.Utils
                 }
             }
 
-            // 6. Orta Dalgalı Tepeler (2 Karo Döngüsü, Z = 3.5f, sortingOrder = -10)
-            Sprite midHillsSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/bg_mid_hills", null);
-            Transform[] midHillTiles = new Transform[2];
-            SpriteRenderer[] midHillRenderers = new SpriteRenderer[2];
-
-            GameObject midHillsRoot = GameObject.Find("MidHillsLayer");
-            if (midHillsRoot == null)
-            {
-                midHillsRoot = new GameObject("MidHillsLayer");
-                for (int i = 0; i < 2; i++)
-                {
-                    GameObject tile = new GameObject($"MidHill_Tile_{i}");
-                    tile.transform.SetParent(midHillsRoot.transform, false);
-                    tile.transform.position = new Vector3(i * tileW, groundLevelY, 3.5f);
-
-                    SpriteRenderer sr = tile.AddComponent<SpriteRenderer>();
-                    sr.sprite = midHillsSprite;
-                    sr.sortingOrder = -10;
-                    Material safeMat = GetSafeSpriteMaterial();
-                    if (safeMat != null) sr.material = safeMat;
-
-                    midHillTiles[i] = tile.transform;
-                    midHillRenderers[i] = sr;
-                }
-            }
-
-            // 7. Paralaks Yöneticisi Bileşeni (ParallaxBackground)
+            // 5. Paralaks Yöneticisi Bileşeni (ParallaxBackground)
             GameObject parallaxObj = GameObject.Find("ParallaxBackgroundManager");
             if (parallaxObj == null)
             {
                 parallaxObj = new GameObject("ParallaxBackgroundManager");
                 ParallaxBackground pb = parallaxObj.AddComponent<ParallaxBackground>();
                 pb.farMountainTiles = farMtTiles;
-                pb.midHillTiles = midHillTiles;
+                pb.midHillTiles = null;
                 pb.cloudTiles = cloudTiles;
-                pb.sunTransform = sunObj != null ? sunObj.transform : null;
+                pb.sunTransform = null;
                 pb.farMountainRenderers = farMtRenderers;
-                pb.midHillRenderers = midHillRenderers;
+                pb.midHillRenderers = null;
+                pb.farMountainFactor = 0.03f;
+                pb.cloudFactor = 0.03f;
+                pb.ambientCloudSpeed = 0.04f;
                 pb.tileWidth = tileW;
                 pb.resetThresholdX = -tileW;
             }
@@ -286,18 +262,18 @@ namespace ZiplaKac.Utils
             {
                 ground = new GameObject("Ground");
                 ground.transform.position = new Vector3(0f, -3.20f, 0f);
-                ground.transform.localScale = new Vector3(4f, 1f, 1f);
+                ground.transform.localScale = new Vector3(8f, 1f, 1f);
 
                 SpriteRenderer sr = ground.AddComponent<SpriteRenderer>();
-                sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/ground_surface", 
-                    () => ProceduralSpriteGenerator.CreateGroundSprite(new Color(0.17f, 0.23f, 0.39f)));
+                Color defaultGround = new Color(0.09f, 0.12f, 0.22f); // #171f38 (Arka plan ile organik bütünleşen zemin)
+                sr.sprite = ProceduralSpriteGenerator.CreateGroundSprite(defaultGround);
                 sr.sortingOrder = 2;
                 Material safeMat = GetSafeSpriteMaterial();
                 if (safeMat != null) sr.material = safeMat;
 
                 BoxCollider2D col = ground.AddComponent<BoxCollider2D>();
-                col.size = new Vector2(40f, 2f);
-                col.offset = new Vector2(0f, -1.0f); // Üst yüzey Y = -3.20f
+                col.size = new Vector2(40f, 4f);
+                col.offset = new Vector2(0f, -2.0f); // Üst yüzey Y = -3.20f
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
                 if (groundLayer != -1) ground.layer = groundLayer;
