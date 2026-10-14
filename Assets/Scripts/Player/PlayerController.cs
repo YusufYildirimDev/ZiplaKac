@@ -15,17 +15,17 @@ namespace ZiplaKac.Player
     {
         [Header("Zıplama Fizik Ayarları")]
         [Tooltip("İlk zıplama gücü")]
-        public float jumpForce = 11.5f;
+        public float jumpForce = 10.5f;
 
-        [Tooltip("Çift zıplama (daha kısa) gücü")]
-        public float doubleJumpForce = 9.5f;
+        [Tooltip("Çift zıplama gücü")]
+        public float doubleJumpForce = 8.8f;
 
-        [Tooltip("Yerçekimi ölçeği (daha seri ve tok düşüş için)")]
-        public float gravityScale = 2.8f;
+        [Tooltip("Yerçekimi ölçeği (akıcı ve tok düşüş)")]
+        public float gravityScale = 2.6f;
 
         [Header("Zemin Algılama Ayarları")]
         public Transform groundCheckTransform;
-        public float groundCheckRadius = 0.2f;
+        public float groundCheckRadius = 0.15f;
         public LayerMask groundLayerMask;
 
         [Header("Görsel Bileşenler")]
@@ -36,11 +36,13 @@ namespace ZiplaKac.Player
 
         // Durum değişkenleri
         private Rigidbody2D rb;
-        private bool isGrounded = false;
-        private bool canDoubleJump = false;
+        private bool isGrounded = true;
+        private int jumpsUsed = 0;
+        private int lastJumpFrame = -1;
         private bool isInvulnerable = false;
 
-        private float fixedXPosition;
+        public const float FIXED_PLAYER_X = -1.35f;
+        public const float GROUND_FLOOR_Y = -2.96f;
 
         public static PlayerController Instance { get; private set; }
 
@@ -49,11 +51,9 @@ namespace ZiplaKac.Player
             Instance = this;
             rb = GetComponent<Rigidbody2D>();
             rb.gravityScale = gravityScale;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-            float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
-            float halfWidth = 5.0f * aspect;
-            fixedXPosition = -halfWidth + (halfWidth * 2f) * 0.22f;
-            transform.position = new Vector3(fixedXPosition, -2.5f, 0f);
+            transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
 
             try
             {
@@ -90,23 +90,20 @@ namespace ZiplaKac.Player
         private void Update()
         {
             // Sabit X pozisyonunu daima koru
-            transform.position = new Vector3(fixedXPosition, transform.position.y, transform.position.z);
+            transform.position = new Vector3(FIXED_PLAYER_X, transform.position.y, transform.position.z);
 
             if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
             {
                 return;
             }
 
-            // Zemin kontrolü
-            CheckGroundedStatus();
-
-            // Squash & Stretch esneme/yaylanma animasyonu (index.html oranı: 0.18f)
+            // Squash & Stretch esneme/yaylanma animasyonu
             if (squashTimer > 0f)
             {
-                squashTimer -= Time.deltaTime * 4.0f;
+                squashTimer -= Time.deltaTime * 5.0f;
                 float sq = Mathf.Max(0f, squashTimer);
-                float sx = 1f + sq * 0.18f;
-                float sy = 1f - sq * 0.18f;
+                float sx = 1f + sq * 0.15f;
+                float sy = 1f - sq * 0.15f;
                 transform.localScale = new Vector3(sx, sy, 1f);
             }
             else
@@ -121,29 +118,34 @@ namespace ZiplaKac.Player
             }
         }
 
-        private void CheckGroundedStatus()
+        public void OnLanded()
         {
-            Vector2 checkPosition = groundCheckTransform != null ? (Vector2)groundCheckTransform.position : (Vector2)transform.position + Vector2.down * 0.45f;
-            bool wasGrounded = isGrounded;
-            
-            Collider2D[] hits = Physics2D.OverlapCircleAll(checkPosition, groundCheckRadius, groundLayerMask);
-            bool foundGround = false;
-            for (int i = 0; i < hits.Length; i++)
+            if (!isGrounded || jumpsUsed > 0)
             {
-                if (hits[i].gameObject != gameObject && !hits[i].isTrigger)
-                {
-                    foundGround = true;
-                    break;
-                }
-            }
-            isGrounded = foundGround;
-
-            if (isGrounded && !wasGrounded)
-            {
-                // Yere değince çift zıplama hakkı sıfırlanır, yaylanır ve toz parçacıkları çıkar
-                canDoubleJump = true;
+                isGrounded = true;
+                jumpsUsed = 0;
                 squashTimer = 1.0f;
-                SpawnLandingDust(checkPosition);
+                SpawnLandingDust(transform.position + Vector3.down * 0.22f);
+            }
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.name.Contains("Ground") || collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            {
+                OnLanded();
+            }
+        }
+
+        private void OnCollisionStay2D(Collision2D collision)
+        {
+            if (collision.gameObject.name.Contains("Ground") || collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            {
+                if (rb.linearVelocity.y <= 0.05f)
+                {
+                    isGrounded = true;
+                    jumpsUsed = 0;
+                }
             }
         }
 
@@ -249,32 +251,39 @@ namespace ZiplaKac.Player
             return false;
         }
 
-        private void PerformJump()
+        public void PerformJump()
         {
-            if (isGrounded)
+            if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
             {
-                // İlk Zıplama
-                rb.linearVelocity = new Vector2(0f, jumpForce);
-                canDoubleJump = true;
-                squashTimer = 1.0f;
-                AudioManager.Instance?.PlayJumpSound();
+                return;
             }
-            else if (canDoubleJump)
+
+            // Aynı frame içinde hem UI hem direct input çift tetiklenmesini engelle
+            if (Time.frameCount == lastJumpFrame) return;
+            lastJumpFrame = Time.frameCount;
+
+            if (jumpsUsed < 2)
             {
-                // Çift Zıplama (Havadayken 2. daha kısa zıplama)
-                rb.linearVelocity = new Vector2(0f, doubleJumpForce);
-                canDoubleJump = false;
+                float force = (jumpsUsed == 0) ? jumpForce : doubleJumpForce;
+                rb.linearVelocity = new Vector2(0f, force);
+                isGrounded = false;
+                jumpsUsed++;
                 squashTimer = 1.0f;
-                AudioManager.Instance?.PlayDoubleJumpSound();
+
+                if (jumpsUsed == 1)
+                {
+                    AudioManager.Instance?.PlayJumpSound();
+                }
+                else
+                {
+                    AudioManager.Instance?.PlayDoubleJumpSound();
+                }
             }
         }
 
         public void Jump()
         {
-            if (GameManager.Instance != null && GameManager.Instance.State == GameState.Playing)
-            {
-                PerformJump();
-            }
+            PerformJump();
         }
 
         public void UpdateCharacterAppearance()
@@ -286,10 +295,14 @@ namespace ZiplaKac.Player
             {
                 if (bodySpriteRenderer != null)
                 {
-                    bodySpriteRenderer.sprite = Utils.ProceduralSpriteGenerator.CreatePlayerSprite(data.bodyColor, data.glowColor, 96);
-                    bodySpriteRenderer.color = Color.white; // Renk sprite içine çizildi
+                    bodySpriteRenderer.sprite = Utils.ProceduralSpriteGenerator.CreatePlayerSprite(data.bodyColor, data.glowColor, 128);
+                    bodySpriteRenderer.color = Color.white;
                 }
-                if (glowSpriteRenderer != null) glowSpriteRenderer.color = data.glowColor;
+                // Çamurlu kahverengi glow halkasını tamamen kapat
+                if (glowSpriteRenderer != null)
+                {
+                    glowSpriteRenderer.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -379,17 +392,14 @@ namespace ZiplaKac.Player
 
         private void HandleGameStateChanged(GameState newState)
         {
+            transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
+            rb.linearVelocity = Vector2.zero;
+            jumpsUsed = 0;
+            isGrounded = true;
+            isInvulnerable = false;
+
             if (newState == GameState.Playing)
             {
-                // Başlangıç pozisyonuna sıfırla (Zeminin üzerinden başlar)
-                float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
-                float halfWidth = 5.0f * aspect;
-                fixedXPosition = -halfWidth + (halfWidth * 2f) * 0.22f;
-
-                transform.position = new Vector3(fixedXPosition, -2.5f, 0f);
-                rb.linearVelocity = Vector2.zero;
-                canDoubleJump = true;
-                isInvulnerable = false;
                 UpdateCharacterAppearance();
                 UpdateShieldVisual();
             }

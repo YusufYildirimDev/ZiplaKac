@@ -63,7 +63,7 @@ namespace ZiplaKac.Obstacles
             }
         }
 
-        private void RecycleToPool()
+        public void RecycleToPool()
         {
             if (ObjectPooler.Instance != null)
             {
@@ -72,6 +72,18 @@ namespace ZiplaKac.Obstacles
             else
             {
                 gameObject.SetActive(false);
+            }
+        }
+
+        public static void ClearAllActiveObstacles()
+        {
+            Obstacle[] all = FindObjectsOfType<Obstacle>();
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (all[i] != null && all[i].gameObject.activeSelf)
+                {
+                    all[i].RecycleToPool();
+                }
             }
         }
     }

@@ -173,7 +173,8 @@ namespace ZiplaKac.Utils
             if (ground == null)
             {
                 ground = new GameObject("Ground");
-                ground.transform.position = new Vector3(0f, -4.5f, 0f);
+                ground.transform.position = new Vector3(0f, -3.20f, 0f);
+                ground.transform.localScale = new Vector3(4f, 1f, 1f);
 
                 SpriteRenderer sr = ground.AddComponent<SpriteRenderer>();
                 sr.sprite = ProceduralSpriteGenerator.CreateGroundSprite(new Color(0.17f, 0.23f, 0.39f)); // #2b3a63 (Modern Zemin)
@@ -182,7 +183,8 @@ namespace ZiplaKac.Utils
                 if (safeMat != null) sr.material = safeMat;
 
                 BoxCollider2D col = ground.AddComponent<BoxCollider2D>();
-                col.size = new Vector2(40f, 2f); // Üst yüzey Y = -3.5f
+                col.size = new Vector2(40f, 2f);
+                col.offset = new Vector2(0f, -1.0f); // Üst yüzey Y = -3.20f
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
                 if (groundLayer != -1) ground.layer = groundLayer;
@@ -199,33 +201,20 @@ namespace ZiplaKac.Utils
                 player = new GameObject("Player");
                 try { player.tag = "Player"; } catch { }
 
-                float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
-                float halfWidth = 5.0f * aspect;
-                // Ekranın sol kenarından %22 içeride konumlandır
-                float playerX = -halfWidth + (halfWidth * 2f) * 0.22f;
-                player.transform.position = new Vector3(playerX, -2.5f, 0f);
+                player.transform.position = new Vector3(PlayerController.FIXED_PLAYER_X, PlayerController.GROUND_FLOOR_Y, 0f);
 
                 Material safeMat = GetSafeSpriteMaterial();
 
                 // Gövde Görseli (Cute rounded square with eyes & catchlight)
                 SpriteRenderer bodySr = player.AddComponent<SpriteRenderer>();
-                bodySr.sprite = ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 96);
+                bodySr.sprite = ProceduralSpriteGenerator.CreatePlayerSprite(new Color(1.0f, 0.82f, 0.4f), new Color(1.0f, 0.91f, 0.66f, 0.8f), 128);
                 bodySr.sortingOrder = 10;
                 if (safeMat != null) bodySr.material = safeMat;
-
-                // Parıltı (Glow) Alt Nesnesi
-                GameObject glowObj = new GameObject("Glow");
-                glowObj.transform.SetParent(player.transform, false);
-                glowObj.transform.localScale = Vector3.one * 1.35f;
-                SpriteRenderer glowSr = glowObj.AddComponent<SpriteRenderer>();
-                glowSr.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(1f, 0.85f, 0.3f, 0.35f), 96);
-                glowSr.sortingOrder = 9;
-                if (safeMat != null) glowSr.material = safeMat;
 
                 // Kalkan Halkası (Shield Ring) Alt Nesnesi
                 GameObject shieldObj = new GameObject("ShieldRing");
                 shieldObj.transform.SetParent(player.transform, false);
-                shieldObj.transform.localScale = Vector3.one * 1.45f;
+                shieldObj.transform.localScale = Vector3.one * 1.35f;
                 SpriteRenderer shieldSr = shieldObj.AddComponent<SpriteRenderer>();
                 shieldSr.sprite = ProceduralSpriteGenerator.CreateRingSprite(new Color(0.30f, 0.79f, 0.94f), 96, 0.84f);
                 shieldSr.sortingOrder = 11;
@@ -235,11 +224,11 @@ namespace ZiplaKac.Utils
                 // Zemin Kontrol Noktası (GroundCheck)
                 GameObject groundCheckObj = new GameObject("GroundCheck");
                 groundCheckObj.transform.SetParent(player.transform, false);
-                groundCheckObj.transform.localPosition = new Vector3(0f, -0.42f, 0f);
+                groundCheckObj.transform.localPosition = new Vector3(0f, -0.22f, 0f);
 
-                // Fizik & Kontrolcü (index.html ile tam uyumlu BoxCollider2D ve gravityScale 2.8f)
+                // Fizik & Kontrolcü (PPU 200 karakter boyutu 0.52x0.52 ile uyumlu BoxCollider2D)
                 BoxCollider2D col = player.AddComponent<BoxCollider2D>();
-                col.size = new Vector2(0.72f, 0.72f);
+                col.size = new Vector2(0.44f, 0.44f);
 
                 Rigidbody2D rb = player.AddComponent<Rigidbody2D>();
                 rb.gravityScale = 2.8f;
@@ -247,7 +236,6 @@ namespace ZiplaKac.Utils
 
                 PlayerController pc = player.AddComponent<PlayerController>();
                 pc.bodySpriteRenderer = bodySr;
-                pc.glowSpriteRenderer = glowSr;
                 pc.shieldRingObject = shieldObj;
                 pc.shieldRingSpriteRenderer = shieldSr;
                 pc.groundCheckTransform = groundCheckObj.transform;
@@ -338,25 +326,25 @@ namespace ZiplaKac.Utils
             if (name == "Cactus")
             {
                 sr.sprite = ProceduralSpriteGenerator.CreateCactusSprite(obsColor);
-                col.size = new Vector2(0.55f, 0.85f);
-                col.offset = new Vector2(0f, 0.45f);
+                col.size = new Vector2(0.34f, 0.54f);
+                col.offset = new Vector2(0f, 0.27f);
             }
             else if (name == "Rock")
             {
                 sr.sprite = ProceduralSpriteGenerator.CreateRockSprite(obsColor);
-                col.size = new Vector2(0.75f, 0.50f);
-                col.offset = new Vector2(0f, 0.25f);
+                col.size = new Vector2(0.48f, 0.30f);
+                col.offset = new Vector2(0f, 0.15f);
             }
             else if (name == "Spike")
             {
                 sr.sprite = ProceduralSpriteGenerator.CreateSpikeSprite(obsColor);
-                col.size = new Vector2(0.50f, 1.0f);
-                col.offset = new Vector2(0f, 0.52f);
+                col.size = new Vector2(0.28f, 0.72f);
+                col.offset = new Vector2(0f, 0.36f);
             }
             else if (name.Contains("Bird"))
             {
                 sr.sprite = ProceduralSpriteGenerator.CreateBirdSprite(airColor);
-                col.size = new Vector2(0.75f, 0.50f);
+                col.size = new Vector2(0.40f, 0.26f);
                 col.offset = Vector2.zero;
             }
 
@@ -381,7 +369,7 @@ namespace ZiplaKac.Utils
             if (safeMat != null) sr.material = safeMat;
 
             CircleCollider2D col = obj.AddComponent<CircleCollider2D>();
-            col.radius = 0.35f;
+            col.radius = 0.22f;
             col.isTrigger = true;
 
             obj.transform.localScale = Vector3.one;
@@ -547,38 +535,39 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.45f);
 
-            // Centered Glassmorphic Card (840x940)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(840f, 940f));
+            // Centered Glassmorphic Card (760x760, Y: +130 so player is clearly visible below)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(760f, 760f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 130f);
 
             // Başlık "ZIPLA KAÇ"
-            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 62, new Vector2(0f, 370f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
+            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 54, new Vector2(0f, 275f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
 
             // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 26, new Vector2(0f, 305f), new Color(0.6f, 0.7f, 0.85f), false);
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 24, new Vector2(0f, 220f), new Color(0.6f, 0.7f, 0.85f), false);
 
             // "KARAKTER SEÇ" etiketi
-            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 22, new Vector2(0f, 175f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
+            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 20, new Vector2(0f, 125f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
 
             // Karakter Galerisi UI (Swatches)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 55f);
-            galleryRt.sizeDelta = new Vector2(760f, 160f);
+            galleryRt.anchoredPosition = new Vector2(0f, 20f);
+            galleryRt.sizeDelta = new Vector2(700f, 130f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
             // Neon Mint "BAŞLA" Butonu (#06d6a0)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -145f), new Vector2(440f, 96f), mintColor, darkNavy, 36);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -165f), new Vector2(400f, 84f), mintColor, darkNavy, 32);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
             // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 22, new Vector2(0f, -310f), new Color(0.55f, 0.65f, 0.8f), false);
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 20, new Vector2(0f, -285f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
@@ -656,37 +645,38 @@ namespace ZiplaKac.Utils
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Centered Glassmorphic Card (840x940)
-            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(840f, 940f));
+            // Centered Glassmorphic Card (760x760, Y: +100)
+            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(760f, 760f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 100f);
 
             // Başlık "OYUN BİTTİ" (Coral #ef476f)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 56, new Vector2(0f, 370f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 52, new Vector2(0f, 280f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
 
             // Alt Bilgi "Bir engele çarptın!"
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 24, new Vector2(0f, 305f), new Color(0.65f, 0.72f, 0.85f), false);
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 24, new Vector2(0f, 225f), new Color(0.65f, 0.72f, 0.85f), false);
 
             // Skor Büyük Rakam
-            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 86, new Vector2(0f, 205f), Color.white, false, FontStyle.Bold);
+            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 80, new Vector2(0f, 135f), Color.white, false, FontStyle.Bold);
 
             // En İyi Skor
-            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 30, new Vector2(0f, 115f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
+            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 28, new Vector2(0f, 55f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
 
             // Yeni Rekor Rozeti
-            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 32, new Vector2(0f, 50f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 28, new Vector2(0f, 0f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
             goUI.newRecordBadge = newRecText.gameObject;
             goUI.newRecordBadge.SetActive(false);
 
             // Son 5 Skor Listesi (Kompakt Tek Satır)
-            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 24, new Vector2(0f, -30f), new Color(0.7f, 0.78f, 0.9f), false);
+            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 22, new Vector2(0f, -55f), new Color(0.7f, 0.78f, 0.9f), false);
 
             // Tekrar Oyna Butonu (Neon Mint #06d6a0)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -155f), new Vector2(440f, 96f), mintColor, darkNavy, 34);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -160f), new Vector2(400f, 84f), mintColor, darkNavy, 32);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
             // Ana Menü Butonu (Sleek ikincil buton)
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -275f), new Vector2(340f, 80f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 26);
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -265f), new Vector2(320f, 72f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 24);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);

@@ -85,8 +85,9 @@ namespace ZiplaKac.UI
                     swatchRt.anchoredPosition = new Vector2(0f, 25f);
                     swatchRt.sizeDelta = new Vector2(85f, 85f);
                     Image swatchImg = swatchObj.AddComponent<Image>();
-                    swatchImg.type = Image.Type.Sliced;
-                    swatchImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(card.bodyColor, Color.clear, 0f, 24);
+                    swatchImg.type = Image.Type.Simple;
+                    swatchImg.preserveAspect = true;
+                    swatchImg.sprite = Utils.ProceduralSpriteGenerator.CreateMiniCharacterIcon(card.bodyColor, 128);
                     swatchImg.raycastTarget = false;
                     card.iconImage = swatchImg;
 

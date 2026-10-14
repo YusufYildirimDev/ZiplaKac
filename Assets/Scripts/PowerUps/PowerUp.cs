@@ -83,7 +83,7 @@ namespace ZiplaKac.PowerUps
             }
         }
 
-        private void RecycleToPool()
+        public void RecycleToPool()
         {
             string poolTag = GetPoolTag();
             if (ObjectPooler.Instance != null)
@@ -93,6 +93,18 @@ namespace ZiplaKac.PowerUps
             else
             {
                 gameObject.SetActive(false);
+            }
+        }
+
+        public static void ClearAllActivePowerUps()
+        {
+            PowerUp[] all = FindObjectsOfType<PowerUp>();
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (all[i] != null && all[i].gameObject.activeSelf)
+                {
+                    all[i].RecycleToPool();
+                }
             }
         }
 

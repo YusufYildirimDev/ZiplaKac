@@ -105,6 +105,8 @@ namespace ZiplaKac.Core
                 case GameState.MainMenu:
                     Time.timeScale = 1.0f;
                     ResetPowerUps();
+                    Obstacles.Obstacle.ClearAllActiveObstacles();
+                    PowerUps.PowerUp.ClearAllActivePowerUps();
                     break;
 
                 case GameState.Playing:
@@ -115,6 +117,8 @@ namespace ZiplaKac.Core
                     comboCount = 0;
                     consecutivePassedObstacles = 0;
                     ResetPowerUps();
+                    Obstacles.Obstacle.ClearAllActiveObstacles();
+                    PowerUps.PowerUp.ClearAllActivePowerUps();
                     break;
 
                 case GameState.GameOver:

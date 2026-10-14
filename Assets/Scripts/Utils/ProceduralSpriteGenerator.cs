@@ -8,22 +8,27 @@ namespace ZiplaKac.Utils
     /// </summary>
     public static class ProceduralSpriteGenerator
     {
+        public const float GAME_PPU = 200f;
+
         /// <summary>
-        /// index.html drawPlayer(): roundRect(x, y, w, h, 8) + shadowBlur: 14, shadowColor: glow + 2 sevimli göz
+        /// Yüksek çözünürlüklü, sevimli (kawaii) küp kahraman avatarı:
+        /// 3D jel/şeker degrade dolgu, tepe parlama çizgisi, parlak gözbebekleri, çift ışık yansıması ve pembe yanaklar.
+        /// PPU: 200f -> Dünya boyutu: 0.52f x 0.52f
         /// </summary>
-        public static Sprite CreatePlayerSprite(Color bodyColor, Color glowColor, int size = 96)
+        public static Sprite CreatePlayerSprite(Color bodyColor, Color glowColor, int size = 128)
         {
             Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            float padding = size * 0.16f; // Işıma (glow) payı
-            float rectW = size - padding * 2f;
-            float rectH = size - padding * 2f;
-            float cornerRadius = rectW * 0.24f; // 8px / 34px oranı
+            float pad = 12f;
+            Vector2 min = new Vector2(pad, pad);
+            Vector2 max = new Vector2(size - pad, size - pad);
+            float cornerRadius = 24f;
 
-            Vector2 min = new Vector2(padding, padding);
-            Vector2 max = new Vector2(size - padding, size - padding);
+            Color topHighlight = Color.Lerp(bodyColor, Color.white, 0.35f);
+            Color bottomShadow = Color.Lerp(bodyColor, new Color(0.08f, 0.08f, 0.15f), 0.28f);
 
+            // 1. Gövde & Yumuşak Kenar
             for (int y = 0; y < size; y++)
             {
                 for (int x = 0; x < size; x++)
@@ -31,92 +36,144 @@ namespace ZiplaKac.Utils
                     Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
                     float d = SignedDistanceRoundedRect(pt, min, max, cornerRadius);
 
-                    if (d <= 0f)
+                    if (d <= -2f)
                     {
-                        // Gövde içi
-                        tex.SetPixel(x, y, bodyColor);
+                        // Dikey Degrade (Jel / Marshmallow efekti)
+                        float vertT = Mathf.Clamp01((y - min.y) / (max.y - min.y));
+                        Color c = Color.Lerp(bottomShadow, topHighlight, vertT);
+
+                        // Tepe parlama yansıması (Glossy Specular)
+                        if (y > max.y - 18f && x > min.x + 10f && x < max.x - 10f)
+                        {
+                            float glossT = (y - (max.y - 18f)) / 18f;
+                            c = Color.Lerp(c, Color.white, glossT * 0.40f);
+                        }
+
+                        tex.SetPixel(x, y, c);
                     }
-                    else if (d <= padding * 0.95f)
+                    else if (d <= 0f)
                     {
-                        // Yumuşak dış ışıma (glow halo)
-                        float t = d / (padding * 0.95f);
-                        float alpha = Mathf.Pow(1f - t, 2.0f) * 0.85f;
-                        tex.SetPixel(x, y, new Color(glowColor.r, glowColor.g, glowColor.b, alpha));
+                        // Kenar Çizgisi (İnce ve temiz)
+                        float edgeT = (d + 2f) / 2f;
+                        Color edgeCol = Color.Lerp(bottomShadow, topHighlight, (float)y / size);
+                        tex.SetPixel(x, y, Color.Lerp(edgeCol, Color.white, 0.15f));
+                    }
+                    else if (d <= 2.5f)
+                    {
+                        // Çok hafif dış antialias
+                        float alpha = (1f - (d / 2.5f)) * 0.45f;
+                        tex.SetPixel(x, y, new Color(bodyColor.r, bodyColor.g, bodyColor.b, alpha));
                     }
                 }
             }
 
-            // Sevimli Gözler (index.html: w*0.62, h*0.38 ve w*0.82, h*0.38)
-            int eyeY = Mathf.RoundToInt(max.y - rectH * 0.38f);
-            int eye1X = Mathf.RoundToInt(min.x + rectW * 0.62f);
-            int eye2X = Mathf.RoundToInt(min.x + rectW * 0.82f);
-            int eyeRadius = Mathf.Max(2, Mathf.RoundToInt(rectW * 0.08f));
-            Color eyeColor = new Color(0.10f, 0.10f, 0.18f, 1f); // #1a1a2e
+            // 2. Canlı Sevimli Gözler (Büyük ve Parlak)
+            int eyeY = Mathf.RoundToInt(min.y + (max.y - min.y) * 0.52f);
+            int eye1X = Mathf.RoundToInt(min.x + (max.x - min.x) * 0.62f);
+            int eye2X = Mathf.RoundToInt(min.x + (max.x - min.x) * 0.84f);
+            int eyeRadius = 9;
+            Color pupilColor = new Color(0.08f, 0.10f, 0.18f, 1f); // Koyu lacivert göz
 
-            DrawFilledCircleAA(tex, eye1X, eyeY, eyeRadius, eyeColor);
-            DrawFilledCircleAA(tex, eye2X, eyeY, eyeRadius, eyeColor);
+            DrawFilledCircleAA(tex, eye1X, eyeY, eyeRadius, pupilColor);
+            DrawFilledCircleAA(tex, eye2X, eyeY, eyeRadius, pupilColor);
 
-            // Göz parıltısı (Highlight)
-            int hlOffset = Mathf.Max(1, eyeRadius / 2);
-            tex.SetPixel(eye1X, eyeY + hlOffset, Color.white);
-            tex.SetPixel(eye2X, eyeY + hlOffset, Color.white);
+            // Göz içi büyük ışıltı (Üst-sağ catchlight)
+            DrawFilledCircleAA(tex, eye1X + 3, eyeY + 3, 3, Color.white);
+            DrawFilledCircleAA(tex, eye2X + 3, eyeY + 3, 3, Color.white);
+
+            // Göz içi küçük ışıltı (Alt-sol mini twinkle)
+            DrawFilledCircleAA(tex, eye1X - 3, eyeY - 3, 1, new Color(1f, 1f, 1f, 0.8f));
+            DrawFilledCircleAA(tex, eye2X - 3, eyeY - 3, 1, new Color(1f, 1f, 1f, 0.8f));
+
+            // 3. Tatlı Yanaklar (Pastel Gül Pembesi Allık)
+            Color blushColor = new Color(1.0f, 0.42f, 0.58f, 0.45f);
+            DrawFilledCircleAA(tex, eye1X - 2, eyeY - 11, 6, blushColor);
+            DrawFilledCircleAA(tex, eye2X + 2, eyeY - 11, 6, blushColor);
+
+            // 4. Minik Tebessüm (Ağız)
+            int mouthX = (eye1X + eye2X) / 2;
+            int mouthY = eyeY - 9;
+            tex.SetPixel(mouthX - 2, mouthY, pupilColor);
+            tex.SetPixel(mouthX - 1, mouthY - 1, pupilColor);
+            tex.SetPixel(mouthX, mouthY - 1, pupilColor);
+            tex.SetPixel(mouthX + 1, mouthY - 1, pupilColor);
+            tex.SetPixel(mouthX + 2, mouthY, pupilColor);
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), GAME_PPU);
         }
 
         /// <summary>
-        /// index.html drawObstacles(): roundRect stem (5px) + sol ve sağ dal
+        /// Karakter seçici galerisi (swatch) için minyatür yüz ikonu
         /// </summary>
-        public static Sprite CreateCactusSprite(Color color, int w = 64, int h = 96)
+        public static Sprite CreateMiniCharacterIcon(Color bodyColor, int size = 80)
+        {
+            return CreatePlayerSprite(bodyColor, bodyColor, size);
+        }
+
+        /// <summary>
+        /// Doğal orantılı Kaktüs (Stem + 2 dal, tepe aydınlatması)
+        /// PPU: 200f -> Genişlik: 0.40f, Yükseklik: 0.60f
+        /// </summary>
+        public static Sprite CreateCactusSprite(Color color, int w = 80, int h = 120)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            float stemW = w * 0.44f;
+            float stemW = 32f;
             float cx = w * 0.5f;
-            float cornerRadius = 6f;
+            float cornerRadius = 10f;
+
+            Color topLight = Color.Lerp(color, Color.white, 0.28f);
+            Color darkContour = Color.Lerp(color, Color.black, 0.20f);
 
             // 1. Ana Gövde (Stem)
             Vector2 stemMin = new Vector2(cx - stemW * 0.5f, 0f);
             Vector2 stemMax = new Vector2(cx + stemW * 0.5f, h);
             DrawRoundedRectOnto(tex, stemMin, stemMax, cornerRadius, color);
 
-            // 2. Sol Kol (Left Branch)
-            float leftY = h * 0.28f;
-            float leftH = h * 0.38f;
-            float armThick = stemW * 0.32f;
-            DrawRoundedRectOnto(tex, new Vector2(cx - stemW * 0.5f - w * 0.22f, leftY), new Vector2(cx - stemW * 0.45f, leftY + armThick), 3f, color);
-            DrawRoundedRectOnto(tex, new Vector2(cx - stemW * 0.5f - w * 0.22f, leftY), new Vector2(cx - stemW * 0.5f - w * 0.22f + armThick, leftY + leftH), 3f, color);
+            // 2. Sol Dal
+            float leftY = h * 0.30f;
+            float leftH = h * 0.40f;
+            float armThick = 18f;
+            DrawRoundedRectOnto(tex, new Vector2(cx - stemW * 0.5f - 22f, leftY), new Vector2(cx - stemW * 0.4f, leftY + armThick), 6f, color);
+            DrawRoundedRectOnto(tex, new Vector2(cx - stemW * 0.5f - 22f, leftY), new Vector2(cx - stemW * 0.5f - 22f + armThick, leftY + leftH), 6f, color);
 
-            // 3. Sağ Kol (Right Branch)
-            float rightY = h * 0.44f;
-            float rightH = h * 0.36f;
-            DrawRoundedRectOnto(tex, new Vector2(cx + stemW * 0.45f, rightY), new Vector2(cx + stemW * 0.5f + w * 0.22f, rightY + armThick), 3f, color);
-            DrawRoundedRectOnto(tex, new Vector2(cx + stemW * 0.5f + w * 0.22f - armThick, rightY), new Vector2(cx + stemW * 0.5f + w * 0.22f, rightY + rightH), 3f, color);
+            // 3. Sağ Dal
+            float rightY = h * 0.45f;
+            float rightH = h * 0.38f;
+            DrawRoundedRectOnto(tex, new Vector2(cx + stemW * 0.4f, rightY), new Vector2(cx + stemW * 0.5f + 22f, rightY + armThick), 6f, color);
+            DrawRoundedRectOnto(tex, new Vector2(cx + stemW * 0.5f + 22f - armThick, rightY), new Vector2(cx + stemW * 0.5f + 22f, rightY + rightH), 6f, color);
+
+            // Tepe yüzey aydınlatmaları
+            for (int x = (int)(cx - stemW * 0.35f); x <= (int)(cx + stemW * 0.35f); x++)
+            {
+                if (x >= 0 && x < w) tex.SetPixel(x, h - 3, topLight);
+            }
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), GAME_PPU);
         }
 
         /// <summary>
-        /// index.html drawObstacles(): spiketall: roundRect taban (4px) + sivri tepe üçgeni
+        /// Doğal orantılı Sivri Kristal Diken (Spike)
+        /// PPU: 200f -> Genişlik: 0.34f, Yükseklik: 0.80f
         /// </summary>
-        public static Sprite CreateSpikeSprite(Color color, int w = 52, int h = 100)
+        public static Sprite CreateSpikeSprite(Color color, int w = 68, int h = 160)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            float baseH = h * 0.70f;
+            float baseH = h * 0.35f;
 
             // Alt taban yuvarlak dikdörtgen
-            DrawRoundedRectOnto(tex, new Vector2(4, 0), new Vector2(w - 4, baseH), 6f, color);
+            DrawRoundedRectOnto(tex, new Vector2(6, 0), new Vector2(w - 6, baseH), 8f, color);
 
-            // Üst sivri üçgen
+            // Üst sivri üçgen kule
             for (int y = (int)baseH - 2; y < h; y++)
             {
                 float t = (float)(y - (baseH - 2)) / Mathf.Max(1, (h - (baseH - 2)));
-                float halfWidthAtY = (w * 0.5f - 4) * (1f - t);
+                float halfWidthAtY = (w * 0.5f - 6) * (1f - t);
                 int startX = Mathf.RoundToInt(w * 0.5f - halfWidthAtY);
                 int endX = Mathf.RoundToInt(w * 0.5f + halfWidthAtY);
 
@@ -124,68 +181,80 @@ namespace ZiplaKac.Utils
                 {
                     if (x >= 0 && x < w && y >= 0 && y < h)
                     {
-                        Color c = Color.Lerp(color, Color.white, t * 0.35f);
+                        // Orta dikey parlama omurgası
+                        float distFromCenter = Mathf.Abs(x - w * 0.5f);
+                        Color c = Color.Lerp(color, Color.white, (1f - (distFromCenter / Mathf.Max(1f, halfWidthAtY))) * 0.45f);
                         tex.SetPixel(x, y, c);
                     }
                 }
             }
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), GAME_PPU);
         }
 
         /// <summary>
-        /// index.html drawObstacles(): rock: roundRect(o.x, oy, o.w, o.h, 8)
+        /// Doğal orantılı Kaya (Boulder)
+        /// PPU: 200f -> Genişlik: 0.55f, Yükseklik: 0.35f
         /// </summary>
-        public static Sprite CreateRockSprite(Color color, int w = 72, int h = 48)
+        public static Sprite CreateRockSprite(Color color, int w = 110, int h = 70)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            DrawRoundedRectOnto(tex, new Vector2(3, 0), new Vector2(w - 3, h - 3), 12f, color);
+            DrawRoundedRectOnto(tex, new Vector2(4, 0), new Vector2(w - 4, h - 4), 18f, color);
 
-            for (int x = 12; x < w - 12; x++)
+            // Üst parlak kaya faseti
+            Color facetLight = Color.Lerp(color, Color.white, 0.30f);
+            for (int x = 20; x < w - 20; x++)
             {
-                int y = h - 6;
-                tex.SetPixel(x, y, Color.Lerp(color, Color.white, 0.25f));
-            }
-
-            tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 64f);
-        }
-
-        /// <summary>
-        /// index.html drawObstacles(): bird: roundRect(10px) + kanatlar
-        /// </summary>
-        public static Sprite CreateBirdSprite(Color color, int w = 72, int h = 48)
-        {
-            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
-            ClearTexture(tex);
-
-            // Gövde
-            DrawRoundedRectOnto(tex, new Vector2(6, 6), new Vector2(w - 6, h - 14), 14f, color);
-
-            // Kanatlar
-            float cx = w * 0.5f;
-            float wingBaseY = h - 16;
-            for (int x = 10; x < w - 10; x++)
-            {
-                float dx = Mathf.Abs(x - cx);
-                float wingTopY = wingBaseY + (1f - (dx / (w * 0.4f))) * 14f;
-                for (int y = (int)wingBaseY; y <= (int)wingTopY; y++)
+                for (int y = h - 14; y < h - 5; y++)
                 {
-                    if (x >= 0 && x < w && y >= 0 && y < h)
+                    if (tex.GetPixel(x, y).a > 0.5f)
                     {
-                        tex.SetPixel(x, y, Color.Lerp(color, Color.white, 0.2f));
+                        tex.SetPixel(x, y, facetLight);
                     }
                 }
             }
 
-            DrawFilledCircleAA(tex, (int)(w * 0.75f), (int)(h * 0.45f), 3, Color.white);
-            DrawFilledCircleAA(tex, (int)(w * 0.77f), (int)(h * 0.45f), 1, Color.black);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), GAME_PPU);
+        }
+
+        /// <summary>
+        /// Doğal orantılı Havada Uçan Siber Kuş (Bird)
+        /// PPU: 200f -> Genişlik: 0.46f, Yükseklik: 0.32f
+        /// </summary>
+        public static Sprite CreateBirdSprite(Color color, int w = 92, int h = 64)
+        {
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            // Ana gövde
+            DrawRoundedRectOnto(tex, new Vector2(8, 8), new Vector2(w - 8, h - 16), 18f, color);
+
+            // Kanat üstleri (Vurgulu)
+            float cx = w * 0.48f;
+            float wingBaseY = h - 22;
+            for (int x = 12; x < w - 12; x++)
+            {
+                float dx = Mathf.Abs(x - cx);
+                float wingTopY = wingBaseY + (1f - (dx / (w * 0.42f))) * 18f;
+                for (int y = (int)wingBaseY; y <= (int)wingTopY; y++)
+                {
+                    if (x >= 0 && x < w && y >= 0 && y < h)
+                    {
+                        tex.SetPixel(x, y, Color.Lerp(color, Color.white, 0.35f));
+                    }
+                }
+            }
+
+            // Parlayan siber göz
+            DrawFilledCircleAA(tex, (int)(w * 0.76f), (int)(h * 0.42f), 4, Color.cyan);
+            DrawFilledCircleAA(tex, (int)(w * 0.77f), (int)(h * 0.43f), 1, Color.white);
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), GAME_PPU);
         }
 
         /// <summary>
@@ -226,7 +295,7 @@ namespace ZiplaKac.Utils
 
             tex.Apply();
             Vector4 border = new Vector4(cornerRadius + 4, cornerRadius + 4, cornerRadius + 4, cornerRadius + 4);
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 64f, 0, SpriteMeshType.FullRect, border);
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, border);
         }
 
         /// <summary>
@@ -245,27 +314,51 @@ namespace ZiplaKac.Utils
                 }
             }
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f);
         }
 
         /// <summary>
-        /// Zemin görseli (Üstünde parlak vurgu çizgisi olan zemin)
+        /// Zemin görseli (Üstünde parlak neon vurgu çizgisi olan modern zemin)
+        /// PPU: 100f -> Yükseklik: 2.56f, Genişlik: 5.12f, Pivot: (0.5f, 1.0f) Üst Kenar
         /// </summary>
-        public static Sprite CreateGroundSprite(Color groundColor, int w = 512, int h = 128)
+        public static Sprite CreateGroundSprite(Color groundColor, int w = 512, int h = 256)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
-            Color topStripe = Color.Lerp(groundColor, Color.white, 0.22f);
+            Color neonStripe = new Color(0.024f, 0.839f, 0.627f); // Neon Mint vurgusu #06d6a0
+            Color subStripe = Color.Lerp(groundColor, Color.white, 0.28f);
 
             for (int y = 0; y < h; y++)
             {
-                Color c = (y >= h - 4) ? topStripe : groundColor;
+                Color c;
+                if (y >= h - 4)
+                {
+                    c = neonStripe; // Üst 4px neon çizgi
+                }
+                else if (y >= h - 8)
+                {
+                    c = subStripe;
+                }
+                else
+                {
+                    float grad = (float)y / (h - 8);
+                    c = Color.Lerp(new Color(0.06f, 0.08f, 0.16f), groundColor, grad);
+                }
+
                 for (int x = 0; x < w; x++)
                 {
-                    tex.SetPixel(x, y, c);
+                    // İnce dikey grid dokusu (hız hissi verir)
+                    if (y < h - 10 && (x % 64 == 0 || x % 64 == 1))
+                    {
+                        tex.SetPixel(x, y, Color.Lerp(c, Color.white, 0.06f));
+                    }
+                    else
+                    {
+                        tex.SetPixel(x, y, c);
+                    }
                 }
             }
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 1.0f), 100f);
         }
 
         public static Sprite CreateCircleSprite(Color color, int resolution = 64)
@@ -275,13 +368,14 @@ namespace ZiplaKac.Utils
             float r = resolution * 0.44f;
             DrawFilledCircleAA(tex, resolution / 2, resolution / 2, (int)r, color);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), GAME_PPU);
         }
 
         /// <summary>
         /// index.html drawPowerUps(): Parlayan küre ve tepe parıltılı güçlendirme orbu
+        /// PPU: 200f -> Çap: 0.44f
         /// </summary>
-        public static Sprite CreatePowerUpOrb(Color color, string label = "", int resolution = 64)
+        public static Sprite CreatePowerUpOrb(Color color, string label = "", int resolution = 88)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             ClearTexture(tex);
@@ -316,21 +410,21 @@ namespace ZiplaKac.Utils
                     if (d < r * 0.45f)
                     {
                         Color cur = tex.GetPixel(x, y);
-                        float hl = (1f - d / (r * 0.45f)) * 0.35f;
+                        float hl = (1f - d / (r * 0.45f)) * 0.40f;
                         tex.SetPixel(x, y, Color.Lerp(cur, Color.white, hl));
                     }
                 }
             }
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), GAME_PPU);
         }
 
-        public static Sprite CreateRingSprite(Color color, int resolution = 64, float innerRatio = 0.75f)
+        public static Sprite CreateRingSprite(Color color, int resolution = 128, float innerRatio = 0.82f)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             ClearTexture(tex);
-            float outerR = resolution * 0.48f;
+            float outerR = resolution * 0.46f;
             float innerR = outerR * innerRatio;
             Vector2 center = new Vector2(resolution * 0.5f, resolution * 0.5f);
 
@@ -343,10 +437,15 @@ namespace ZiplaKac.Utils
                     {
                         tex.SetPixel(x, y, color);
                     }
+                    else if (d >= innerR - 1.5f && d <= outerR + 1.5f)
+                    {
+                        float alpha = color.a * 0.4f;
+                        tex.SetPixel(x, y, new Color(color.r, color.g, color.b, alpha));
+                    }
                 }
             }
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 64f);
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), GAME_PPU);
         }
 
         public static Sprite CreateRectangleSprite(Color color, int width = 64, int height = 64)

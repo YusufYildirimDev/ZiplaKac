@@ -32,7 +32,7 @@ namespace ZiplaKac.Obstacles
             float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
             float halfWidth = 5.0f * aspect;
             spawnX = halfWidth + 1.2f;
-            groundY = -3.5f;
+            groundY = -3.20f;
         }
 
         private void Start()
@@ -70,15 +70,15 @@ namespace ZiplaKac.Obstacles
             float spawnY = groundY;
             if (chosen.obstacleType == ObstacleType.LowBird)
             {
-                spawnY = groundY + 1.8f; // Zıplayarak veya altından kaçılabilecek alçak uçuş
+                spawnY = -2.05f; // Alçak uçuş: üzerinden zıplanabilir
             }
             else if (chosen.obstacleType == ObstacleType.HighBird)
             {
-                spawnY = groundY + 3.0f; // Yüksek uçuş
+                spawnY = -1.40f; // Yüksek uçuş: altından geçilir
             }
             else
             {
-                // Cactus, Spike, Rock: tabanları zemin yüzeyi Y = -3.5f üzerinde durur
+                // Cactus, Spike, Rock: tabanları zemin yüzeyi Y = -3.20f üzerinde durur
                 spawnY = groundY;
             }
 
