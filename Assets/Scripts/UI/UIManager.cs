@@ -152,15 +152,27 @@ namespace ZiplaKac.UI
 
         private void ShowComboFloatingText(int comboCount, Vector3 worldPosition)
         {
+            if (hudPanel != null)
+            {
+                HUDController hud = hudPanel.GetComponent<HUDController>();
+                if (hud != null)
+                {
+                    hud.ShowCombo(comboCount);
+                    return;
+                }
+            }
+
             if (ObjectPooler.Instance != null)
             {
-                GameObject txtObj = ObjectPooler.Instance.SpawnFromPool("FloatingText", worldPosition + Vector3.up * 1.5f, Quaternion.identity);
+                // Ekran ortasında yedek pozisyonlama (asla ekran dışına veya soluna taşmaz)
+                Vector3 safePos = new Vector3(0f, 1.5f, 0f);
+                GameObject txtObj = ObjectPooler.Instance.SpawnFromPool("FloatingText", safePos, Quaternion.identity);
                 if (txtObj != null)
                 {
                     FloatingText ft = txtObj.GetComponent<FloatingText>();
                     if (ft != null)
                     {
-                        ft.SetText($"Kombo x{comboCount}! +10", new Color(1.0f, 0.84f, 0.04f)); // #ffd60a
+                        ft.SetText($"KOMBO x{comboCount}! +10", new Color(1.0f, 0.84f, 0.04f));
                     }
                 }
             }

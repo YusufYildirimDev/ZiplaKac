@@ -19,13 +19,24 @@ namespace ZiplaKac.UI
         private void OnEnable()
         {
             timer = 0f;
-            if (textComponent == null) textComponent = GetComponentInChildren<Text>();
+            EnsureTextSetup();
             if (textComponent != null) initialColor = textComponent.color;
+        }
+
+        private void EnsureTextSetup()
+        {
+            if (textComponent == null) textComponent = GetComponentInChildren<Text>();
+            if (textComponent != null)
+            {
+                textComponent.horizontalOverflow = HorizontalWrapMode.Overflow;
+                textComponent.verticalOverflow = VerticalWrapMode.Overflow;
+                textComponent.alignment = TextAnchor.MiddleCenter;
+            }
         }
 
         public void SetText(string message, Color color)
         {
-            if (textComponent == null) textComponent = GetComponentInChildren<Text>();
+            EnsureTextSetup();
             if (textComponent != null)
             {
                 textComponent.text = message;

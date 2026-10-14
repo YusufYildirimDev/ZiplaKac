@@ -417,16 +417,30 @@ namespace ZiplaKac.Utils
             GameObject canvasObj = new GameObject("FloatingTextCanvas");
             Canvas canvas = canvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
-            canvasObj.transform.localScale = Vector3.one * 0.02f;
+            canvasObj.transform.localScale = Vector3.one * 0.012f;
+
+            RectTransform canvasRt = canvasObj.GetComponent<RectTransform>();
+            canvasRt.sizeDelta = new Vector2(600f, 160f);
 
             GameObject textObj = new GameObject("Text");
             textObj.transform.SetParent(canvasObj.transform, false);
 
+            RectTransform textRt = textObj.AddComponent<RectTransform>();
+            textRt.sizeDelta = new Vector2(600f, 160f);
+            textRt.anchoredPosition = Vector2.zero;
+
             Text txt = textObj.AddComponent<Text>();
             txt.font = GetSafeDefaultFont();
-            txt.fontSize = 36;
+            txt.fontSize = 44;
+            txt.fontStyle = FontStyle.Bold;
             txt.alignment = TextAnchor.MiddleCenter;
-            txt.color = Color.yellow;
+            txt.color = new Color(1.0f, 0.84f, 0.04f); // #ffd60a
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Overflow;
+
+            Shadow shadow = textObj.AddComponent<Shadow>();
+            shadow.effectColor = new Color(0f, 0f, 0f, 0.9f);
+            shadow.effectDistance = new Vector2(2f, -2f);
 
             FloatingText ft = canvasObj.AddComponent<FloatingText>();
             ft.textComponent = txt;
@@ -631,6 +645,36 @@ namespace ZiplaKac.Utils
 
             // Alt Kontrol İpucu
             hud.controlTipText = CreateText(panel.transform, "ControlTipText", "Zıpla: Dokun / Space", 24, new Vector2(0f, -840f), new Color(0.6f, 0.7f, 0.85f, 0.7f), false);
+
+            // Kombo Bildirim Kartı (Ekranın Üst-Orta Kısmı, Y: 520, X: 0 - Asla sola kaymaz, taşmaz)
+            GameObject comboCard = CreateCardContainer(panel.transform, "ComboNotificationCard", new Vector2(460f, 84f));
+            RectTransform comboRt = comboCard.GetComponent<RectTransform>();
+            comboRt.anchoredPosition = new Vector2(0f, 520f);
+
+            Image comboBg = comboCard.GetComponent<Image>();
+            comboBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.08f, 0.10f, 0.22f, 0.92f),
+                new Color(1.0f, 0.84f, 0.04f, 0.85f),
+                3f, 26, 128, 64);
+            comboBg.raycastTarget = false;
+
+            CanvasGroup comboCg = comboCard.AddComponent<CanvasGroup>();
+            comboCg.alpha = 0f;
+            comboCg.blocksRaycasts = false;
+            comboCg.interactable = false;
+
+            Text comboText = CreateText(comboCard.transform, "ComboText", "KOMBO x5! +10", 38, Vector2.zero, new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            comboText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            comboText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            Shadow comboShadow = comboText.gameObject.AddComponent<Shadow>();
+            comboShadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            comboShadow.effectDistance = new Vector2(2f, -2f);
+
+            hud.comboBannerObject = comboCard;
+            hud.comboBannerText = comboText;
+            hud.comboCanvasGroup = comboCg;
+            comboCard.SetActive(false);
 
             panel.SetActive(false);
             if (UIManager.Instance != null) UIManager.Instance.hudPanel = panel;
