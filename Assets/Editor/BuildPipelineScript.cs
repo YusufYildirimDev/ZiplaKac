@@ -13,6 +13,12 @@ namespace ZiplaKac.Editor
 
             Debug.Log($"[BuildPipelineScript] Starting iOS build to '{buildPath}'...");
 
+            PlayerSettings.companyName = "YusufYildirim";
+            PlayerSettings.productName = "ZiplaKac";
+            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.iOS, "com.yusufyldrm.ziplakac");
+            PlayerSettings.iOS.appleDeveloperTeamID = "29367Z6APG";
+            PlayerSettings.iOS.appleEnableAutomaticSigning = true;
+
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
             {
                 scenes = scenes,
