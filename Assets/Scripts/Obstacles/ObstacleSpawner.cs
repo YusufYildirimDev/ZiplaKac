@@ -13,7 +13,7 @@ namespace ZiplaKac.Obstacles
     {
         [Header("Spawn Konumu Ayarları")]
         public float spawnX = 4.0f;
-        public float groundY = -3.5f;
+        public float groundY = -3.20f;
 
         [Header("Zamanlama Ayarları")]
         [Tooltip("Başlangıç iki engel arası süre (saniye)")]
@@ -32,7 +32,7 @@ namespace ZiplaKac.Obstacles
             float aspect = (float)Screen.width / Mathf.Max(1, Screen.height);
             float halfWidth = 5.0f * aspect;
             spawnX = halfWidth + 1.2f;
-            groundY = -1.55f;
+            groundY = -3.20f;
         }
 
         private void Start()
@@ -98,7 +98,7 @@ namespace ZiplaKac.Obstacles
             }
             else
             {
-                // Cactus, Spike, Rock: tabanları tam zemin yüzeyi / bitimi Y = -1.55f üzerinde durur
+                // Cactus, Spike, Rock: tabanları tam zemin yüzeyi / bitimi Y = -3.20f üzerinde durur
                 spawnY = groundY;
             }
 

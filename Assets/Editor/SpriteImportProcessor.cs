@@ -46,7 +46,7 @@ namespace ZiplaKac.Editor
                 }
                 else if (lower.Contains("ground_tier"))
                 {
-                    textureImporter.spritePixelsPerUnit = 92f;
+                    textureImporter.spritePixelsPerUnit = 150f;
                     settings.spriteAlignment = (int)SpriteAlignment.TopCenter;
                     settings.spritePivot = new Vector2(0.5f, 1.0f);
                     textureImporter.wrapMode = TextureWrapMode.Repeat;
