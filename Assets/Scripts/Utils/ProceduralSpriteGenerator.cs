@@ -236,36 +236,60 @@ namespace ZiplaKac.Utils
         }
 
         /// <summary>
-        /// Doğal orantılı Havada Uçan Siber Kuş (Bird)
-        /// PPU: 200f -> Genişlik: 0.46f, Yükseklik: 0.32f
+        /// Yüksek görünürlüklü ve belirgin Havada Uçan Siber Kuş (Bird)
+        /// PPU: 200f -> Genişlik: 0.90f, Yükseklik: 0.48f
         /// </summary>
-        public static Sprite CreateBirdSprite(Color color, int w = 92, int h = 64)
+        public static Sprite CreateBirdSprite(Color color, int w = 180, int h = 96)
         {
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            // Ana gövde
-            DrawRoundedRectOnto(tex, new Vector2(8, 8), new Vector2(w - 8, h - 16), 18f, color);
+            Color goldGlow = new Color(1.0f, 0.84f, 0.35f);
+            Color darkContour = Color.Lerp(color, Color.black, 0.35f);
 
-            // Kanat üstleri (Vurgulu)
-            float cx = w * 0.48f;
-            float wingBaseY = h - 22;
-            for (int x = 12; x < w - 12; x++)
+            // 1. Kanatlar (Geniş aerodinamik yay)
+            float cx = w * 0.45f;
+            for (int x = 6; x < w - 16; x++)
             {
-                float dx = Mathf.Abs(x - cx);
-                float wingTopY = wingBaseY + (1f - (dx / (w * 0.42f))) * 18f;
-                for (int y = (int)wingBaseY; y <= (int)wingTopY; y++)
+                float dx = (x - cx);
+                float wingCurve = Mathf.Cos(dx / (w * 0.46f) * Mathf.PI * 0.5f);
+                float wingTop = h * 0.45f + wingCurve * (h * 0.48f);
+                float wingBottom = wingTop - (14f + wingCurve * 18f);
+
+                for (int y = Mathf.Max(0, (int)wingBottom); y <= Mathf.Min(h - 1, (int)wingTop); y++)
+                {
+                    // Uçlara doğru altın sarısı parlama
+                    float tipT = Mathf.Clamp01((y - wingBottom) / Mathf.Max(1f, wingTop - wingBottom));
+                    Color c = (tipT > 0.70f) ? Color.Lerp(color, goldGlow, (tipT - 0.70f) / 0.30f) : color;
+                    tex.SetPixel(x, y, c);
+                }
+            }
+
+            // 2. Ana Gövde (Ortalanmış ve Tok)
+            DrawRoundedRectOnto(tex, new Vector2(cx - 36, h * 0.20f), new Vector2(cx + 36, h * 0.78f), 22f, color);
+
+            // 3. Keskin Gagası (Altın Sarısı #ffd166)
+            int beakStartX = (int)(cx - 32);
+            int beakLen = 22;
+            int beakCenterY = (int)(h * 0.44f);
+            for (int bx = 0; bx < beakLen; bx++)
+            {
+                int x = beakStartX - bx;
+                int halfThick = (int)((1f - (float)bx / beakLen) * 7f);
+                for (int y = beakCenterY - halfThick; y <= beakCenterY + halfThick; y++)
                 {
                     if (x >= 0 && x < w && y >= 0 && y < h)
                     {
-                        tex.SetPixel(x, y, Color.Lerp(color, Color.white, 0.35f));
+                        tex.SetPixel(x, y, goldGlow);
                     }
                 }
             }
 
-            // Parlayan siber göz
-            DrawFilledCircleAA(tex, (int)(w * 0.76f), (int)(h * 0.42f), 4, Color.cyan);
-            DrawFilledCircleAA(tex, (int)(w * 0.77f), (int)(h * 0.43f), 1, Color.white);
+            // 4. Parlayan Menacing Siber Göz (Cyan & Beyaz Işıltı)
+            int eyeX = (int)(cx - 14);
+            int eyeY = (int)(h * 0.54f);
+            DrawFilledCircleAA(tex, eyeX, eyeY, 6, Color.cyan);
+            DrawFilledCircleAA(tex, eyeX, eyeY, 3, Color.white);
 
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), GAME_PPU);

@@ -15,7 +15,7 @@
     --player: #ffd166;
     --player-glow: #ffe8a8;
     --obstacle: #ef476f;
-    --obstacle-air: #30264a;
+    --obstacle-air: #ef476f;
     --accent: #06d6a0;
     --text: #f4f6fb;
     --card-bg: rgba(20, 26, 48, 0.85);
@@ -420,6 +420,9 @@
     })(ti);
   }
 
+  var birdSpriteImg = new Image();
+  birdSpriteImg.src = "Assets/Resources/Sprites/bird.png";
+
   function resetGame() {
     groundHeight = Math.round(H * 0.18);
     groundY = H - groundHeight;
@@ -514,9 +517,9 @@
     } else if (kind === "spiketall") {
       w = 16 + Math.random() * 8; h = 55 + Math.random() * 23; y = groundY - h;
     } else if (kind === "birdlow") {
-      w = 30; h = 22; y = groundY - 70;
+      w = 52; h = 30; y = groundY - 76;
     } else {
-      w = 30; h = 22; y = groundY - 112;
+      w = 52; h = 30; y = groundY - 124;
     }
     obstacles.push({ x: W + 20, y: y, w: w, h: h, kind: kind, phase: Math.random() * 10 });
   }
@@ -801,20 +804,49 @@
         ctx.fillRect(o.x - 6, oy + o.h * 0.25, 7, 6);
         ctx.fillRect(o.x + o.w - 1, oy + o.h * 0.45, 7, 6);
       } else if (isAir) {
-        roundRect(o.x, oy, o.w, o.h, 10);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(o.x + o.w * 0.2, oy);
-        ctx.lineTo(o.x - 6, oy - 8);
-        ctx.lineTo(o.x + o.w * 0.4, oy + 2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(o.x + o.w * 0.6, oy);
-        ctx.lineTo(o.x + o.w + 6, oy - 8);
-        ctx.lineTo(o.x + o.w * 0.8, oy + 2);
-        ctx.closePath();
-        ctx.fill();
+        if (birdSpriteImg.complete && birdSpriteImg.naturalWidth > 0) {
+          ctx.drawImage(birdSpriteImg, o.x, oy, o.w, o.h);
+        } else {
+          // Outstretched wings with gold highlights
+          ctx.fillStyle = "#ffd166";
+          ctx.beginPath();
+          ctx.moveTo(o.x + o.w * 0.35, oy + 8);
+          ctx.lineTo(o.x - 2, oy - 10);
+          ctx.lineTo(o.x + o.w * 0.55, oy + 4);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(o.x + o.w * 0.45, oy + 4);
+          ctx.lineTo(o.x + o.w + 4, oy - 10);
+          ctx.lineTo(o.x + o.w * 0.70, oy + 8);
+          ctx.closePath();
+          ctx.fill();
+
+          // Main body in bright hazard coral
+          ctx.fillStyle = getVar("--obstacle-air");
+          roundRect(o.x + 8, oy + 2, o.w - 16, o.h - 4, 10);
+          ctx.fill();
+
+          // Golden sharp beak
+          ctx.fillStyle = "#ffd166";
+          ctx.beginPath();
+          ctx.moveTo(o.x + 8, oy + o.h * 0.35);
+          ctx.lineTo(o.x - 8, oy + o.h * 0.52);
+          ctx.lineTo(o.x + 8, oy + o.h * 0.68);
+          ctx.closePath();
+          ctx.fill();
+
+          // Glowing cyan eye
+          ctx.fillStyle = "#4cc9f0";
+          ctx.beginPath();
+          ctx.arc(o.x + 15, oy + o.h * 0.46, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(o.x + 14, oy + o.h * 0.44, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       } else {
         roundRect(o.x, oy, o.w, o.h, 8);
         ctx.fill();

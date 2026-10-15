@@ -351,7 +351,7 @@ namespace ZiplaKac.Utils
             if (safeMat != null) sr.material = safeMat;
 
             Color obsColor = new Color(0.94f, 0.28f, 0.44f); // #ef476f (HTML Obstacle Coral)
-            Color airColor = new Color(0.35f, 0.28f, 0.5f);  // #30264a (HTML Air Bird Violet)
+            Color airColor = new Color(0.94f, 0.28f, 0.44f); // #ef476f (Vibrant Hazard Coral Red)
 
             BoxCollider2D col = obj.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
@@ -377,7 +377,7 @@ namespace ZiplaKac.Utils
             else if (name.Contains("Bird"))
             {
                 sr.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/bird", () => ProceduralSpriteGenerator.CreateBirdSprite(airColor));
-                col.size = new Vector2(0.40f, 0.26f);
+                col.size = new Vector2(0.64f, 0.38f);
                 col.offset = Vector2.zero;
             }
 
