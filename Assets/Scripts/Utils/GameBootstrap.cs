@@ -190,11 +190,14 @@ namespace ZiplaKac.Utils
                 sg.tierSprites[2] = Resources.Load<Sprite>("Sprites/ground_tier2_alacakaranlik");
                 sg.tierSprites[3] = Resources.Load<Sprite>("Sprites/ground_tier3_gece");
 
-                float tileW = 11.13f;
+                float tileW = 6.8266f;
+                if (sg.tierSprites[0] != null && sg.tierSprites[0].pixelsPerUnit > 0)
+                {
+                    tileW = sg.tierSprites[0].rect.width / sg.tierSprites[0].pixelsPerUnit;
+                }
                 sg.tileWidth = tileW;
-                sg.resetThresholdX = -tileW;
 
-                int tileCount = 3;
+                int tileCount = 4;
                 sg.tiles = new Transform[tileCount];
                 sg.renderers = new SpriteRenderer[tileCount];
                 Material safeMat = GetSafeSpriteMaterial();
@@ -203,7 +206,8 @@ namespace ZiplaKac.Utils
                 {
                     GameObject tileObj = new GameObject($"GroundTile_{i}");
                     tileObj.transform.SetParent(ground.transform, false);
-                    tileObj.transform.localPosition = new Vector3(i * tileW, 0f, 0f);
+                    float startX = (i - 1) * tileW;
+                    tileObj.transform.localPosition = new Vector3(startX, 0f, 0f);
 
                     SpriteRenderer sr = tileObj.AddComponent<SpriteRenderer>();
                     sr.sprite = sg.tierSprites[0];
@@ -223,6 +227,7 @@ namespace ZiplaKac.Utils
                 if (groundLayer != -1) ground.layer = groundLayer;
 
                 sg.SetTier(0);
+                sg.ResetPositions();
             }
         }
 

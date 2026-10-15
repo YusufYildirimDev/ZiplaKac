@@ -21,8 +21,7 @@ namespace ZiplaKac.Utils
         public Sprite[] tierSprites = new Sprite[4];
 
         [Header("Paralaks & Karo Ölçüleri")]
-        public float tileWidth = 10.24f;
-        public float resetThresholdX = -10.24f;
+        public float tileWidth = 6.8266f;
 
         private int currentTier = 0;
 
@@ -37,6 +36,7 @@ namespace ZiplaKac.Utils
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnTierChanged += HandleTierChanged;
+                GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
             }
         }
 
@@ -45,6 +45,7 @@ namespace ZiplaKac.Utils
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnTierChanged -= HandleTierChanged;
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
             }
         }
 
@@ -57,6 +58,15 @@ namespace ZiplaKac.Utils
             else
             {
                 SetTier(0);
+            }
+            ResetPositions();
+        }
+
+        private void HandleGameStateChanged(GameState state)
+        {
+            if (state == GameState.Playing || state == GameState.MainMenu)
+            {
+                ResetPositions();
             }
         }
 
@@ -80,10 +90,19 @@ namespace ZiplaKac.Utils
                 }
             }
 
+            // Kamera sol kenarını dinamik hesapla (tüm en-boy oranlarıyla uyumlu)
+            float halfCamWidth = 3.5f;
+            if (Camera.main != null && Camera.main.orthographic)
+            {
+                halfCamWidth = Camera.main.orthographicSize * Camera.main.aspect;
+            }
+            // Karo tamamen ekranın solundan çıktığında sıfırla
+            float resetThreshold = -halfCamWidth - (tileWidth * 0.5f) - 0.5f;
+
             // Karoların sonsuz döngü kontrolü
             for (int i = 0; i < tiles.Length; i++)
             {
-                if (tiles[i] != null && tiles[i].position.x <= resetThresholdX)
+                if (tiles[i] != null && tiles[i].position.x <= resetThreshold)
                 {
                     // En sağdaki karoyu bul
                     float maxX = float.MinValue;
@@ -121,10 +140,41 @@ namespace ZiplaKac.Utils
                         if (r != null) r.sprite = targetSprite;
                     }
                 }
+                UpdateTileWidth();
+            }
+        }
+
+        public void UpdateTileWidth()
+        {
+            if (tierSprites != null && currentTier < tierSprites.Length && tierSprites[currentTier] != null)
+            {
+                Sprite targetSprite = tierSprites[currentTier];
                 if (targetSprite.pixelsPerUnit > 0)
                 {
                     tileWidth = targetSprite.rect.width / targetSprite.pixelsPerUnit;
-                    resetThresholdX = -tileWidth;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tüm zemin karolarını ekranı başlangıç anında sıfır boşlukla kaplayacak şekilde sırayla konumlandırır.
+        /// </summary>
+        public void ResetPositions()
+        {
+            UpdateTileWidth();
+            if (tiles == null || tiles.Length == 0) return;
+
+            // Karoları sırayla sol tampondan (-tileWidth) başlayarak sağa doğru diz
+            // Tile 0: -tileWidth (sol kenar koruması)
+            // Tile 1: 0 (ekran ortası)
+            // Tile 2: +tileWidth (ekran sağı)
+            // Tile 3: +2*tileWidth (sağ bekleme alanı)
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                if (tiles[i] != null)
+                {
+                    float startX = (i - 1) * tileWidth;
+                    tiles[i].localPosition = new Vector3(startX, 0f, 0f);
                 }
             }
         }
