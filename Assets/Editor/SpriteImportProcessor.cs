@@ -15,6 +15,7 @@ namespace ZiplaKac.Editor
             {
                 TextureImporter textureImporter = (TextureImporter)assetImporter;
                 textureImporter.textureType = TextureImporterType.Sprite;
+                textureImporter.spriteImportMode = SpriteImportMode.Single;
                 textureImporter.alphaIsTransparency = true;
                 textureImporter.mipmapEnabled = false;
                 textureImporter.filterMode = FilterMode.Bilinear;
@@ -45,7 +46,7 @@ namespace ZiplaKac.Editor
                 }
                 else if (lower.Contains("ground_tier"))
                 {
-                    textureImporter.spritePixelsPerUnit = 100f;
+                    textureImporter.spritePixelsPerUnit = 92f;
                     settings.spriteAlignment = (int)SpriteAlignment.TopCenter;
                     settings.spritePivot = new Vector2(0.5f, 1.0f);
                     textureImporter.wrapMode = TextureWrapMode.Repeat;

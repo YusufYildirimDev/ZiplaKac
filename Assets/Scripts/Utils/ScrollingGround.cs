@@ -121,6 +121,11 @@ namespace ZiplaKac.Utils
                         if (r != null) r.sprite = targetSprite;
                     }
                 }
+                if (targetSprite.pixelsPerUnit > 0)
+                {
+                    tileWidth = targetSprite.rect.width / targetSprite.pixelsPerUnit;
+                    resetThresholdX = -tileWidth;
+                }
             }
         }
     }

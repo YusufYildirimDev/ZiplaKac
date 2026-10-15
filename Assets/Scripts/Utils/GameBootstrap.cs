@@ -182,7 +182,7 @@ namespace ZiplaKac.Utils
             if (ground == null)
             {
                 ground = new GameObject("Ground");
-                ground.transform.position = new Vector3(0f, -3.20f, 0f);
+                ground.transform.position = new Vector3(0f, -1.55f, 0f);
 
                 ScrollingGround sg = ground.AddComponent<ScrollingGround>();
                 sg.tierSprites[0] = Resources.Load<Sprite>("Sprites/ground_tier0_gunduz");
@@ -190,7 +190,7 @@ namespace ZiplaKac.Utils
                 sg.tierSprites[2] = Resources.Load<Sprite>("Sprites/ground_tier2_alacakaranlik");
                 sg.tierSprites[3] = Resources.Load<Sprite>("Sprites/ground_tier3_gece");
 
-                float tileW = 10.24f;
+                float tileW = 11.13f;
                 sg.tileWidth = tileW;
                 sg.resetThresholdX = -tileW;
 
@@ -217,7 +217,7 @@ namespace ZiplaKac.Utils
                 // Sabit Zemin Çarpışma Kutusu (Karakter fiziği için)
                 BoxCollider2D col = ground.AddComponent<BoxCollider2D>();
                 col.size = new Vector2(50f, 4f);
-                col.offset = new Vector2(0f, -2.0f); // Üst yüzey Y = -3.20f
+                col.offset = new Vector2(0f, -2.0f); // Üst yüzey Y = -1.55f
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
                 if (groundLayer != -1) ground.layer = groundLayer;

@@ -43,7 +43,7 @@ namespace ZiplaKac.Player
         private bool isInvulnerable = false;
 
         public const float FIXED_PLAYER_X = -1.35f;
-        public const float GROUND_FLOOR_Y = -2.96f;
+        public const float GROUND_FLOOR_Y = -1.32f;
 
         public static PlayerController Instance { get; private set; }
 

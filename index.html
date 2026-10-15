@@ -262,6 +262,7 @@
     canvas.width = Math.floor(W * DPR);
     canvas.height = Math.floor(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    groundHeight = Math.round(H * 0.345);
     groundY = H - groundHeight;
     if (player && player.onGround) {
       player.y = groundY - player.h;
@@ -420,6 +421,7 @@
   }
 
   function resetGame() {
+    groundHeight = Math.round(H * 0.345);
     groundY = H - groundHeight;
     player = {
       x: Math.max(50, W * 0.18),
