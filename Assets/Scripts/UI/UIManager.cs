@@ -80,50 +80,33 @@ namespace ZiplaKac.UI
 
         public void HandleTierChanged(int tierIndex)
         {
-            Color topColor, bottomColor, groundColor;
-            bool showStars = (tierIndex == 3);
-
+            Color topColor;
             switch (tierIndex)
             {
-                case 1: // Tier 1 (40-99): Günbatımı (Sıcak & Dingin)
-                    topColor = new Color(0.98f, 0.68f, 0.45f);   // #fba973
-                    bottomColor = new Color(0.85f, 0.42f, 0.32f);// #d96b52
-                    groundColor = new Color(0.35f, 0.18f, 0.15f);// #592e26
-                    break;
-                case 2: // Tier 2 (100-199): Alacakaranlık (Sakin Mor)
-                    topColor = new Color(0.38f, 0.32f, 0.52f);   // #615285
-                    bottomColor = new Color(0.16f, 0.12f, 0.27f);// #291f45
-                    groundColor = new Color(0.14f, 0.11f, 0.24f);// #241c3d
-                    break;
-                case 3: // Tier 3 (200+): Yıldızlı Gece (Derin Uzay)
-                    topColor = new Color(0.05f, 0.07f, 0.16f);   // #0d1229
-                    bottomColor = new Color(0.02f, 0.03f, 0.08f);// #050814
-                    groundColor = new Color(0.04f, 0.05f, 0.11f);// #0a0d1c
-                    break;
-                default: // Tier 0 (0-39): Modern Gece Mavisi (Sakin & Uyumlu)
-                    topColor = new Color(0.12f, 0.16f, 0.29f);   // #1e2a4a
-                    bottomColor = new Color(0.06f, 0.08f, 0.15f);// #0f1426
-                    groundColor = new Color(0.09f, 0.12f, 0.22f);// #171f38
-                    break;
+                case 1: topColor = new Color(1.0f, 0.72f, 0.42f); break; // Günbatımı
+                case 2: topColor = new Color(0.42f, 0.36f, 0.58f); break; // Alacakaranlık
+                case 3: topColor = new Color(0.04f, 0.05f, 0.16f); break; // Gece
+                default: topColor = new Color(0.68f, 0.91f, 1.0f); break; // Gündüz
             }
 
-            if (gradientBgRenderer != null)
-            {
-                gradientBgRenderer.sprite = Utils.ProceduralSpriteGenerator.CreateGradientSkySprite(topColor, bottomColor);
-            }
-            else if (mainCamera != null)
+            if (mainCamera != null)
             {
                 mainCamera.backgroundColor = topColor;
             }
 
-            if (groundRenderer != null)
+            if (Utils.BackgroundTierManager.Instance != null)
             {
-                groundRenderer.sprite = Utils.ProceduralSpriteGenerator.CreateGroundSprite(groundColor);
+                Utils.BackgroundTierManager.Instance.HandleTierChanged(tierIndex);
+            }
+
+            if (Utils.ScrollingGround.Instance != null)
+            {
+                Utils.ScrollingGround.Instance.HandleTierChanged(tierIndex);
             }
 
             if (starsContainer != null)
             {
-                starsContainer.SetActive(showStars);
+                starsContainer.SetActive(tierIndex == 3);
             }
         }
 

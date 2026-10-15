@@ -386,12 +386,38 @@
   var obstacles = [];
   var powerups = [];
   var particles = [];
-  var score = 0, speed = 0, spawnTimer = 0, powerupTimer = 6, gravity = 0, gameTime = 0;
+  var score = 0, speed = 0, spawnTimer = 0, powerupTimer = 6, gravity = 0, gameTime = 0, groundScrollX = 0;
   var tLast = 0;
   var ignoreCollisionUntil = 0;
   var comboCount = 0, comboPopupText = "", comboPopupTimer = 0;
   var effects = { slowUntil: 0, multiUntil: 0 };
   var wasNewBest = false;
+
+  var bgImages = [];
+  var groundImages = [];
+  var bgFiles = [
+    "assets/sprites/bg_tier0_gunduz.png",
+    "assets/sprites/bg_tier1_gunbatimi.png",
+    "assets/sprites/bg_tier2_alacakaranlik.png",
+    "assets/sprites/bg_tier3_gece.png"
+  ];
+  var groundFiles = [
+    "assets/sprites/ground_tier0_gunduz.png",
+    "assets/sprites/ground_tier1_gunbatimi.png",
+    "assets/sprites/ground_tier2_alacakaranlik.png",
+    "assets/sprites/ground_tier3_gece.png"
+  ];
+  for (var ti = 0; ti < 4; ti++) {
+    (function(idx) {
+      var imgB = new Image();
+      imgB.src = bgFiles[idx];
+      bgImages[idx] = imgB;
+
+      var imgG = new Image();
+      imgG.src = groundFiles[idx];
+      groundImages[idx] = imgG;
+    })(ti);
+  }
 
   function resetGame() {
     groundY = H - groundHeight;
@@ -608,6 +634,7 @@
 
     speed += dt * 14;
     score += dt * 22 * (multiActive ? 2 : 1);
+    groundScrollX += effSpeed * dt;
     updateHud();
 
     // physics
@@ -704,6 +731,11 @@
   ];
 
   function drawBackground(tier) {
+    var img = bgImages[tier];
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, 0, 0, W, H);
+      return;
+    }
     var g = ctx.createLinearGradient(0, 0, 0, H);
     if (tier === 0) {
       g.addColorStop(0, getVar("--bg-top"));
@@ -729,8 +761,19 @@
   }
 
   function drawGround(tier) {
+    var img = groundImages[tier];
+    var gH = H - groundY;
+    if (img && img.complete && img.naturalWidth > 0) {
+      var tileW = (img.naturalWidth / img.naturalHeight) * gH;
+      if (tileW <= 0) tileW = 1024 * (gH / 320);
+      var startX = -(groundScrollX % tileW);
+      for (var x = startX; x < W + tileW; x += tileW) {
+        ctx.drawImage(img, x, groundY, tileW, gH);
+      }
+      return;
+    }
     ctx.fillStyle = tier === 0 ? getVar("--ground") : TIER_BG[tier].ground;
-    ctx.fillRect(0, groundY, W, H - groundY);
+    ctx.fillRect(0, groundY, W, gH);
   }
 
   function drawObstacles() {

@@ -36,7 +36,21 @@ namespace ZiplaKac.Editor
                 textureImporter.ReadTextureSettings(settings);
 
                 string lower = assetPath.ToLowerInvariant();
-                if (lower.Contains("bg_") || lower.Contains("ground_") || lower.Contains("background"))
+                if (lower.Contains("bg_tier"))
+                {
+                    textureImporter.spritePixelsPerUnit = 192f;
+                    settings.spriteAlignment = (int)SpriteAlignment.Center;
+                    settings.spritePivot = new Vector2(0.5f, 0.5f);
+                    textureImporter.wrapMode = TextureWrapMode.Clamp;
+                }
+                else if (lower.Contains("ground_tier"))
+                {
+                    textureImporter.spritePixelsPerUnit = 100f;
+                    settings.spriteAlignment = (int)SpriteAlignment.TopCenter;
+                    settings.spritePivot = new Vector2(0.5f, 1.0f);
+                    textureImporter.wrapMode = TextureWrapMode.Repeat;
+                }
+                else if (lower.Contains("bg_") || lower.Contains("ground_") || lower.Contains("background"))
                 {
                     textureImporter.spritePixelsPerUnit = 200f;
                     if (lower.Contains("mountain") || lower.Contains("hill"))
