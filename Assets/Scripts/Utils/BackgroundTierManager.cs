@@ -125,12 +125,23 @@ namespace ZiplaKac.Utils
 
         public void SetInitialTier(int tierIndex)
         {
-            currentTier = Mathf.Clamp(tierIndex, 0, 3);
-            if (tierSprites != null && currentTier < tierSprites.Length && tierSprites[currentTier] != null)
+            currentTier = Mathf.Clamp(tierIndex, 0, 2);
+            Sprite sp = null;
+            if (WorldThemeManager.Instance != null)
+            {
+                currentCharacterKey = WorldThemeManager.Instance.CurrentCharacterKey;
+                sp = WorldThemeManager.Instance.GetBackgroundSprite(currentCharacterKey, currentTier);
+            }
+            if (sp == null && tierSprites != null && currentTier < tierSprites.Length)
+            {
+                sp = tierSprites[currentTier];
+            }
+
+            if (sp != null)
             {
                 if (primaryRenderer != null)
                 {
-                    primaryRenderer.sprite = tierSprites[currentTier];
+                    primaryRenderer.sprite = sp;
                     primaryRenderer.color = Color.white;
                 }
                 if (fadeRenderer != null)

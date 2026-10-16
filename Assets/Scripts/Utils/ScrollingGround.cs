@@ -170,10 +170,19 @@ namespace ZiplaKac.Utils
 
         public void SetTier(int tierIndex)
         {
-            currentTier = Mathf.Clamp(tierIndex, 0, 3);
-            if (tierSprites != null && currentTier < tierSprites.Length && tierSprites[currentTier] != null)
+            currentTier = Mathf.Clamp(tierIndex, 0, 2);
+            Sprite targetSprite = null;
+            if (WorldThemeManager.Instance != null)
             {
-                Sprite targetSprite = tierSprites[currentTier];
+                targetSprite = WorldThemeManager.Instance.GetGroundSprite(WorldThemeManager.Instance.CurrentCharacterKey, currentTier);
+            }
+            if (targetSprite == null && tierSprites != null && currentTier < tierSprites.Length)
+            {
+                targetSprite = tierSprites[currentTier];
+            }
+
+            if (targetSprite != null)
+            {
                 if (renderers != null)
                 {
                     foreach (var r in renderers)
