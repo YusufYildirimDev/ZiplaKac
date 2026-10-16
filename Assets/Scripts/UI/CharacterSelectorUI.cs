@@ -34,12 +34,14 @@ namespace ZiplaKac.UI
             currentSelectedId = SaveSystem.GetSelectedCharacterId("classic");
             SetupCards();
             RefreshSelectionVisuals();
+            WorldThemeManager.Instance?.SetCharacter(currentSelectedId);
         }
 
         private void OnEnable()
         {
             currentSelectedId = SaveSystem.GetSelectedCharacterId("classic");
             RefreshSelectionVisuals();
+            WorldThemeManager.Instance?.SetCharacter(currentSelectedId);
         }
 
         private static Font GetSafeFont()
@@ -166,6 +168,9 @@ namespace ZiplaKac.UI
 
             AudioManager.Instance?.PlayJumpSound();
             AudioManager.Instance?.TriggerHapticFeedback();
+
+            // Dünya temasını anında güncelle
+            WorldThemeManager.Instance?.SetCharacter(characterId);
         }
 
         private void RefreshSelectionVisuals()

@@ -394,30 +394,101 @@
   var effects = { slowUntil: 0, multiUntil: 0 };
   var wasNewBest = false;
 
-  var bgImages = [];
-  var groundImages = [];
-  var bgFiles = [
-    "assets/sprites/bg_tier0_gunduz.png",
-    "assets/sprites/bg_tier1_gunbatimi.png",
-    "assets/sprites/bg_tier2_alacakaranlik.png",
-    "assets/sprites/bg_tier3_gece.png"
-  ];
-  var groundFiles = [
-    "assets/sprites/ground_tier0_gunduz.png",
-    "assets/sprites/ground_tier1_gunbatimi.png",
-    "assets/sprites/ground_tier2_alacakaranlik.png",
-    "assets/sprites/ground_tier3_gece.png"
-  ];
-  for (var ti = 0; ti < 4; ti++) {
-    (function(idx) {
+  var WORLDS = {
+    classic: {
+      key: "klasik",
+      name: "Çayır Diyarı",
+      bgs: [
+        "Assets/Resources/Sprites/Worlds/bg_klasik_01_gunduz_cayiri.png",
+        "Assets/Resources/Sprites/Worlds/bg_klasik_02_altin_sonbahar.png",
+        "Assets/Resources/Sprites/Worlds/bg_klasik_03_yildizli_cayir_gecesi.png"
+      ],
+      grounds: [
+        "Assets/Resources/Sprites/Worlds/zemin_klasik_01_gunduz_cayiri.png",
+        "Assets/Resources/Sprites/Worlds/zemin_klasik_02_altin_sonbahar.png",
+        "Assets/Resources/Sprites/Worlds/zemin_klasik_03_yildizli_cayir_gecesi.png"
+      ],
+      obstacle: "#ef476f",
+      obstacleAir: "#ff5c77"
+    },
+    fire: {
+      key: "ates",
+      name: "Volkan Diyarı",
+      bgs: [
+        "Assets/Resources/Sprites/Worlds/bg_ates_01_col_gunbatimi.png",
+        "Assets/Resources/Sprites/Worlds/bg_ates_02_lav_vadisi.png",
+        "Assets/Resources/Sprites/Worlds/bg_ates_03_kizil_gece.png"
+      ],
+      grounds: [
+        "Assets/Resources/Sprites/Worlds/zemin_ates_01_col_gunbatimi.png",
+        "Assets/Resources/Sprites/Worlds/zemin_ates_02_lav_vadisi.png",
+        "Assets/Resources/Sprites/Worlds/zemin_ates_03_kizil_gece.png"
+      ],
+      obstacle: "#ff3b00",
+      obstacleAir: "#ff6b00"
+    },
+    ice: {
+      key: "buz",
+      name: "Buz Diyarı",
+      bgs: [
+        "Assets/Resources/Sprites/Worlds/bg_buz_01_karli_daglar.png",
+        "Assets/Resources/Sprites/Worlds/bg_buz_02_buzul_alacakaranligi.png",
+        "Assets/Resources/Sprites/Worlds/bg_buz_03_kutup_gecesi.png"
+      ],
+      grounds: [
+        "Assets/Resources/Sprites/Worlds/zemin_buz_01_karli_daglar.png",
+        "Assets/Resources/Sprites/Worlds/zemin_buz_02_buzul_alacakaranligi.png",
+        "Assets/Resources/Sprites/Worlds/zemin_buz_03_kutup_gecesi.png"
+      ],
+      obstacle: "#00f0ff",
+      obstacleAir: "#48cae4"
+    },
+    toxic: {
+      key: "zehir",
+      name: "Zehirli Bataklık",
+      bgs: [
+        "Assets/Resources/Sprites/Worlds/bg_zehir_01_yemyesil_orman.png",
+        "Assets/Resources/Sprites/Worlds/bg_zehir_02_toksik_sis.png",
+        "Assets/Resources/Sprites/Worlds/bg_zehir_03_radyoaktif_gece.png"
+      ],
+      grounds: [
+        "Assets/Resources/Sprites/Worlds/zemin_zehir_01_yemyesil_orman.png",
+        "Assets/Resources/Sprites/Worlds/zemin_zehir_02_toksik_sis.png",
+        "Assets/Resources/Sprites/Worlds/zemin_zehir_03_radyoaktif_gece.png"
+      ],
+      obstacle: "#39ff14",
+      obstacleAir: "#00e676"
+    },
+    shadow: {
+      key: "gece",
+      name: "Gölge Diyarı",
+      bgs: [
+        "Assets/Resources/Sprites/Worlds/bg_gece_01_alacakaranlik_orman.png",
+        "Assets/Resources/Sprites/Worlds/bg_gece_02_mor_nebula.png",
+        "Assets/Resources/Sprites/Worlds/bg_gece_03_derin_uzay.png"
+      ],
+      grounds: [
+        "Assets/Resources/Sprites/Worlds/zemin_gece_01_alacakaranlik_orman.png",
+        "Assets/Resources/Sprites/Worlds/zemin_gece_02_mor_nebula.png",
+        "Assets/Resources/Sprites/Worlds/zemin_gece_03_derin_uzay.png"
+      ],
+      obstacle: "#d946ef",
+      obstacleAir: "#f43f5e"
+    }
+  };
+
+  var worldImages = {};
+  for (var wKey in WORLDS) {
+    worldImages[wKey] = { bgs: [], grounds: [] };
+    for (var sIdx = 0; sIdx < 3; sIdx++) {
       var imgB = new Image();
-      imgB.src = bgFiles[idx];
-      bgImages[idx] = imgB;
+      imgB.src = WORLDS[wKey].bgs[sIdx];
+      worldImages[wKey].bgs[sIdx] = imgB;
 
       var imgG = new Image();
-      imgG.src = groundFiles[idx];
-      groundImages[idx] = imgG;
-    })(ti);
+      imgG.src = WORLDS[wKey].grounds[sIdx];
+      worldImages[wKey].grounds[sIdx] = imgG;
+    }
   }
 
   var birdSpriteImg = new Image();
@@ -459,10 +530,9 @@
   }
 
   function getTier(s) {
-    if (s < 40) return 0;
-    if (s < 100) return 1;
-    if (s < 200) return 2;
-    return 3;
+    if (s < 80) return 0;
+    if (s < 200) return 1;
+    return 2;
   }
 
   function updateHud() {
@@ -503,8 +573,7 @@
   var TIER_WEIGHTS = [
     { cactus: 70, rock: 30 },
     { cactus: 50, rock: 25, spiketall: 25 },
-    { cactus: 35, rock: 20, spiketall: 25, birdlow: 20 },
-    { cactus: 25, rock: 15, spiketall: 20, birdlow: 20, birdhigh: 20 }
+    { cactus: 30, rock: 20, spiketall: 20, birdlow: 15, birdhigh: 15 }
   ];
 
   function spawnObstacle() {
@@ -737,7 +806,9 @@
   ];
 
   function drawBackground(tier) {
-    var img = bgImages[tier];
+    var world = WORLDS[selectedCharId] || WORLDS.classic;
+    var wImgs = worldImages[selectedCharId] || worldImages.classic;
+    var img = wImgs && wImgs.bgs ? wImgs.bgs[tier] : null;
     if (img && img.complete && img.naturalWidth > 0) {
       ctx.drawImage(img, 0, 0, W, H);
       return;
@@ -747,27 +818,18 @@
       g.addColorStop(0, getVar("--bg-top"));
       g.addColorStop(1, getVar("--bg-bottom"));
     } else {
-      var c = TIER_BG[tier];
+      var c = TIER_BG[tier] || TIER_BG[1];
       g.addColorStop(0, c.top);
       g.addColorStop(1, c.bottom);
     }
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
-
-    if (tier === 3) {
-      ctx.fillStyle = "rgba(255,255,255,0.6)";
-      for (var i = 0; i < 18; i++) {
-        var sx = (i * 53.7) % W;
-        var sy = (i * 97.3) % (groundY * 0.7);
-        ctx.globalAlpha = 0.3 + (i % 3) * 0.2;
-        ctx.fillRect(sx, sy, 2, 2);
-      }
-      ctx.globalAlpha = 1;
-    }
   }
 
   function drawGround(tier) {
-    var img = groundImages[tier];
+    var world = WORLDS[selectedCharId] || WORLDS.classic;
+    var wImgs = worldImages[selectedCharId] || worldImages.classic;
+    var img = wImgs && wImgs.grounds ? wImgs.grounds[tier] : null;
     var gH = H - groundY;
     if (img && img.complete && img.naturalWidth > 0) {
       var tileW = (img.naturalWidth / img.naturalHeight) * gH;
@@ -778,17 +840,18 @@
       }
       return;
     }
-    ctx.fillStyle = tier === 0 ? getVar("--ground") : TIER_BG[tier].ground;
+    ctx.fillStyle = tier === 0 ? getVar("--ground") : (TIER_BG[tier] ? TIER_BG[tier].ground : "#2d2350");
     ctx.fillRect(0, groundY, W, gH);
   }
 
   function drawObstacles() {
+    var world = WORLDS[selectedCharId] || WORLDS.classic;
     for (var i = 0; i < obstacles.length; i++) {
       var o = obstacles[i];
       var isAir = o.kind === "birdlow" || o.kind === "birdhigh";
       var bob = isAir ? Math.sin(gameTime * 6 + o.phase) * 4 : 0;
       var oy = o.y + bob;
-      ctx.fillStyle = isAir ? getVar("--obstacle-air") : getVar("--obstacle");
+      ctx.fillStyle = isAir ? world.obstacleAir : world.obstacle;
 
       if (o.kind === "spiketall") {
         roundRect(o.x, oy + 10, o.w, o.h - 10, 4);
@@ -824,8 +887,8 @@
           ctx.closePath();
           ctx.fill();
 
-          // Main body in bright hazard coral
-          ctx.fillStyle = getVar("--obstacle-air");
+          // Main body in world's air obstacle color
+          ctx.fillStyle = world.obstacleAir;
           roundRect(o.x + 8, oy + 2, o.w - 16, o.h - 4, 10);
           ctx.fill();
 

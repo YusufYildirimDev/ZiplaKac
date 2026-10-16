@@ -114,6 +114,11 @@ namespace ZiplaKac.Core
                     CurrentScore = 0f;
                     CurrentSpeed = baseSpeed;
                     CurrentTierIndex = 0;
+                    if (WorldThemeManager.Instance != null)
+                    {
+                        WorldThemeManager.Instance.SyncFromSavedCharacter();
+                        WorldThemeManager.Instance.SetStage(0);
+                    }
                     comboCount = 0;
                     consecutivePassedObstacles = 0;
                     ResetPowerUps();
@@ -242,15 +247,12 @@ namespace ZiplaKac.Core
             int calculatedTier = 0;
             int currentScoreInt = Mathf.FloorToInt(CurrentScore);
 
+            // 3 Aşama: 0-79 (Aşama 1), 80-199 (Aşama 2), 200+ (Aşama 3)
             if (currentScoreInt >= 200)
-            {
-                calculatedTier = 3;
-            }
-            else if (currentScoreInt >= 100)
             {
                 calculatedTier = 2;
             }
-            else if (currentScoreInt >= 40)
+            else if (currentScoreInt >= 80)
             {
                 calculatedTier = 1;
             }
@@ -262,6 +264,10 @@ namespace ZiplaKac.Core
             if (calculatedTier != CurrentTierIndex)
             {
                 CurrentTierIndex = calculatedTier;
+                if (WorldThemeManager.Instance != null)
+                {
+                    WorldThemeManager.Instance.SetStage(CurrentTierIndex);
+                }
                 OnTierChanged?.Invoke(CurrentTierIndex);
             }
         }

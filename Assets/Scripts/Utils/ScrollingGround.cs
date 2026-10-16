@@ -33,6 +33,10 @@ namespace ZiplaKac.Utils
 
         private void OnEnable()
         {
+            if (WorldThemeManager.Instance != null)
+            {
+                WorldThemeManager.Instance.OnWorldThemeChanged += HandleWorldThemeChanged;
+            }
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnTierChanged += HandleTierChanged;
@@ -42,6 +46,10 @@ namespace ZiplaKac.Utils
 
         private void OnDisable()
         {
+            if (WorldThemeManager.Instance != null)
+            {
+                WorldThemeManager.Instance.OnWorldThemeChanged -= HandleWorldThemeChanged;
+            }
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnTierChanged -= HandleTierChanged;
@@ -51,7 +59,21 @@ namespace ZiplaKac.Utils
 
         private void Start()
         {
-            if (GameManager.Instance != null)
+            if (WorldThemeManager.Instance != null)
+            {
+                Sprite targetSprite = WorldThemeManager.Instance.GetGroundSprite(
+                    WorldThemeManager.Instance.CurrentCharacterKey,
+                    WorldThemeManager.Instance.CurrentStageIndex
+                );
+                if (targetSprite != null && renderers != null)
+                {
+                    foreach (var r in renderers)
+                    {
+                        if (r != null) r.sprite = targetSprite;
+                    }
+                }
+            }
+            else if (GameManager.Instance != null)
             {
                 HandleTierChanged(GameManager.Instance.CurrentTierIndex);
             }
@@ -122,8 +144,27 @@ namespace ZiplaKac.Utils
             }
         }
 
+        public void HandleWorldThemeChanged(string characterKey, int stageIndex)
+        {
+            if (WorldThemeManager.Instance == null) return;
+
+            Sprite targetSprite = WorldThemeManager.Instance.GetGroundSprite(characterKey, stageIndex);
+            if (targetSprite != null)
+            {
+                if (renderers != null)
+                {
+                    foreach (var r in renderers)
+                    {
+                        if (r != null) r.sprite = targetSprite;
+                    }
+                }
+                UpdateTileWidth();
+            }
+        }
+
         public void HandleTierChanged(int tierIndex)
         {
+            if (WorldThemeManager.Instance != null) return;
             SetTier(tierIndex);
         }
 
@@ -146,13 +187,19 @@ namespace ZiplaKac.Utils
 
         public void UpdateTileWidth()
         {
-            if (tierSprites != null && currentTier < tierSprites.Length && tierSprites[currentTier] != null)
+            Sprite activeSprite = null;
+            if (renderers != null && renderers.Length > 0 && renderers[0] != null)
             {
-                Sprite targetSprite = tierSprites[currentTier];
-                if (targetSprite.pixelsPerUnit > 0)
-                {
-                    tileWidth = targetSprite.rect.width / targetSprite.pixelsPerUnit;
-                }
+                activeSprite = renderers[0].sprite;
+            }
+            else if (tierSprites != null && currentTier < tierSprites.Length && tierSprites[currentTier] != null)
+            {
+                activeSprite = tierSprites[currentTier];
+            }
+
+            if (activeSprite != null && activeSprite.pixelsPerUnit > 0)
+            {
+                tileWidth = activeSprite.rect.width / activeSprite.pixelsPerUnit;
             }
         }
 

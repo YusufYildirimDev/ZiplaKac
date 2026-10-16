@@ -14,9 +14,11 @@ namespace ZiplaKac.Obstacles
 
         private bool hasBeenPassed = false;
         private Transform playerTransform;
+        private SpriteRenderer spriteRenderer;
 
         private void Awake()
         {
+            spriteRenderer = GetComponent<SpriteRenderer>();
             UpdateOffscreenBoundary();
         }
 
@@ -24,10 +26,43 @@ namespace ZiplaKac.Obstacles
         {
             UpdateOffscreenBoundary();
             hasBeenPassed = false;
+            ApplyThemeColor();
+
             if (playerTransform == null && GameManager.Instance != null)
             {
                 Player.PlayerController player = FindObjectOfType<Player.PlayerController>();
                 if (player != null) playerTransform = player.transform;
+            }
+
+            if (WorldThemeManager.Instance != null)
+            {
+                WorldThemeManager.Instance.OnWorldThemeChanged += HandleWorldThemeChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (WorldThemeManager.Instance != null)
+            {
+                WorldThemeManager.Instance.OnWorldThemeChanged -= HandleWorldThemeChanged;
+            }
+        }
+
+        private void HandleWorldThemeChanged(string characterKey, int stageIndex)
+        {
+            ApplyThemeColor();
+        }
+
+        public void ApplyThemeColor()
+        {
+            if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null) return;
+
+            if (WorldThemeManager.Instance != null)
+            {
+                var palette = WorldThemeManager.Instance.GetCurrentPalette();
+                bool isAir = poolTag.Contains("Bird");
+                spriteRenderer.color = isAir ? palette.airObstacleColor : palette.groundObstacleColor;
             }
         }
 

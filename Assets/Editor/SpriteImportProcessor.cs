@@ -37,14 +37,14 @@ namespace ZiplaKac.Editor
                 textureImporter.ReadTextureSettings(settings);
 
                 string lower = assetPath.ToLowerInvariant();
-                if (lower.Contains("bg_tier"))
+                if (lower.Contains("bg_tier") || lower.Contains("/bg_") || lower.Contains("\\bg_"))
                 {
                     textureImporter.spritePixelsPerUnit = 192f;
                     settings.spriteAlignment = (int)SpriteAlignment.Center;
                     settings.spritePivot = new Vector2(0.5f, 0.5f);
                     textureImporter.wrapMode = TextureWrapMode.Clamp;
                 }
-                else if (lower.Contains("ground_tier"))
+                else if (lower.Contains("ground_tier") || lower.Contains("zemin_"))
                 {
                     textureImporter.spritePixelsPerUnit = 150f;
                     settings.spriteAlignment = (int)SpriteAlignment.TopCenter;

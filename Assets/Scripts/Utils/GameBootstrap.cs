@@ -116,6 +116,12 @@ namespace ZiplaKac.Utils
                 GameObject mm = new GameObject("MonetizationManager");
                 mm.AddComponent<MonetizationManager>();
             }
+
+            if (WorldThemeManager.Instance == null)
+            {
+                GameObject wtm = new GameObject("WorldThemeManager");
+                wtm.AddComponent<WorldThemeManager>();
+            }
         }
 
         private static Material s_safeSpriteMat;
@@ -158,6 +164,11 @@ namespace ZiplaKac.Utils
                 primaryObj.transform.localPosition = Vector3.zero;
                 SpriteRenderer primarySr = primaryObj.AddComponent<SpriteRenderer>();
                 primarySr.sprite = btm.tierSprites[0];
+                if (WorldThemeManager.Instance != null)
+                {
+                    Sprite initBg = WorldThemeManager.Instance.GetBackgroundSprite(WorldThemeManager.Instance.CurrentCharacterKey, 0);
+                    if (initBg != null) primarySr.sprite = initBg;
+                }
                 primarySr.sortingOrder = -20;
                 if (safeMat != null) primarySr.material = safeMat;
                 btm.primaryRenderer = primarySr;
@@ -191,7 +202,15 @@ namespace ZiplaKac.Utils
                 sg.tierSprites[3] = Resources.Load<Sprite>("Sprites/ground_tier3_gece");
 
                 float tileW = 6.8266f;
-                if (sg.tierSprites[0] != null && sg.tierSprites[0].pixelsPerUnit > 0)
+                if (WorldThemeManager.Instance != null)
+                {
+                    Sprite initGround = WorldThemeManager.Instance.GetGroundSprite(WorldThemeManager.Instance.CurrentCharacterKey, 0);
+                    if (initGround != null && initGround.pixelsPerUnit > 0)
+                    {
+                        tileW = initGround.rect.width / initGround.pixelsPerUnit;
+                    }
+                }
+                else if (sg.tierSprites[0] != null && sg.tierSprites[0].pixelsPerUnit > 0)
                 {
                     tileW = sg.tierSprites[0].rect.width / sg.tierSprites[0].pixelsPerUnit;
                 }
@@ -202,6 +221,13 @@ namespace ZiplaKac.Utils
                 sg.renderers = new SpriteRenderer[tileCount];
                 Material safeMat = GetSafeSpriteMaterial();
 
+                Sprite defaultGroundSprite = sg.tierSprites[0];
+                if (WorldThemeManager.Instance != null)
+                {
+                    Sprite initGround = WorldThemeManager.Instance.GetGroundSprite(WorldThemeManager.Instance.CurrentCharacterKey, 0);
+                    if (initGround != null) defaultGroundSprite = initGround;
+                }
+
                 for (int i = 0; i < tileCount; i++)
                 {
                     GameObject tileObj = new GameObject($"GroundTile_{i}");
@@ -210,7 +236,7 @@ namespace ZiplaKac.Utils
                     tileObj.transform.localPosition = new Vector3(startX, 0f, 0f);
 
                     SpriteRenderer sr = tileObj.AddComponent<SpriteRenderer>();
-                    sr.sprite = sg.tierSprites[0];
+                    sr.sprite = defaultGroundSprite;
                     sr.sortingOrder = 2;
                     if (safeMat != null) sr.material = safeMat;
 
@@ -355,8 +381,8 @@ namespace ZiplaKac.Utils
             Material safeMat = GetSafeSpriteMaterial();
             if (safeMat != null) sr.material = safeMat;
 
-            Color obsColor = new Color(0.94f, 0.28f, 0.44f); // #ef476f (HTML Obstacle Coral)
-            Color airColor = new Color(0.94f, 0.28f, 0.44f); // #ef476f (Vibrant Hazard Coral Red)
+            Color obsColor = Color.white; // Temel beyaz: SpriteRenderer.color dünya paletine göre renklendirir
+            Color airColor = Color.white;
 
             BoxCollider2D col = obj.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
