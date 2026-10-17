@@ -63,6 +63,7 @@ namespace ZiplaKac.Player
             rb.interpolation = RigidbodyInterpolation2D.Interpolate;
 
             transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
+            rb.simulated = false;
 
             try
             {
@@ -525,8 +526,13 @@ namespace ZiplaKac.Player
 
             if (newState == GameState.Playing)
             {
+                rb.simulated = true;
                 UpdateCharacterAppearance();
                 UpdateShieldVisual();
+            }
+            else
+            {
+                rb.simulated = false;
             }
         }
 

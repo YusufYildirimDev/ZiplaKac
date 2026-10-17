@@ -45,7 +45,7 @@ namespace ZiplaKac.UI
 
         private void Start()
         {
-            // İlk indirmede otomatik olarak aç
+            // İlk indirmede veya rehber henüz tamamlanmamışsa otomatik olarak aç
             if (PlayerPrefs.GetInt(KEY_ONBOARDING_SEEN, 0) == 0)
             {
                 OpenModal();
@@ -62,7 +62,7 @@ namespace ZiplaKac.UI
             currentSlideIndex = 0;
             UpdateSlideDisplay();
 
-            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
+            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(false);
             }
@@ -84,7 +84,8 @@ namespace ZiplaKac.UI
 
         public void NextSlide()
         {
-            if (currentSlideIndex < slides.Length - 1)
+            int total = (slides != null && slides.Length > 0) ? slides.Length : 4;
+            if (currentSlideIndex < total - 1)
             {
                 currentSlideIndex++;
                 UpdateSlideDisplay();
@@ -92,8 +93,16 @@ namespace ZiplaKac.UI
             }
             else
             {
-                // Son adımdaysa kapat ve menüye dön
-                CloseModal();
+                // Son adımdaysa ("HADİ BAŞLAYALIM! 🚀"), rehberi kapat ve oyunu doğrudan başlat!
+                PlayerPrefs.SetInt(KEY_ONBOARDING_SEEN, 1);
+                PlayerPrefs.Save();
+                gameObject.SetActive(false);
+                AudioManager.Instance?.PlayJumpSound();
+
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.StartGame();
+                }
             }
         }
 
@@ -109,6 +118,9 @@ namespace ZiplaKac.UI
 
         private void UpdateSlideDisplay()
         {
+            int total = (slides != null && slides.Length > 0) ? slides.Length : 4;
+            currentSlideIndex = Mathf.Clamp(currentSlideIndex, 0, total - 1);
+
             // 1. Slaytları aç/kapat
             if (slides != null)
             {
@@ -124,7 +136,6 @@ namespace ZiplaKac.UI
             // 2. Başlık ve Rozet Metinleri
             if (stepBadgeText != null)
             {
-                int total = slides != null ? slides.Length : 4;
                 stepBadgeText.text = $"REHBER • ADIM {currentSlideIndex + 1} / {total}";
             }
 
@@ -147,16 +158,42 @@ namespace ZiplaKac.UI
                 }
             }
 
-            // 3. Önceki Butonu (İlk slaytta gizlenir)
-            if (prevButton != null)
+            // 3. Buton Yerleşimleri ve Standart Boyutları (Uygulamadaki standart 96px yükseklik)
+            RectTransform nextRt = nextButton != null ? nextButton.GetComponent<RectTransform>() : null;
+            RectTransform prevRt = prevButton != null ? prevButton.GetComponent<RectTransform>() : null;
+
+            if (currentSlideIndex == 0)
             {
-                prevButton.gameObject.SetActive(currentSlideIndex > 0);
+                // İlk slaytta sadece Sonraki var: Ekran ortasında tam boy (540x96)
+                if (prevButton != null) prevButton.gameObject.SetActive(false);
+                if (nextRt != null)
+                {
+                    nextRt.anchoredPosition = new Vector2(0f, -630f);
+                    nextRt.sizeDelta = new Vector2(540f, 96f);
+                }
+            }
+            else
+            {
+                // Diğer slaytlarda hem Önceki hem Sonraki var (380x96)
+                if (prevButton != null)
+                {
+                    prevButton.gameObject.SetActive(true);
+                    if (prevRt != null)
+                    {
+                        prevRt.anchoredPosition = new Vector2(-210f, -630f);
+                        prevRt.sizeDelta = new Vector2(380f, 96f);
+                    }
+                }
+                if (nextRt != null)
+                {
+                    nextRt.anchoredPosition = new Vector2(210f, -630f);
+                    nextRt.sizeDelta = new Vector2(380f, 96f);
+                }
             }
 
-            // 4. Sonraki Butonu Metni (Son slaytta "HADİ BAŞLAYALIM!" olur)
+            // 4. Sonraki Butonu Metni (Son slaytta "HADİ BAŞLAYALIM! 🚀" olur)
             if (nextButtonText != null)
             {
-                int total = slides != null ? slides.Length : 4;
                 nextButtonText.text = (currentSlideIndex == total - 1) ? "HADİ BAŞLAYALIM! 🚀" : "SONRAKİ ➔";
             }
 

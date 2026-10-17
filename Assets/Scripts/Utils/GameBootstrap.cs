@@ -49,6 +49,7 @@ namespace ZiplaKac.Utils
 
         private void Awake()
         {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             SetupCamera();
             SetupManagers();
             SetupBackground();
@@ -545,6 +546,12 @@ namespace ZiplaKac.Utils
 
                 // 6. Başlangıç & Kurallar Onboarding Modalı
                 CreateOnboardingModal(canvasObj.transform);
+
+                bool shouldShowOnboarding = PlayerPrefs.GetInt(UI.OnboardingModalUI.KEY_ONBOARDING_SEEN, 0) == 0;
+                if (shouldShowOnboarding && UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null)
+                {
+                    UIManager.Instance.mainMenuPanel.SetActive(false);
+                }
             }
 
             // EventSystem Kontrolü (iOS & New Input System tam uyumluluk)
@@ -707,18 +714,18 @@ namespace ZiplaKac.Utils
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // Neon Mint "BAŞLA" Butonu (#06d6a0 - Büyük ve Çarpıcı)
+            // Neon Mint "BAŞLA" Butonu (#06d6a0 - Standart 540x96)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -80f), new Vector2(540f, 104f), mintColor, darkNavy, 44);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -70f), new Vector2(540f, 96f), mintColor, darkNavy, 36);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // 🛒 Mağaza & Gardırop (Yükseltmeler, Güçler, Kıyafetler) Butonu (#9b5de5 / Mor Vurgusu)
+            // 🛒 Mağaza & Gardırop (Yükseltmeler, Güçler, Kıyafetler) Butonu (#9b5de5 - Standart 540x96)
             Color purpleColor = new Color(0.61f, 0.36f, 0.90f);
-            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -205f), new Vector2(540f, 92f), purpleColor, Color.white, 32);
+            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -180f), new Vector2(540f, 96f), purpleColor, Color.white, 32);
             Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
             wardrobeBtn.onClick.AddListener(() => {
                 if (UI.WardrobeModalUI.Instance != null)
@@ -727,9 +734,9 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // 🎁 Günlük Ödül Sandığı Butonu (#ffd166 / Amber Vurgusu)
+            // 🎁 Günlük Ödül Sandığı Butonu (#ffd166 - Standart 540x96)
             Color goldColor = new Color(1.0f, 0.82f, 0.40f);
-            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -315f), new Vector2(540f, 92f), goldColor, darkNavy, 32);
+            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -290f), new Vector2(540f, 96f), goldColor, darkNavy, 32);
             Button rewardBtn = rewardBtnObj.GetComponent<Button>();
             rewardBtn.onClick.AddListener(() => {
                 if (DailyRewardModalUI.Instance != null)
@@ -738,9 +745,9 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // 📖 Nasıl Oynanır & Rehber Butonu (#4cc9f0 / Neon Cyan)
+            // 📖 Nasıl Oynanır & Rehber Butonu (#4cc9f0 - Standart 540x96)
             Color cyanColor = new Color(0.30f, 0.79f, 0.94f);
-            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR? (REHBER)", new Vector2(0f, -415f), new Vector2(540f, 82f), cyanColor, darkNavy, 28);
+            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR? (REHBER)", new Vector2(0f, -400f), new Vector2(540f, 96f), cyanColor, darkNavy, 32);
             Button rulesBtn = rulesBtnObj.GetComponent<Button>();
             rulesBtn.onClick.AddListener(() => {
                 if (UI.OnboardingModalUI.Instance != null)
@@ -750,7 +757,7 @@ namespace ZiplaKac.Utils
             });
 
             // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -505f), new Color(0.55f, 0.65f, 0.8f), false);
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -495f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
@@ -909,20 +916,20 @@ namespace ZiplaKac.Utils
             // Son 5 Skor Listesi
             goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 26, new Vector2(0f, -25f), new Color(0.7f, 0.78f, 0.9f), false);
 
-            // Tekrar Oyna Butonu (Neon Mint #06d6a0 - Büyük ve Çarpıcı)
+            // Tekrar Oyna Butonu (Neon Mint #06d6a0 - Standart 540x96)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -135f), new Vector2(540f, 104f), mintColor, darkNavy, 44);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -140f), new Vector2(540f, 96f), mintColor, darkNavy, 36);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
-            // 🎁 Ödüllü Reklam İzle Butonu (#ffd166 / Altın Amber Vurgusu)
+            // 🎁 Ödüllü Reklam İzle Butonu (#ffd166 - Standart 540x96)
             Color goldColor = new Color(1.0f, 0.82f, 0.40f);
-            GameObject adBtn = CreatePillButton(card.transform, "RewardedAdButton", "🎁 REKLAM İZLE: +50 PUAN", new Vector2(0f, -260f), new Vector2(540f, 92f), goldColor, darkNavy, 32);
+            GameObject adBtn = CreatePillButton(card.transform, "RewardedAdButton", "🎁 REKLAM İZLE: +50 PUAN", new Vector2(0f, -250f), new Vector2(540f, 96f), goldColor, darkNavy, 32);
             goUI.rewardedAdButton = adBtn.GetComponent<Button>();
             goUI.rewardedAdButtonText = adBtn.GetComponentInChildren<Text>();
 
-            // Ana Menü Butonu (Sleek ikincil buton)
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -370f), new Vector2(440f, 84f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 32);
+            // Ana Menü Butonu (Standart 540x96)
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -360f), new Vector2(540f, 96f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 32);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);
@@ -968,16 +975,16 @@ namespace ZiplaKac.Utils
             // Durum Mesajı
             modalUI.statusText = CreateText(card.transform, "Status", "🎁 Bugünün sandığı açılmaya hazır!", 36, new Vector2(0f, -190f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
 
-            // Sandığı Aç Butonu (Büyük ve Belirgin)
+            // Sandığı Aç Butonu (Standart 540x96)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject claimBtnObj = CreatePillButton(card.transform, "ClaimButton", "SANDIĞI AÇ", new Vector2(0f, -320f), new Vector2(540f, 106f), mintColor, darkNavy, 38);
+            GameObject claimBtnObj = CreatePillButton(card.transform, "ClaimButton", "SANDIĞI AÇ", new Vector2(0f, -320f), new Vector2(540f, 96f), mintColor, darkNavy, 34);
             modalUI.claimButton = claimBtnObj.GetComponent<Button>();
             modalUI.claimButtonText = claimBtnObj.GetComponentInChildren<Text>();
             modalUI.claimButton.onClick.AddListener(modalUI.OnClaimButtonClicked);
 
-            // Kapat Butonu
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -460f), new Vector2(440f, 88f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 32);
+            // Kapat Butonu (Standart 540x96)
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -440f), new Vector2(540f, 96f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 32);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
@@ -1066,8 +1073,8 @@ namespace ZiplaKac.Utils
             modalUI.itemsContainer = contentRt;
             modalUI.itemsScrollRect = scrollRect;
 
-            // Kapat Butonu (En altta güvenli mesafede büyük buton)
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -675f), new Vector2(440f, 90f), new Color(0.15f, 0.20f, 0.35f, 0.95f), Color.white, 34);
+            // Kapat Butonu (Standart 540x96)
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -670f), new Vector2(540f, 96f), new Color(0.15f, 0.20f, 0.35f, 0.95f), Color.white, 32);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
@@ -1197,20 +1204,28 @@ namespace ZiplaKac.Utils
                 modalUI.pageDots[d] = dImg;
             }
 
-            // Önceki Butonu (Sol Alt)
-            GameObject prevBtnObj = CreatePillButton(card.transform, "PrevButton", "◀ ÖNCEKİ", new Vector2(-220f, -630f), new Vector2(340f, 92f), new Color(0.12f, 0.16f, 0.28f, 0.95f), Color.white, 30);
+            // Önceki Butonu (Sol Alt - Standart 380x96)
+            GameObject prevBtnObj = CreatePillButton(card.transform, "PrevButton", "◀ ÖNCEKİ", new Vector2(-210f, -630f), new Vector2(380f, 96f), new Color(0.12f, 0.16f, 0.28f, 0.95f), Color.white, 30);
             modalUI.prevButton = prevBtnObj.GetComponent<Button>();
             modalUI.prevButton.onClick.AddListener(modalUI.PreviousSlide);
 
-            // Sonraki Butonu (Sağ Alt / Mint Yeşili)
+            // Sonraki Butonu (Sağ Alt / Mint Yeşili - Standart 380x96)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject nextBtnObj = CreatePillButton(card.transform, "NextButton", "SONRAKİ ➔", new Vector2(220f, -630f), new Vector2(380f, 96f), mintColor, darkNavy, 32);
+            GameObject nextBtnObj = CreatePillButton(card.transform, "NextButton", "SONRAKİ ➔", new Vector2(210f, -630f), new Vector2(380f, 96f), mintColor, darkNavy, 32);
             modalUI.nextButton = nextBtnObj.GetComponent<Button>();
             modalUI.nextButtonText = nextBtnObj.GetComponentInChildren<Text>();
             modalUI.nextButton.onClick.AddListener(modalUI.NextSlide);
 
-            modal.SetActive(false);
+            CanvasGroup cg = modal.AddComponent<CanvasGroup>();
+            cg.blocksRaycasts = true;
+
+            bool shouldShow = PlayerPrefs.GetInt(UI.OnboardingModalUI.KEY_ONBOARDING_SEEN, 0) == 0;
+            modal.SetActive(shouldShow);
+            if (shouldShow)
+            {
+                modalUI.OpenModal();
+            }
         }
 
         private static void CreateOnboardingRow(Transform parent, string name, float yPos, float height, string emoji, string title, string desc, Color titleColor)
