@@ -494,6 +494,186 @@ namespace ZiplaKac.Utils
             return CreateSpikeSprite(color, width, height);
         }
 
+        public static Sprite CreateGoldCoinSprite(int resolution = 128)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Vector2 center = new Vector2(resolution * 0.5f, resolution * 0.5f);
+            float outerR = resolution * 0.46f;
+            float rimR = resolution * 0.39f;
+            float innerR = resolution * 0.34f;
+
+            Color rimDark = new Color(0.68f, 0.42f, 0.04f, 1f);     // Derin bronz altın kenar
+            Color goldTop = new Color(1.00f, 0.92f, 0.48f, 1f);     // Parlak tepe altın
+            Color goldBottom = new Color(0.92f, 0.65f, 0.08f, 1f);  // Zengin alt altın
+            Color innerRimCol = new Color(1.00f, 0.84f, 0.25f, 1f); // İç kabartma halka
+            Color starCol = new Color(1.00f, 0.98f, 0.80f, 1f);     // Merkez yıldız / ışıltı
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d = Vector2.Distance(pt, center);
+
+                    if (d <= outerR)
+                    {
+                        if (d > rimR)
+                        {
+                            float edgeT = (d - rimR) / (outerR - rimR);
+                            tex.SetPixel(x, y, Color.Lerp(goldBottom, rimDark, edgeT));
+                        }
+                        else if (d > innerR)
+                        {
+                            tex.SetPixel(x, y, innerRimCol);
+                        }
+                        else
+                        {
+                            float vertT = Mathf.Clamp01((y - (center.y - innerR)) / (innerR * 2f));
+                            Color baseC = Color.Lerp(goldBottom, goldTop, vertT);
+
+                            float dx = Mathf.Abs(x - center.x);
+                            float dy = Mathf.Abs(y - center.y);
+                            if ((dx + dy * 1.5f < 16f) || (dx * 1.5f + dy < 16f) || (dx < 6f && dy < 6f))
+                            {
+                                baseC = Color.Lerp(baseC, starCol, 0.75f);
+                            }
+
+                            if (pt.y > center.y + 4f && pt.x < center.x - 2f)
+                            {
+                                float glossD = Vector2.Distance(pt, new Vector2(center.x - 14f, center.y + 14f));
+                                if (glossD < 18f)
+                                {
+                                    baseC = Color.Lerp(baseC, Color.white, (1f - glossD / 18f) * 0.45f);
+                                }
+                            }
+
+                            tex.SetPixel(x, y, baseC);
+                        }
+                    }
+                    else if (d <= outerR + 1.5f)
+                    {
+                        float a = (1f - (d - outerR) / 1.5f);
+                        tex.SetPixel(x, y, new Color(rimDark.r, rimDark.g, rimDark.b, a));
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        public static Sprite CreateTrophyIconSprite(int resolution = 128)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Vector2 center = new Vector2(resolution * 0.5f, resolution * 0.5f);
+            Color goldTop = new Color(1.0f, 0.92f, 0.45f, 1f);
+            Color goldMid = new Color(0.96f, 0.72f, 0.12f, 1f);
+            Color goldDark = new Color(0.70f, 0.45f, 0.05f, 1f);
+
+            float r = resolution * 0.45f;
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d = Vector2.Distance(pt, center);
+                    if (d <= r)
+                    {
+                        float vertT = Mathf.Clamp01((y - (center.y - r)) / (r * 2f));
+                        Color c = Color.Lerp(new Color(0.18f, 0.12f, 0.32f, 0.95f), new Color(0.28f, 0.18f, 0.48f, 0.95f), vertT);
+                        if (d > r - 4f) c = Color.Lerp(c, goldTop, 0.9f);
+                        tex.SetPixel(x, y, c);
+                    }
+                    else if (d <= r + 1.5f)
+                    {
+                        float a = 1f - (d - r) / 1.5f;
+                        tex.SetPixel(x, y, new Color(goldTop.r, goldTop.g, goldTop.b, a * 0.6f));
+                    }
+                }
+            }
+
+            for (int y = 24; y <= 98; y++)
+            {
+                for (int x = 24; x <= 104; x++)
+                {
+                    float relX = x - center.x;
+                    float relY = y - center.y;
+
+                    bool inCup = (relY >= -6f && relY <= 30f && Mathf.Abs(relX) <= (14f + (relY + 6f) * 0.45f));
+                    bool inStem = (relY >= -22f && relY < -6f && Mathf.Abs(relX) <= 6f);
+                    bool inBase = (relY >= -32f && relY < -22f && Mathf.Abs(relX) <= (22f - (relY + 32f) * 0.6f));
+                    bool inHandleL = (relY >= 4f && relY <= 26f && relX >= -34f && relX <= -16f && (Mathf.Abs(relX - (-25f)) > 3f || relY > 23f || relY < 7f));
+                    bool inHandleR = (relY >= 4f && relY <= 26f && relX >= 16f && relX <= 34f && (Mathf.Abs(relX - 25f) > 3f || relY > 23f || relY < 7f));
+
+                    if (inCup || inStem || inBase || inHandleL || inHandleR)
+                    {
+                        float cupT = Mathf.Clamp01((y - 24f) / 74f);
+                        Color c = Color.Lerp(goldDark, goldTop, cupT);
+                        if (relX < -2f && inCup) c = Color.Lerp(c, Color.white, 0.35f);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        public static Sprite CreateScoreStarSprite(int resolution = 128)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Vector2 center = new Vector2(resolution * 0.5f, resolution * 0.5f);
+            Color mintTop = new Color(0.40f, 0.95f, 0.80f, 1f);
+            Color mintMid = new Color(0.024f, 0.839f, 0.627f, 1f);
+            Color mintDark = new Color(0.01f, 0.45f, 0.35f, 1f);
+
+            float r = resolution * 0.45f;
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d = Vector2.Distance(pt, center);
+                    if (d <= r)
+                    {
+                        float vertT = Mathf.Clamp01((y - (center.y - r)) / (r * 2f));
+                        Color c = Color.Lerp(new Color(0.05f, 0.15f, 0.22f, 0.95f), new Color(0.08f, 0.24f, 0.32f, 0.95f), vertT);
+                        if (d > r - 4f) c = Color.Lerp(c, mintTop, 0.9f);
+                        tex.SetPixel(x, y, c);
+                    }
+                    else if (d <= r + 1.5f)
+                    {
+                        float a = 1f - (d - r) / 1.5f;
+                        tex.SetPixel(x, y, new Color(mintTop.r, mintTop.g, mintTop.b, a * 0.6f));
+                    }
+                }
+            }
+
+            for (int y = 28; y <= 100; y++)
+            {
+                for (int x = 28; x <= 100; x++)
+                {
+                    float dx = Mathf.Abs(x - center.x);
+                    float dy = Mathf.Abs(y - center.y);
+                    if ((dx + dy * 1.3f < 28f) || (dx * 1.3f + dy < 28f) || (dx < 12f && dy < 12f))
+                    {
+                        float t = 1f - Mathf.Max(dx, dy) / 28f;
+                        Color c = Color.Lerp(mintMid, Color.white, t);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
         #region Helper Matematik Fonksiyonları
         private static void ClearTexture(Texture2D tex)
         {

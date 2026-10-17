@@ -179,11 +179,11 @@ namespace ZiplaKac.UI
                 return;
             }
 
-            // 1. Skor ve Altın Güncellemeleri
+            // 1. Skor ve Altın Güncellemeleri (Büyük ve Belirgin Arcade Formatı)
             int scoreInt = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
-            if (currentScoreText != null) currentScoreText.text = $"Skor: {scoreInt}";
-            if (highScoreText != null) highScoreText.text = $"En iyi: {GameManager.Instance.HighScore}";
-            if (goldText != null) goldText.text = $"🪙 {GameManager.Instance.CurrentRunGold}";
+            if (currentScoreText != null) currentScoreText.text = $"<size=20><color=#8da4c4>SKOR</color></size>\n<size=42><color=#ffffff><b>{scoreInt}</b></color></size>";
+            if (highScoreText != null) highScoreText.text = $"<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>{GameManager.Instance.HighScore}</b></color></size>";
+            if (goldText != null) goldText.text = $"<size=18><color=#ffd166>ALTIN</color></size>\n<size=38><color=#ffea79><b>{GameManager.Instance.CurrentRunGold}</b></color></size>";
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler
             UpdatePowerUpBadges();
