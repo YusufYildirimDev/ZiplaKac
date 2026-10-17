@@ -216,6 +216,61 @@
     opacity: 0.75;
     font-weight: 600;
   }
+  #powerupCountdown {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.3s;
+  }
+  #powerupCountdown.hidden { opacity: 0; }
+  #powerupCountdown .pcd-ring {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid currentColor;
+    box-shadow: 0 0 24px currentColor, inset 0 0 14px rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    gap: 2px;
+  }
+  #powerupCountdown .pcd-icon {
+    font-size: 26px;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  #powerupCountdown .pcd-num {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+    text-shadow: 0 0 12px currentColor;
+  }
+  #powerupCountdown .pcd-label {
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  @keyframes pcd-pulse {
+    0%   { transform: translate(-50%,-50%) scale(1.00); }
+    50%  { transform: translate(-50%,-50%) scale(1.07); }
+    100% { transform: translate(-50%,-50%) scale(1.00); }
+  }
+  #powerupCountdown.active {
+    animation: pcd-pulse 1s ease-in-out infinite;
+  }
 </style>
 </head>
 <body>
@@ -227,6 +282,15 @@
   </div>
   <div id="statusRow"></div>
   <div id="hint">Dokun: zıpla · havadayken tekrar dokun: çift zıpla</div>
+
+  <!-- Merkez Güçlendirme Geri Sayaç -->
+  <div id="powerupCountdown" class="hidden">
+    <div class="pcd-ring">
+      <div class="pcd-icon" id="pcdIcon">⚡</div>
+      <div class="pcd-num" id="pcdNum">0</div>
+      <div class="pcd-label" id="pcdLabel">SN</div>
+    </div>
+  </div>
 
   <div id="overlay">
     <div class="card">
@@ -250,6 +314,11 @@
   var scoreLabel = document.getElementById("scoreLabel");
   var bestLabel = document.getElementById("bestLabel");
   var statusRow = document.getElementById("statusRow");
+
+  var pcdEl = document.getElementById("powerupCountdown");
+  var pcdIcon = document.getElementById("pcdIcon");
+  var pcdNum = document.getElementById("pcdNum");
+  var pcdLabel = document.getElementById("pcdLabel");
 
   var DPR = Math.max(1, window.devicePixelRatio || 1);
   var W = 0, H = 0;
@@ -554,6 +623,34 @@
     if (effects.slowUntil > gameTime) badges.push('<span class="badge" style="background:var(--slow);color:#06283a;">Yavaş ' + Math.ceil(effects.slowUntil - gameTime) + "s</span>");
     if (effects.multiUntil > gameTime) badges.push('<span class="badge" style="background:var(--multi);color:#3a2a00;">x2 Puan ' + Math.ceil(effects.multiUntil - gameTime) + "s</span>");
     statusRow.innerHTML = badges.join("");
+
+    // Merkez Güçlendirme Geri Sayaç
+    var hasSlow = effects.slowUntil > gameTime;
+    var hasMulti = effects.multiUntil > gameTime;
+    if (hasSlow || hasMulti) {
+      // Öncelik: son eklenen (ikisi aynı anda aktifse multi önce)
+      var remaining, icon, label, color;
+      if (hasMulti) {
+        remaining = Math.ceil(effects.multiUntil - gameTime);
+        icon = "✨";
+        label = "X2 PUAN";
+        color = "#ffd60a";
+      } else {
+        remaining = Math.ceil(effects.slowUntil - gameTime);
+        icon = "🐢";
+        label = "YAVAŞ";
+        color = "#4cc9f0";
+      }
+      pcdEl.classList.remove("hidden");
+      pcdEl.classList.add("active");
+      pcdEl.style.color = color;
+      pcdIcon.textContent = icon;
+      pcdNum.textContent = remaining;
+      pcdLabel.textContent = label;
+    } else {
+      pcdEl.classList.add("hidden");
+      pcdEl.classList.remove("active");
+    }
   }
 
   function jump() {

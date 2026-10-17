@@ -8,6 +8,7 @@ namespace ZiplaKac.UI
     /// <summary>
     /// Oyun içi HUD ekranını yöneten kontrolcü.
     /// Anlık skor, en iyi skor, aktif güçlendirme rozetleri, kombo bildirimi ve kontrol ipucunu gösterir.
+    /// Aktif zamanlı güçlendirme varsa ekran ortasında büyük, belirgin bir geri sayaç gösterir.
     /// </summary>
     public class HUDController : MonoBehaviour
     {
@@ -26,13 +27,35 @@ namespace ZiplaKac.UI
         public GameObject multiBadgeObject;
         public Text multiBadgeText;
 
+        [Header("Merkez Güçlendirme Geri Sayaç")]
+        [Tooltip("Ekran ortasındaki büyük geri sayaç paneli (Image veya RectTransform içeren GameObject)")]
+        public GameObject powerupCountdownPanel;
+
+        [Tooltip("Geri sayaçtaki büyük sayı metni (örn. '5')")]
+        public Text countdownNumberText;
+
+        [Tooltip("Geri sayaç ikonu/adı metni (örn. 'YAVAŞ' veya 'X2 PUAN')")]
+        public Text countdownLabelText;
+
+        [Tooltip("Sayaç dairesinin arka plan Image bileşeni — renk değişimi için")]
+        public Image countdownRingImage;
+
+        [Header("Geri Sayaç Renkleri")]
+        public Color slowColor = new Color(0.30f, 0.82f, 0.94f, 1f);   // Mavi — Yavaş
+        public Color multiColor = new Color(1.00f, 0.84f, 0.04f, 1f);  // Altın — x2 Puan
+
         [Header("Kombo Bildirimi")]
         public GameObject comboBannerObject;
         public Text comboBannerText;
         public CanvasGroup comboCanvasGroup;
 
         private Coroutine comboCoroutine;
+        private Coroutine pulseCoroutine;
         private readonly Vector2 comboBasePosition = new Vector2(0f, 520f);
+
+        // Son gösterilen güçlendirme tipi — değişim animasyonu için
+        private enum PowerupType { None, Slow, Multi }
+        private PowerupType lastShownType = PowerupType.None;
 
         private void OnEnable()
         {
@@ -52,6 +75,11 @@ namespace ZiplaKac.UI
             {
                 StopCoroutine(comboCoroutine);
                 comboCoroutine = null;
+            }
+            if (pulseCoroutine != null)
+            {
+                StopCoroutine(pulseCoroutine);
+                pulseCoroutine = null;
             }
         }
 
@@ -150,23 +178,26 @@ namespace ZiplaKac.UI
                 return;
             }
 
-            // 1. Skor Güncellemeleri (index.html: Skor: X, En iyi: Y)
+            // 1. Skor Güncellemeleri
             int scoreInt = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
             if (currentScoreText != null) currentScoreText.text = $"Skor: {scoreInt}";
             if (highScoreText != null) highScoreText.text = $"En iyi: {GameManager.Instance.HighScore}";
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler
             UpdatePowerUpBadges();
+
+            // 3. Merkez Geri Sayaç
+            UpdateCenterCountdown();
         }
 
         private void UpdatePowerUpBadges()
         {
-            // Kalkan Rozeti (index.html: Kalkan)
+            // Kalkan Rozeti
             bool shield = GameManager.Instance.isShieldActive;
             if (shieldBadgeObject != null) shieldBadgeObject.SetActive(shield);
             if (shieldBadgeText != null && shield) shieldBadgeText.text = "Kalkan";
 
-            // Yavaşlatma Rozeti (index.html: Yavaş 4s)
+            // Yavaşlatma Rozeti
             bool slow = GameManager.Instance.isSlowActive;
             if (slowBadgeObject != null) slowBadgeObject.SetActive(slow);
             if (slowBadgeText != null && slow)
@@ -175,7 +206,7 @@ namespace ZiplaKac.UI
                 slowBadgeText.text = $"Yavaş {sec}s";
             }
 
-            // x2 Skor Rozeti (index.html: x2 Puan 5s)
+            // x2 Skor Rozeti
             bool multi = GameManager.Instance.isDoubleScoreActive;
             if (multiBadgeObject != null) multiBadgeObject.SetActive(multi);
             if (multiBadgeText != null && multi)
@@ -184,5 +215,77 @@ namespace ZiplaKac.UI
                 multiBadgeText.text = $"x2 Puan {sec}s";
             }
         }
+
+        private void UpdateCenterCountdown()
+        {
+            if (powerupCountdownPanel == null) return;
+
+            bool hasSlow  = GameManager.Instance.isSlowActive;
+            bool hasMulti = GameManager.Instance.isDoubleScoreActive;
+
+            if (!hasSlow && !hasMulti)
+            {
+                // Hiçbir zamanlı güçlendirme yok — paneli gizle
+                if (powerupCountdownPanel.activeSelf)
+                {
+                    powerupCountdownPanel.SetActive(false);
+                    lastShownType = PowerupType.None;
+                }
+                return;
+            }
+
+            // Aktif güçlendirme belirle (ikisi aynı anda aktifse multi öncelikli)
+            PowerupType current = hasMulti ? PowerupType.Multi : PowerupType.Slow;
+            int seconds = current == PowerupType.Multi
+                ? Mathf.CeilToInt(GameManager.Instance.doubleScoreTimer)
+                : Mathf.CeilToInt(GameManager.Instance.slowTimer);
+
+            // İlk kez veya tür değiştiğinde animasyon başlat
+            if (!powerupCountdownPanel.activeSelf || current != lastShownType)
+            {
+                powerupCountdownPanel.SetActive(true);
+                lastShownType = current;
+
+                // Renk ve yazı güncelle
+                Color ringColor = current == PowerupType.Multi ? multiColor : slowColor;
+                if (countdownRingImage != null) countdownRingImage.color = ringColor;
+                if (countdownLabelText != null)
+                    countdownLabelText.text = current == PowerupType.Multi ? "X2 PUAN" : "YAVAŞ";
+
+                // Pulse animasyonu başlat
+                if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
+                pulseCoroutine = StartCoroutine(PulseCountdown());
+            }
+
+            // Sayıyı her frame güncelle
+            if (countdownNumberText != null) countdownNumberText.text = seconds.ToString();
+        }
+
+        /// <summary>
+        /// Paneli sürekli nefes alır gibi büyütüp küçültür (1 saniyeye 1 döngü).
+        /// </summary>
+        private IEnumerator PulseCountdown()
+        {
+            if (powerupCountdownPanel == null) yield break;
+            RectTransform rt = powerupCountdownPanel.GetComponent<RectTransform>();
+            if (rt == null) yield break;
+
+            while (powerupCountdownPanel.activeSelf)
+            {
+                float t = 0f;
+                while (t < 1f)
+                {
+                    t += Time.unscaledDeltaTime;
+                    // sin dalgası: 1.00 -> 1.09 -> 1.00
+                    float s = 1f + 0.09f * Mathf.Sin(t * Mathf.PI);
+                    rt.localScale = Vector3.one * s;
+                    yield return null;
+                }
+            }
+
+            rt.localScale = Vector3.one;
+            pulseCoroutine = null;
+        }
     }
 }
+
