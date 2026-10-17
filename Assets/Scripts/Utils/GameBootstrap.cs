@@ -875,7 +875,9 @@ namespace ZiplaKac.Utils
             chestRt.anchoredPosition = new Vector2(0f, 130f);
             chestRt.sizeDelta = new Vector2(220f, 220f);
             Image chestImg = chestObj.AddComponent<Image>();
-            chestImg.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
+            modalUI.closedChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
+            modalUI.openChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest_open", () => modalUI.closedChestSprite);
+            chestImg.sprite = SaveSystem.CanClaimDailyReward() ? modalUI.closedChestSprite : modalUI.openChestSprite;
             chestImg.preserveAspect = true;
             chestImg.raycastTarget = false;
             modalUI.chestImage = chestImg;
