@@ -654,9 +654,9 @@ namespace ZiplaKac.Utils
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // 👔 Gardırop (Kıyafetler & Aksesuarlar) Butonu (#9b5de5 / Mor Vurgusu)
+            // 🛒 Mağaza & Gardırop (Yükseltmeler, Güçler, Kıyafetler) Butonu (#9b5de5 / Mor Vurgusu)
             Color purpleColor = new Color(0.61f, 0.36f, 0.90f);
-            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "👔 GARDIROP (KIYAFETLER)", new Vector2(0f, -198f), new Vector2(440f, 68f), purpleColor, Color.white, 24);
+            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -198f), new Vector2(440f, 68f), purpleColor, Color.white, 24);
             Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
             wardrobeBtn.onClick.AddListener(() => {
                 if (UI.WardrobeModalUI.Instance != null)
@@ -914,29 +914,45 @@ namespace ZiplaKac.Utils
 
             UI.WardrobeModalUI modalUI = modal.AddComponent<UI.WardrobeModalUI>();
 
-            // Modal Card (720x920)
-            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(720f, 920f));
+            // Modal Card (720x960)
+            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(720f, 960f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
             // Başlık
-            modalUI.titleText = CreateText(card.transform, "Title", "GARDIROP (KIYAFETLER)", 40, new Vector2(0f, 380f), new Color(0.61f, 0.36f, 0.90f), false, FontStyle.Bold);
+            modalUI.titleText = CreateText(card.transform, "Title", "⚡ GÜÇLER & YÜKSELTMELER", 36, new Vector2(0f, 410f), new Color(0.61f, 0.36f, 0.90f), false, FontStyle.Bold);
 
             // Toplam Altın Göstergesi
-            modalUI.totalGoldText = CreateText(card.transform, "TotalGold", "🪙 Toplam Altın: 150", 28, new Vector2(0f, 320f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            modalUI.totalGoldText = CreateText(card.transform, "TotalGold", "🪙 Toplam Altın: 150", 26, new Vector2(0f, 355f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
 
             // Durum / Hata Mesajı
-            modalUI.statusMessageText = CreateText(card.transform, "StatusMsg", "", 20, new Vector2(0f, 275f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            modalUI.statusMessageText = CreateText(card.transform, "StatusMsg", "", 18, new Vector2(0f, 310f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+
+            // Sekmeler Çubuğu (Tabs Bar)
+            Color tabActive = new Color(0.61f, 0.36f, 0.90f);
+            Color tabInactive = new Color(0.12f, 0.15f, 0.28f, 0.9f);
+
+            GameObject tabUpgradesObj = CreatePillButton(card.transform, "TabUpgradesBtn", "⚡ YÜKSELTMELER", new Vector2(-155f, 255f), new Vector2(290f, 52f), tabActive, Color.white, 20);
+            modalUI.tabUpgradesButton = tabUpgradesObj.GetComponent<Button>();
+            modalUI.tabUpgradesBg = tabUpgradesObj.GetComponent<Image>();
+            modalUI.tabUpgradesText = tabUpgradesObj.GetComponentInChildren<Text>();
+            modalUI.tabUpgradesButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.Upgrades));
+
+            GameObject tabOutfitsObj = CreatePillButton(card.transform, "TabOutfitsBtn", "👔 GARDIROP", new Vector2(155f, 255f), new Vector2(290f, 52f), tabInactive, new Color(0.7f, 0.8f, 0.9f), 20);
+            modalUI.tabOutfitsButton = tabOutfitsObj.GetComponent<Button>();
+            modalUI.tabOutfitsBg = tabOutfitsObj.GetComponent<Image>();
+            modalUI.tabOutfitsText = tabOutfitsObj.GetComponentInChildren<Text>();
+            modalUI.tabOutfitsButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.Outfits));
 
             // Items Container
             GameObject itemsContainerObj = new GameObject("ItemsContainer");
             itemsContainerObj.transform.SetParent(card.transform, false);
             RectTransform itemsRt = itemsContainerObj.AddComponent<RectTransform>();
-            itemsRt.anchoredPosition = new Vector2(0f, 40f);
-            itemsRt.sizeDelta = new Vector2(660f, 460f);
+            itemsRt.anchoredPosition = new Vector2(0f, -65f);
+            itemsRt.sizeDelta = new Vector2(660f, 550f);
             modalUI.itemsContainer = itemsContainerObj.transform;
 
             // Kapat Butonu
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -380f), new Vector2(280f, 68f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 24);
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -420f), new Vector2(280f, 64f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 22);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 

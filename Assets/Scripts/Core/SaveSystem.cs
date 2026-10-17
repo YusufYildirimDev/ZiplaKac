@@ -202,6 +202,85 @@ namespace ZiplaKac.Core
 
         private const string KEY_LAST_DAILY_REWARD = "ZiplaKac_LastDailyRewardDate";
         private const string KEY_UNLOCKED_CHARACTERS = "ZiplaKac_UnlockedCharacters";
+        private const string KEY_CONSUMABLE_PREFIX = "ZiplaKac_Consumable_";
+        private const string KEY_UPGRADE_PREFIX = "ZiplaKac_Upgrade_";
+        private const string KEY_DAILY_STREAK = "ZiplaKac_DailyStreak";
+        private const string KEY_LAST_STREAK_DATE = "ZiplaKac_LastStreakDate";
+
+        // Consumables: "shield", "slow_start", "lucky_pu", "second_chance"
+        public static int GetConsumableCount(string consumableId)
+        {
+            return PlayerPrefs.GetInt(KEY_CONSUMABLE_PREFIX + consumableId, 0);
+        }
+
+        public static void AddConsumable(string consumableId, int count = 1)
+        {
+            int current = GetConsumableCount(consumableId);
+            PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + consumableId, current + count);
+            PlayerPrefs.Save();
+        }
+
+        public static bool UseConsumable(string consumableId)
+        {
+            int current = GetConsumableCount(consumableId);
+            if (current > 0)
+            {
+                PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + consumableId, current - 1);
+                PlayerPrefs.Save();
+                return true;
+            }
+            return false;
+        }
+
+        public static bool PurchaseConsumable(string consumableId, int price)
+        {
+            if (SpendGold(price))
+            {
+                AddConsumable(consumableId, 1);
+                return true;
+            }
+            return false;
+        }
+
+        // Upgrades: "pu_duration", "double_jump", "combo_memory", "signature"
+        public static int GetUpgradeLevel(string characterId, string upgradeId)
+        {
+            return PlayerPrefs.GetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", 0);
+        }
+
+        public static void SetUpgradeLevel(string characterId, string upgradeId, int level)
+        {
+            PlayerPrefs.SetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", level);
+            PlayerPrefs.Save();
+        }
+
+        public static bool PurchaseUpgrade(string characterId, string upgradeId, int price, int maxLevel = 1)
+        {
+            int currentLevel = GetUpgradeLevel(characterId, upgradeId);
+            if (currentLevel >= maxLevel) return false;
+
+            if (SpendGold(price))
+            {
+                SetUpgradeLevel(characterId, upgradeId, currentLevel + 1);
+                return true;
+            }
+            return false;
+        }
+
+        public static int GetDailyStreak()
+        {
+            return PlayerPrefs.GetInt(KEY_DAILY_STREAK, 0);
+        }
+
+        public static int CalculateDailyLoginBonus()
+        {
+            int streak = GetDailyStreak() + 1;
+            if (streak == 1) return 20;
+            if (streak == 2) return 25;
+            if (streak == 3) return 30;
+            if (streak == 4) return 35;
+            return 50;
+        }
 
         public static bool CanClaimDailyReward()
         {
@@ -210,11 +289,30 @@ namespace ZiplaKac.Core
             return lastClaim != today;
         }
 
-        public static void ClaimDailyReward()
+        public static int ClaimDailyReward()
         {
             string today = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
+            string yesterday = System.DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
+            string lastDate = PlayerPrefs.GetString(KEY_LAST_STREAK_DATE, "");
+
+            int currentStreak = PlayerPrefs.GetInt(KEY_DAILY_STREAK, 0);
+            if (lastDate == yesterday)
+            {
+                currentStreak++;
+            }
+            else if (lastDate != today)
+            {
+                currentStreak = 1;
+            }
+
+            PlayerPrefs.SetInt(KEY_DAILY_STREAK, currentStreak);
+            PlayerPrefs.SetString(KEY_LAST_STREAK_DATE, today);
             PlayerPrefs.SetString(KEY_LAST_DAILY_REWARD, today);
+
+            int goldBonus = (currentStreak == 1) ? 20 : (currentStreak == 2) ? 25 : (currentStreak == 3) ? 30 : (currentStreak == 4) ? 35 : 50;
+            AddGold(goldBonus);
             PlayerPrefs.Save();
+            return goldBonus;
         }
 
         public static bool IsCharacterUnlocked(string id)

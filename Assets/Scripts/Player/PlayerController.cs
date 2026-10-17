@@ -276,7 +276,11 @@ namespace ZiplaKac.Player
                 lastJumpTime = Time.time;
                 lastJumpFrame = Time.frameCount;
 
-                float force = (jumpsUsed == 0) ? jumpForce : doubleJumpForce;
+                string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+                bool hasDoubleJumpMaster = SaveSystem.GetUpgradeLevel(charKey, "double_jump") > 0;
+                float currentDoubleJumpForce = hasDoubleJumpMaster ? doubleJumpForce * 1.15f : doubleJumpForce;
+
+                float force = (jumpsUsed == 0) ? jumpForce : currentDoubleJumpForce;
                 rb.linearVelocity = new Vector2(0f, force);
                 isGrounded = false;
                 jumpsUsed++;

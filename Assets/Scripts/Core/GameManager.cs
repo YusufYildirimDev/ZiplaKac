@@ -40,11 +40,18 @@ namespace ZiplaKac.Core
         public int HighScore { get; private set; }
         public int CurrentTierIndex { get; private set; } = 0;
         public int CurrentRunGold { get; private set; } = 0;
+        public int RunObstacleGold { get; private set; } = 0;
+        public int RunComboGold { get; private set; } = 0;
+        public int RunScoreGold { get; private set; } = 0;
+        public int RunRecordGold { get; private set; } = 0;
 
         [Header("Güçlendirme Durumları")]
         public bool isShieldActive = false;
         public bool isSlowActive = false;
         public bool isDoubleScoreActive = false;
+        public bool hasSecondChance = false;
+        public bool isTemporaryInvulnerable = false;
+        private float invulnerabilityTimer = 0f;
 
         public float slowTimer = 0f;
         public float doubleScoreTimer = 0f;
@@ -82,13 +89,26 @@ namespace ZiplaKac.Core
         {
             if (State != GameState.Playing) return;
 
+            if (isTemporaryInvulnerable)
+            {
+                invulnerabilityTimer -= Time.deltaTime;
+                if (invulnerabilityTimer <= 0f)
+                {
+                    isTemporaryInvulnerable = false;
+                }
+            }
+
             // 1. Hız artışı
             CurrentSpeed += speedAcceleration * Time.deltaTime;
             CurrentSpeed = Mathf.Min(CurrentSpeed, maxSpeed);
 
-            // 2. Skor hesabı (Slow aktif olsa dahi puan kazanma hızı etkilenmez)
+            // 2. Skor hesabı (Klasik karakterin imza yeteneği varsa +%15 bonus)
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+            bool hasSignature = SaveSystem.GetUpgradeLevel(charKey, "signature") > 0;
+            float signatureScoreBonus = (charKey == "klasik" && hasSignature) ? 1.15f : 1.0f;
+
             float scoreMultiplier = isDoubleScoreActive ? 2.0f : 1.0f;
-            CurrentScore += basePointsPerSecond * scoreMultiplier * Time.deltaTime;
+            CurrentScore += basePointsPerSecond * scoreMultiplier * signatureScoreBonus * Time.deltaTime;
 
             // 3. Güçlendirme süre takibi
             UpdatePowerUpTimers();
@@ -116,6 +136,13 @@ namespace ZiplaKac.Core
                     CurrentSpeed = baseSpeed;
                     CurrentTierIndex = 0;
                     CurrentRunGold = 0;
+                    RunObstacleGold = 0;
+                    RunComboGold = 0;
+                    RunScoreGold = 0;
+                    RunRecordGold = 0;
+                    isTemporaryInvulnerable = false;
+                    invulnerabilityTimer = 0f;
+
                     if (WorldThemeManager.Instance != null)
                     {
                         WorldThemeManager.Instance.SyncFromSavedCharacter();
@@ -126,15 +153,25 @@ namespace ZiplaKac.Core
                     ResetPowerUps();
                     Obstacles.Obstacle.ClearAllActiveObstacles();
                     PowerUps.PowerUp.ClearAllActivePowerUps();
+
+                    // --- Tek Kullanımlık (Consumable) Güçlendirmeleri Uygula ---
+                    ApplyConsumablesAtStart();
                     break;
+
                 case GameState.GameOver:
-                    Time.timeScale = 1.0f; // Varsa son patlama animasyonları için
+                    Time.timeScale = 1.0f;
                     int finalScoreInt = Mathf.FloorToInt(CurrentScore);
                     bool isNewRecord = SaveSystem.SaveScore(finalScoreInt);
                     if (isNewRecord)
                     {
                         HighScore = finalScoreInt;
+                        RunRecordGold = 50; // Yeni rekor bonusu
                     }
+
+                    // Skorun %10'u kadar altın
+                    RunScoreGold = Mathf.FloorToInt(CurrentScore * 0.10f);
+                    CurrentRunGold += RunScoreGold + RunRecordGold;
+
                     if (CurrentRunGold > 0)
                     {
                         SaveSystem.AddGold(CurrentRunGold);
@@ -145,21 +182,108 @@ namespace ZiplaKac.Core
             OnGameStateChanged?.Invoke(State);
         }
 
+        private void ApplyConsumablesAtStart()
+        {
+            // 1. Başlangıç Kalkanı (Varsa tüket ve aç)
+            if (SaveSystem.UseConsumable("shield"))
+            {
+                ActivateShield();
+            }
+
+            // 2. Yavaş Başlangıç (İlk 5 saniye yavaşlatma)
+            if (SaveSystem.UseConsumable("slow_start"))
+            {
+                ActivateSlow(5.0f);
+            }
+
+            // 3. Şanslı Güçlendirme (İlk güçlendirme 3. saniyede çıkar)
+            if (SaveSystem.UseConsumable("lucky_pu"))
+            {
+                PowerUps.PowerUpSpawner spawner = FindObjectOfType<PowerUps.PowerUpSpawner>();
+                if (spawner != null) spawner.SetNextSpawnTime(3.0f);
+            }
+
+            // 4. İkinci Şans Bileti
+            hasSecondChance = SaveSystem.GetConsumableCount("second_chance") > 0;
+        }
+
         public void StartGame()
         {
             SetState(GameState.Playing);
         }
 
+        public void TriggerTemporaryInvulnerability(float duration = 1.5f)
+        {
+            isTemporaryInvulnerable = true;
+            invulnerabilityTimer = duration;
+        }
+
         public void GameOver()
         {
+            if (isTemporaryInvulnerable) return;
+
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+            bool hasComboMemory = SaveSystem.GetUpgradeLevel(charKey, "combo_memory") > 0;
+            bool hasSignature = SaveSystem.GetUpgradeLevel(charKey, "signature") > 0;
+
             if (isShieldActive)
             {
                 // Kalkan darbeyi emer
                 isShieldActive = false;
-                comboCount = 0; // Kalkan kullanıldığında kombo sıfırlanır
-                consecutivePassedObstacles = 0;
+                if (hasComboMemory)
+                {
+                    comboCount = Mathf.FloorToInt(comboCount / 2f);
+                    consecutivePassedObstacles = comboCount * 5;
+                }
+                else
+                {
+                    comboCount = 0;
+                    consecutivePassedObstacles = 0;
+                }
                 OnShieldStatusChanged?.Invoke();
                 AudioManager.Instance?.PlayShieldHitSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                TriggerTemporaryInvulnerability(0.8f);
+                return;
+            }
+
+            // İkinci Şans Bileti Kontrolü
+            if (hasSecondChance && SaveSystem.UseConsumable("second_chance"))
+            {
+                hasSecondChance = false;
+                TriggerTemporaryInvulnerability(1.6f);
+                Obstacles.Obstacle.ClearAllActiveObstacles();
+                if (hasComboMemory)
+                {
+                    comboCount = Mathf.FloorToInt(comboCount / 2f);
+                    consecutivePassedObstacles = comboCount * 5;
+                }
+                else
+                {
+                    comboCount = 0;
+                    consecutivePassedObstacles = 0;
+                }
+                AudioManager.Instance?.PlayPowerUpSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                return;
+            }
+
+            // Gece Karakteri İmza Yeteneği: %28 Otomatik Sıyrılma Şansı
+            if (charKey == "gece" && hasSignature && UnityEngine.Random.value < 0.28f)
+            {
+                TriggerTemporaryInvulnerability(1.6f);
+                Obstacles.Obstacle.ClearAllActiveObstacles();
+                if (hasComboMemory)
+                {
+                    comboCount = Mathf.FloorToInt(comboCount / 2f);
+                    consecutivePassedObstacles = comboCount * 5;
+                }
+                else
+                {
+                    comboCount = 0;
+                    consecutivePassedObstacles = 0;
+                }
+                AudioManager.Instance?.PlayPowerUpSound();
                 AudioManager.Instance?.TriggerHapticFeedback();
                 return;
             }
@@ -175,15 +299,37 @@ namespace ZiplaKac.Core
 
             // Her geçilen engel için altın kazanılır (x2 puan varsa +2 altın)
             int goldEarned = isDoubleScoreActive ? 2 : 1;
+            RunObstacleGold += goldEarned;
             CurrentRunGold += goldEarned;
 
             consecutivePassedObstacles++;
+
+            // Kombo Serisi Altın Bonusu (5 / 10 / 20 / 40 eşikleri)
+            int comboGoldBonus = 0;
+            if (consecutivePassedObstacles == 5) comboGoldBonus = 2;
+            else if (consecutivePassedObstacles == 10) comboGoldBonus = 5;
+            else if (consecutivePassedObstacles == 20) comboGoldBonus = 12;
+            else if (consecutivePassedObstacles == 40) comboGoldBonus = 30;
+            else if (consecutivePassedObstacles > 40 && consecutivePassedObstacles % 10 == 0) comboGoldBonus = 10;
+
+            // Zehir Karakteri İmza Yeteneği: Kombo ödülleri x1.25 katına çıkar
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+            if (charKey == "zehir" && SaveSystem.GetUpgradeLevel(charKey, "signature") > 0 && comboGoldBonus > 0)
+            {
+                comboGoldBonus = Mathf.RoundToInt(comboGoldBonus * 1.25f);
+            }
+
+            if (comboGoldBonus > 0)
+            {
+                RunComboGold += comboGoldBonus;
+                CurrentRunGold += comboGoldBonus;
+            }
+
             if (consecutivePassedObstacles % 5 == 0)
             {
                 comboCount++;
                 int bonusPoints = 10;
                 CurrentScore += bonusPoints;
-                CurrentRunGold += 5; // Her 5'li komboda ekstra +5 bonus altın
                 OnComboAchieved?.Invoke(comboCount, obstaclePosition);
                 AudioManager.Instance?.PlayComboSound();
             }
@@ -207,15 +353,23 @@ namespace ZiplaKac.Core
 
         public void ActivateSlow(float duration = 4.0f)
         {
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+            int puLevel = SaveSystem.GetUpgradeLevel(charKey, "pu_duration");
+            float finalDuration = duration * (1f + 0.20f * puLevel);
+
             isSlowActive = true;
-            slowTimer = duration;
+            slowTimer = finalDuration;
             AudioManager.Instance?.PlayPowerUpSound();
         }
 
         public void ActivateDoubleScore(float duration = 5.0f)
         {
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+            int puLevel = SaveSystem.GetUpgradeLevel(charKey, "pu_duration");
+            float finalDuration = duration * (1f + 0.20f * puLevel);
+
             isDoubleScoreActive = true;
-            doubleScoreTimer = duration;
+            doubleScoreTimer = finalDuration;
             AudioManager.Instance?.PlayPowerUpSound();
         }
 

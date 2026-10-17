@@ -109,8 +109,16 @@ namespace ZiplaKac.UI
             if (goldEarnedText != null)
             {
                 int runGold = GameManager.Instance.CurrentRunGold;
+                int scoreGold = GameManager.Instance.RunScoreGold;
+                int comboGold = GameManager.Instance.RunComboGold;
+                int recGold = GameManager.Instance.RunRecordGold;
                 int totalGold = SaveSystem.GetTotalGold();
-                goldEarnedText.text = $"+{runGold} 🪙  (Toplam: {totalGold})";
+
+                string breakdown = $"+{runGold} 🪙 (Skor: +{scoreGold}, Kombo: +{comboGold}";
+                if (recGold > 0) breakdown += $", Rekor: +{recGold}";
+                breakdown += $")\n<size=20><color=#ffd166>Kasa: {totalGold} 🪙</color></size>";
+
+                goldEarnedText.text = breakdown;
             }
 
             // Yeni Rekor Rozeti Kontrolü

@@ -91,6 +91,11 @@ namespace ZiplaKac.PowerUps
             return false;
         }
 
+        public void SetNextSpawnTime(float seconds)
+        {
+            spawnTimer = seconds;
+        }
+
         private void ResetTimer()
         {
             spawnTimer = Random.Range(minSpawnTime, maxSpawnTime);
