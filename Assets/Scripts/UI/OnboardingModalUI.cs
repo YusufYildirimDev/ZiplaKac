@@ -43,25 +43,9 @@ namespace ZiplaKac.UI
             Instance = this;
         }
 
-        private void Start()
+        private void OnEnable()
         {
-            // İlk indirmede veya rehber henüz tamamlanmamışsa otomatik olarak aç
-            if (PlayerPrefs.GetInt(KEY_ONBOARDING_SEEN, 0) == 0)
-            {
-                OpenModal();
-            }
-            else
-            {
-                gameObject.SetActive(false);
-            }
-        }
-
-        public void OpenModal()
-        {
-            gameObject.SetActive(true);
             transform.SetAsLastSibling();
-            currentSlideIndex = 0;
-            UpdateSlideDisplay();
 
             CanvasGroup cg = GetComponent<CanvasGroup>();
             if (cg != null)
@@ -71,10 +55,28 @@ namespace ZiplaKac.UI
                 cg.blocksRaycasts = true;
             }
 
-            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null)
+            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(false);
             }
+
+            UpdateSlideDisplay();
+        }
+
+        private void OnDisable()
+        {
+            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
+            {
+                UIManager.Instance.mainMenuPanel.SetActive(true);
+            }
+        }
+
+        public void OpenModal()
+        {
+            currentSlideIndex = 0;
+            gameObject.SetActive(true);
+            transform.SetAsLastSibling();
+            UpdateSlideDisplay();
         }
 
         public void CloseModal()
@@ -82,12 +84,6 @@ namespace ZiplaKac.UI
             PlayerPrefs.SetInt(KEY_ONBOARDING_SEEN, 1);
             PlayerPrefs.Save();
             gameObject.SetActive(false);
-
-            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null)
-            {
-                UIManager.Instance.mainMenuPanel.SetActive(true);
-            }
-
             AudioManager.Instance?.PlayJumpSound();
         }
 
@@ -108,7 +104,7 @@ namespace ZiplaKac.UI
                 gameObject.SetActive(false);
                 AudioManager.Instance?.PlayJumpSound();
 
-                if (GameManager.Instance != null)
+                if (GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
                 {
                     GameManager.Instance.StartGame();
                 }

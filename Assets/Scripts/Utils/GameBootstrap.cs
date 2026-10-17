@@ -619,9 +619,12 @@ namespace ZiplaKac.Utils
 
             Text labelTxt = CreateText(obj.transform, "Label", label, fontSize, Vector2.zero, textColor, false, FontStyle.Bold);
             RectTransform labelRt = labelTxt.GetComponent<RectTransform>();
-            labelRt.sizeDelta = new Vector2(size.x - 24f, size.y);
+            labelRt.anchorMin = Vector2.zero;
+            labelRt.anchorMax = Vector2.one;
+            labelRt.offsetMin = new Vector2(12f, 0f);
+            labelRt.offsetMax = new Vector2(-12f, 0f);
             labelTxt.resizeTextForBestFit = true;
-            labelTxt.resizeTextMinSize = 20;
+            labelTxt.resizeTextMinSize = 18;
             labelTxt.resizeTextMaxSize = fontSize;
             labelTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelTxt.verticalOverflow = VerticalWrapMode.Truncate;
@@ -756,6 +759,7 @@ namespace ZiplaKac.Utils
             GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -400f), new Vector2(540f, 96f), cyanColor, darkNavy, 32);
             Button rulesBtn = rulesBtnObj.GetComponent<Button>();
             rulesBtn.onClick.AddListener(() => {
+                Debug.Log("[RulesButton] Clicked! Opening onboarding modal...");
                 AudioManager.Instance?.PlayJumpSound();
                 if (UI.OnboardingModalUI.Instance != null)
                 {
@@ -767,6 +771,10 @@ namespace ZiplaKac.Utils
                     if (found != null)
                     {
                         found.OpenModal();
+                    }
+                    else
+                    {
+                        Debug.LogError("[RulesButton] OnboardingModalUI not found!");
                     }
                 }
             });
@@ -1118,8 +1126,8 @@ namespace ZiplaKac.Utils
             modalUI.stepBadgeText = CreateText(card.transform, "StepBadge", "REHBER • ADIM 1 / 4", 24, new Vector2(0f, 660f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
             modalUI.titleText = CreateText(card.transform, "TitleText", "OYUN KURALLARI & KONTROLLER", 38, new Vector2(0f, 605f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
 
-            // Sağ Üst "✕ KAPAT" Butonu
-            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ KAPAT", new Vector2(365f, 660f), new Vector2(140f, 52f), new Color(0.15f, 0.20f, 0.32f, 0.85f), new Color(0.85f, 0.90f, 1f), 22);
+            // Sağ Üst "✕ KAPAT" Butonu (Genişletilmiş dokunma alanı)
+            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ KAPAT", new Vector2(350f, 660f), new Vector2(180f, 64f), new Color(0.18f, 0.24f, 0.38f, 0.95f), new Color(0.9f, 0.95f, 1f), 24);
             modalUI.closeButton = skipBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
