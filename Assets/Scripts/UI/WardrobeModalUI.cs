@@ -183,7 +183,7 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 132f;
+            float rowHeight = 150f;
             float spacing = 16f;
             float topPadding = 16f;
             int totalItems = consumableConfigs.Count + upgradeConfigs.Count;
@@ -279,7 +279,7 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 146f;
+            float rowHeight = 160f;
             float spacing = 18f;
             float topPadding = 18f;
             int totalItems = outfitConfigs.Count;
@@ -357,7 +357,7 @@ namespace ZiplaKac.UI
                 1.5f, 22, 128, 128);
             bg.type = Image.Type.Sliced;
 
-            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme / Yetenek Rozet İkonu
+            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme / Yetenek Rozet İkonu (120x120)
             bool hasOutfit = !string.IsNullOrEmpty(outfitType);
             bool hasShopItem = !string.IsNullOrEmpty(shopItemId);
             bool hasEmoji = !string.IsNullOrEmpty(iconEmoji);
@@ -371,8 +371,8 @@ namespace ZiplaKac.UI
                 iconRt.anchorMin = new Vector2(0f, 0.5f);
                 iconRt.anchorMax = new Vector2(0f, 0.5f);
                 iconRt.pivot = new Vector2(0f, 0.5f);
-                iconRt.anchoredPosition = new Vector2(26f, 0f);
-                iconRt.sizeDelta = new Vector2(104f, 104f);
+                iconRt.anchoredPosition = new Vector2(24f, 0f);
+                iconRt.sizeDelta = new Vector2(120f, 120f);
 
                 Image iconImg = iconObj.AddComponent<Image>();
                 Sprite itemSprite = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_{outfitType}");
@@ -388,15 +388,15 @@ namespace ZiplaKac.UI
             }
             else if (hasShopItem || hasEmoji)
             {
-                // Güçlendirme / Yetenek Rozet İkonu (Yeni yüklenen yüksek çözünürlüklü 2D ikonlar)
+                // Güçlendirme / Yetenek Rozet İkonu (Yeni yüklenen yüksek çözünürlüklü 2D ikonlar: 120x120)
                 GameObject badgeObj = new GameObject("IconBadge");
                 badgeObj.transform.SetParent(rowObj.transform, false);
                 RectTransform badgeRt = badgeObj.AddComponent<RectTransform>();
                 badgeRt.anchorMin = new Vector2(0f, 0.5f);
                 badgeRt.anchorMax = new Vector2(0f, 0.5f);
                 badgeRt.pivot = new Vector2(0f, 0.5f);
-                badgeRt.anchoredPosition = new Vector2(26f, 0f);
-                badgeRt.sizeDelta = new Vector2(104f, 104f);
+                badgeRt.anchoredPosition = new Vector2(24f, 0f);
+                badgeRt.sizeDelta = new Vector2(120f, 120f);
 
                 Image badgeImg = badgeObj.AddComponent<Image>();
                 badgeImg.preserveAspect = true;
@@ -431,15 +431,15 @@ namespace ZiplaKac.UI
 
                     Text emojiTxt = emojiTxtObj.AddComponent<Text>();
                     emojiTxt.font = font;
-                    emojiTxt.fontSize = 46;
+                    emojiTxt.fontSize = 54;
                     emojiTxt.alignment = TextAnchor.MiddleCenter;
                     emojiTxt.text = iconEmoji;
                 }
             }
 
-            // 2. Metin Alanı (Daha büyük ve okunaklı)
-            float textLeft = hasVisual ? 146f : 30f;
-            float textWidth = hasVisual ? 460f : 570f;
+            // 2. Metin Alanı (Daha büyük ve okunaklı: 32pt başlık / 24pt alt yazı)
+            float textLeft = hasVisual ? 160f : 30f;
+            float textWidth = hasVisual ? 445f : 570f;
 
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(rowObj.transform, false);
@@ -448,27 +448,27 @@ namespace ZiplaKac.UI
             labelRt.anchorMax = new Vector2(0f, 0.5f);
             labelRt.pivot = new Vector2(0f, 0.5f);
             labelRt.anchoredPosition = new Vector2(textLeft, 0f);
-            labelRt.sizeDelta = new Vector2(textWidth, rowHeight - 16f);
+            labelRt.sizeDelta = new Vector2(textWidth, rowHeight - 14f);
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;
-            labelText.fontSize = 28;
+            labelText.fontSize = 32;
             labelText.fontStyle = FontStyle.Bold;
             labelText.alignment = TextAnchor.MiddleLeft;
             labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelText.verticalOverflow = VerticalWrapMode.Truncate;
             labelText.color = Color.white;
-            labelText.text = $"{title}\n<size=20><color=#b8c8dc>{subtitle}</color></size>";
+            labelText.text = $"{title}\n<size=24><color=#b8c8dc>{subtitle}</color></size>";
 
-            // 3. Buton Alanı (Genişletilmiş ve büyük)
+            // 3. Buton Alanı (Genişletilmiş ve büyük: 215x80, 28pt)
             GameObject btnObj = new GameObject("ActionBtn");
             btnObj.transform.SetParent(rowObj.transform, false);
             RectTransform btnRt = btnObj.AddComponent<RectTransform>();
             btnRt.anchorMin = new Vector2(1f, 0.5f);
             btnRt.anchorMax = new Vector2(1f, 0.5f);
             btnRt.pivot = new Vector2(1f, 0.5f);
-            btnRt.anchoredPosition = new Vector2(-24f, 0f);
-            btnRt.sizeDelta = new Vector2(200f, 68f);
+            btnRt.anchoredPosition = new Vector2(-22f, 0f);
+            btnRt.sizeDelta = new Vector2(215f, 80f);
 
             Image btnBg = btnObj.AddComponent<Image>();
             Color finalBtnColor = btnColor ?? new Color(1.0f, 0.82f, 0.40f);
@@ -491,7 +491,7 @@ namespace ZiplaKac.UI
 
             Text bTxt = btnTxtObj.AddComponent<Text>();
             bTxt.font = font;
-            bTxt.fontSize = 23;
+            bTxt.fontSize = 28;
             bTxt.fontStyle = FontStyle.Bold;
             bTxt.alignment = TextAnchor.MiddleCenter;
             bTxt.color = (finalBtnColor.r > 0.6f && finalBtnColor.g > 0.6f) ? new Color(0.05f, 0.08f, 0.13f) : Color.white;
