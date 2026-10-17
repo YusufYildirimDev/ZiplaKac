@@ -116,7 +116,7 @@ namespace ZiplaKac.UI
 
                 string breakdown = $"+{runGold} 🪙 (Skor: +{scoreGold}, Kombo: +{comboGold}";
                 if (recGold > 0) breakdown += $", Rekor: +{recGold}";
-                breakdown += $")\n<size=20><color=#ffd166>Kasa: {totalGold} 🪙</color></size>";
+                breakdown += $")\n<size=28><color=#ffd166>Kasa: {totalGold} 🪙</color></size>";
 
                 goldEarnedText.text = breakdown;
             }

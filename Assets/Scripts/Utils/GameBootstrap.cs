@@ -802,47 +802,48 @@ namespace ZiplaKac.Utils
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Centered Glassmorphic Card (760x860, Y: +80)
-            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(760f, 860f));
+            // Centered Glassmorphic Card (920x1260, Y: +80)
+            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(920f, 1260f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 80f);
 
-            // Başlık "OYUN BİTTİ" (Coral #ef476f)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 52, new Vector2(0f, 325f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
+            // Başlık "OYUN BİTTİ" (Coral #ef476f - Büyük ve Belirgin)
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 68, new Vector2(0f, 490f), new Color(0.94f, 0.28f, 0.44f), false, FontStyle.Bold);
 
             // Alt Bilgi "Bir engele çarptın!"
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 24, new Vector2(0f, 270f), new Color(0.65f, 0.72f, 0.85f), false);
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın!", 30, new Vector2(0f, 420f), new Color(0.65f, 0.72f, 0.85f), false);
 
-            // Skor Büyük Rakam
-            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 80, new Vector2(0f, 185f), Color.white, false, FontStyle.Bold);
+            // Skor Büyük Rakam (Devasa ve Parlak)
+            goUI.finalScoreText = CreateText(card.transform, "FinalScoreText", "0", 110, new Vector2(0f, 310f), Color.white, false, FontStyle.Bold);
 
             // En İyi Skor
-            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 28, new Vector2(0f, 110f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
+            goUI.highScoreText = CreateText(card.transform, "HighScoreText", "En iyi skor: 0", 36, new Vector2(0f, 205f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold);
 
             // Yeni Rekor Rozeti
-            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 28, new Vector2(0f, 65f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            Text newRecText = CreateText(card.transform, "NewRecordBadge", "★ YENİ REKOR! ★", 34, new Vector2(0f, 150f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
             goUI.newRecordBadge = newRecText.gameObject;
             goUI.newRecordBadge.SetActive(false);
 
-            // Bu Koşuda Kazanılan Altın & Toplam Altın
-            goUI.goldEarnedText = CreateText(card.transform, "GoldEarnedText", "+0 🪙  (Toplam: 0)", 26, new Vector2(0f, 20f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            // Bu Koşuda Kazanılan Altın & Toplam Altın (İki satır geniş alan)
+            goUI.goldEarnedText = CreateText(card.transform, "GoldEarnedText", "+0 🪙  (Toplam: 0)", 34, new Vector2(0f, 75f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            goUI.goldEarnedText.rectTransform.sizeDelta = new Vector2(850f, 130f);
 
-            // Son 5 Skor Listesi (Kompakt Tek Satır)
-            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, -25f), new Color(0.7f, 0.78f, 0.9f), false);
+            // Son 5 Skor Listesi
+            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 26, new Vector2(0f, -25f), new Color(0.7f, 0.78f, 0.9f), false);
 
-            // Tekrar Oyna Butonu (Neon Mint #06d6a0)
+            // Tekrar Oyna Butonu (Neon Mint #06d6a0 - Büyük ve Çarpıcı)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -95f), new Vector2(400f, 80f), mintColor, darkNavy, 30);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -135f), new Vector2(540f, 104f), mintColor, darkNavy, 44);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
             // 🎁 Ödüllü Reklam İzle Butonu (#ffd166 / Altın Amber Vurgusu)
             Color goldColor = new Color(1.0f, 0.82f, 0.40f);
-            GameObject adBtn = CreatePillButton(card.transform, "RewardedAdButton", "🎁 REKLAM İZLE: +50 PUAN", new Vector2(0f, -195f), new Vector2(440f, 74f), goldColor, darkNavy, 24);
+            GameObject adBtn = CreatePillButton(card.transform, "RewardedAdButton", "🎁 REKLAM İZLE: +50 PUAN", new Vector2(0f, -260f), new Vector2(540f, 92f), goldColor, darkNavy, 32);
             goUI.rewardedAdButton = adBtn.GetComponent<Button>();
             goUI.rewardedAdButtonText = adBtn.GetComponentInChildren<Text>();
 
             // Ana Menü Butonu (Sleek ikincil buton)
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -295f), new Vector2(320f, 68f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 24);
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -370f), new Vector2(440f, 84f), new Color(0.12f, 0.16f, 0.29f, 0.9f), new Color(0.9f, 0.95f, 1f), 32);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);
