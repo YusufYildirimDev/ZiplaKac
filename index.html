@@ -652,7 +652,9 @@
       // 1. Tek Kullanımlıklar
       CONSUMABLE_ITEMS.forEach(function(item) {
         var count = getConsumableCount(item.id);
+        var iconSrc = "Assets/Resources/Sprites/Shop/shop_" + item.id + ".png";
         html += '<div class="wardrobe-row">' +
+          '<img src="' + iconSrc + '" alt="' + item.name + '" style="width:48px;height:48px;margin-right:12px;object-fit:contain;flex-shrink:0;">' +
           '<div class="wardrobe-info">' +
             '<div class="wardrobe-name">' + item.name + '</div>' +
             '<div class="wardrobe-price">' + item.desc + ' · <span style="color:#06d6a0;">Envanter: ' + count + '</span></div>' +
@@ -669,8 +671,10 @@
         var btnText = isMax ? "MAX" : (item.price + " 🪙");
         var btnBg = isMax ? "#4a5568" : "#06d6a0";
         var btnColor = isMax ? "#fff" : "#05070d";
+        var iconSrc = "Assets/Resources/Sprites/Shop/shop_" + item.id + ".png";
 
         html += '<div class="wardrobe-row">' +
+          '<img src="' + iconSrc + '" alt="' + item.name + '" style="width:48px;height:48px;margin-right:12px;object-fit:contain;flex-shrink:0;">' +
           '<div class="wardrobe-info">' +
             '<div class="wardrobe-name">' + item.name + '</div>' +
             '<div class="wardrobe-price">' + item.desc + ' · <span style="color:#ffd166;">' + lvlText + '</span></div>' +

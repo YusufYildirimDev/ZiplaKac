@@ -227,7 +227,7 @@ namespace ZiplaKac.UI
                         AudioManager.Instance?.PlayGameOverSound();
                         ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
                     }
-                }, null, null, null, emoji);
+                }, null, null, null, emoji, cfg.id);
                 spawnedRows.Add(row);
             }
 
@@ -268,7 +268,7 @@ namespace ZiplaKac.UI
                         AudioManager.Instance?.PlayGameOverSound();
                         ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
                     }
-                }, btnColor, null, null, emoji);
+                }, btnColor, null, null, emoji, cfg.id);
                 spawnedRows.Add(row);
             }
         }
@@ -339,7 +339,7 @@ namespace ZiplaKac.UI
             }
         }
 
-        private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null, string iconEmoji = null)
+        private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null, string iconEmoji = null, string shopItemId = null)
         {
             GameObject rowObj = new GameObject(name);
             rowObj.transform.SetParent(itemsContainer, false);
@@ -357,10 +357,11 @@ namespace ZiplaKac.UI
                 1.5f, 22, 128, 128);
             bg.type = Image.Type.Sliced;
 
-            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme Rozeti
+            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme / Yetenek Rozet İkonu
             bool hasOutfit = !string.IsNullOrEmpty(outfitType);
+            bool hasShopItem = !string.IsNullOrEmpty(shopItemId);
             bool hasEmoji = !string.IsNullOrEmpty(iconEmoji);
-            bool hasVisual = hasOutfit || hasEmoji;
+            bool hasVisual = hasOutfit || hasShopItem || hasEmoji;
 
             if (hasOutfit)
             {
@@ -385,9 +386,9 @@ namespace ZiplaKac.UI
                     iconImg.color = new Color(1f, 1f, 1f, 0.25f);
                 }
             }
-            else if (hasEmoji)
+            else if (hasShopItem || hasEmoji)
             {
-                // Güçlendirme / Yetenek Rozet İkonu
+                // Güçlendirme / Yetenek Rozet İkonu (Yeni yüklenen yüksek çözünürlüklü 2D ikonlar)
                 GameObject badgeObj = new GameObject("IconBadge");
                 badgeObj.transform.SetParent(rowObj.transform, false);
                 RectTransform badgeRt = badgeObj.AddComponent<RectTransform>();
@@ -395,28 +396,45 @@ namespace ZiplaKac.UI
                 badgeRt.anchorMax = new Vector2(0f, 0.5f);
                 badgeRt.pivot = new Vector2(0f, 0.5f);
                 badgeRt.anchoredPosition = new Vector2(26f, 0f);
-                badgeRt.sizeDelta = new Vector2(96f, 96f);
+                badgeRt.sizeDelta = new Vector2(104f, 104f);
 
                 Image badgeImg = badgeObj.AddComponent<Image>();
-                badgeImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                    new Color(0.15f, 0.19f, 0.35f, 0.85f),
-                    new Color(1f, 1f, 1f, 0.12f),
-                    1f, 20, 128, 128);
-                badgeImg.type = Image.Type.Sliced;
+                badgeImg.preserveAspect = true;
+                badgeImg.raycastTarget = false;
 
-                GameObject emojiTxtObj = new GameObject("Emoji");
-                emojiTxtObj.transform.SetParent(badgeObj.transform, false);
-                RectTransform emojiRt = emojiTxtObj.AddComponent<RectTransform>();
-                emojiRt.anchorMin = Vector2.zero;
-                emojiRt.anchorMax = Vector2.one;
-                emojiRt.offsetMin = Vector2.zero;
-                emojiRt.offsetMax = Vector2.zero;
+                Sprite shopIcon = null;
+                if (!string.IsNullOrEmpty(shopItemId))
+                {
+                    shopIcon = ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/Shop/shop_{shopItemId}", null);
+                }
 
-                Text emojiTxt = emojiTxtObj.AddComponent<Text>();
-                emojiTxt.font = font;
-                emojiTxt.fontSize = 46;
-                emojiTxt.alignment = TextAnchor.MiddleCenter;
-                emojiTxt.text = iconEmoji;
+                if (shopIcon != null)
+                {
+                    badgeImg.sprite = shopIcon;
+                }
+                else
+                {
+                    // Fallback rozet kutusu ve emoji
+                    badgeImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                        new Color(0.15f, 0.19f, 0.35f, 0.85f),
+                        new Color(1f, 1f, 1f, 0.12f),
+                        1f, 20, 128, 128);
+                    badgeImg.type = Image.Type.Sliced;
+
+                    GameObject emojiTxtObj = new GameObject("Emoji");
+                    emojiTxtObj.transform.SetParent(badgeObj.transform, false);
+                    RectTransform emojiRt = emojiTxtObj.AddComponent<RectTransform>();
+                    emojiRt.anchorMin = Vector2.zero;
+                    emojiRt.anchorMax = Vector2.one;
+                    emojiRt.offsetMin = Vector2.zero;
+                    emojiRt.offsetMax = Vector2.zero;
+
+                    Text emojiTxt = emojiTxtObj.AddComponent<Text>();
+                    emojiTxt.font = font;
+                    emojiTxt.fontSize = 46;
+                    emojiTxt.alignment = TextAnchor.MiddleCenter;
+                    emojiTxt.text = iconEmoji;
+                }
             }
 
             // 2. Metin Alanı (Daha büyük ve okunaklı)
