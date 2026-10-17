@@ -65,9 +65,10 @@ namespace ZiplaKac.UI
             hasClaimed = true;
             SaveSystem.ClaimDailyReward();
 
-            // 100 Bonus Skor Hediye Et
+            // 100 Bonus Skor ve 100 Altın Hediye Et
             int currentHigh = SaveSystem.GetHighScore();
             SaveSystem.SaveScore(currentHigh + 100);
+            SaveSystem.AddGold(100);
 
             AudioManager.Instance?.PlayNewRecordSound();
             AudioManager.Instance?.TriggerHapticFeedback();
@@ -75,7 +76,7 @@ namespace ZiplaKac.UI
             // Sandık zıplama efekti
             StartCoroutine(AnimateChestOpening());
 
-            if (statusText != null) statusText.text = "🎉 TEBRİKLER! +100 SKOR PUANI KAZANDIN!";
+            if (statusText != null) statusText.text = "🎉 TEBRİKLER! +100 SKOR VE +100 🪙 ALTIN KAZANDIN!";
             if (claimButtonText != null) claimButtonText.text = "HARİKA!";
         }
 

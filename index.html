@@ -271,6 +271,56 @@
   #powerupCountdown.active {
     animation: pcd-pulse 1s ease-in-out infinite;
   }
+  button.wardrobe-btn {
+    background: #9b5de5;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(155,93,229,0.35);
+    margin-top: 10px;
+    width: 100%;
+  }
+  button.wardrobe-btn:active {
+    transform: scale(0.97);
+  }
+  .wardrobe-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.06);
+    padding: 8px 12px;
+    border-radius: 10px;
+    gap: 10px;
+  }
+  .wardrobe-row img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+  .wardrobe-info {
+    flex: 1;
+    text-align: left;
+  }
+  .wardrobe-name {
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .wardrobe-price {
+    font-size: 11px;
+    color: #ffd166;
+  }
+  .wardrobe-action-btn {
+    border: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -278,6 +328,7 @@
   <canvas id="game"></canvas>
   <div id="hud">
     <div id="scoreLabel">Skor: 0</div>
+    <div id="goldLabel" style="color:#ffd166;font-weight:700;">🪙 0</div>
     <div id="bestLabel">En iyi: 0</div>
   </div>
   <div id="statusRow"></div>
@@ -299,6 +350,18 @@
       <div class="char-label">Karakterini seç</div>
       <div class="char-grid" id="charGrid"></div>
       <button id="startBtn">Başla</button>
+      <button id="wardrobeBtn" class="wardrobe-btn">👔 Gardırop (Kıyafetler)</button>
+    </div>
+  </div>
+
+  <!-- Gardırop Modalı -->
+  <div id="wardrobeModal" class="hidden" style="position:absolute;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:30;">
+    <div class="card" style="max-width:340px;width:86%;padding:20px;">
+      <h1 style="color:#9b5de5;font-size:22px;margin-bottom:4px;">👔 Gardırop</h1>
+      <div id="wardrobeTotalGold" style="color:#ffd166;font-size:15px;font-weight:700;margin-bottom:8px;">🪙 Toplam Altın: 150</div>
+      <div id="wardrobeStatusMsg" style="font-size:12px;min-height:16px;margin-bottom:8px;"></div>
+      <div id="wardrobeItemsList" style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin-bottom:14px;"></div>
+      <button id="closeWardrobeBtn" style="background:#3a4060;color:#fff;border:none;padding:10px 20px;border-radius:999px;font-weight:700;cursor:pointer;width:100%;">Kapat</button>
     </div>
   </div>
 </div>
@@ -312,6 +375,7 @@
   var wrap = document.getElementById("wrap");
   var overlay = document.getElementById("overlay");
   var scoreLabel = document.getElementById("scoreLabel");
+  var goldLabel = document.getElementById("goldLabel");
   var bestLabel = document.getElementById("bestLabel");
   var statusRow = document.getElementById("statusRow");
 
@@ -319,6 +383,10 @@
   var pcdIcon = document.getElementById("pcdIcon");
   var pcdNum = document.getElementById("pcdNum");
   var pcdLabel = document.getElementById("pcdLabel");
+
+  var wardrobeModal = document.getElementById("wardrobeModal");
+  var wardrobeBtn = document.getElementById("wardrobeBtn");
+  var closeWardrobeBtn = document.getElementById("closeWardrobeBtn");
 
   var DPR = Math.max(1, window.devicePixelRatio || 1);
   var W = 0, H = 0;
@@ -407,8 +475,167 @@
         selectedCharId = this.getAttribute("data-char");
         try { window.localStorage.setItem(CHAR_KEY, selectedCharId); } catch (err) { /* ignore */ }
         buildCharGrid();
+        renderWardrobeModal();
       });
     }
+  }
+
+  // ---- Gold & Wardrobe (Outfits) ----
+  var GOLD_KEY = "zipla-kac-gold";
+  var OUTFITS_PURCHASED_KEY = "zipla-kac-outfits-bought";
+  var OUTFITS_EQUIPPED_KEY = "zipla-kac-outfits-equipped";
+  var runGold = 0;
+
+  var WARDROBE_ITEMS = [
+    { type: "pelerin", name: "Pelerin", price: 100 },
+    { type: "gunes_gozlugu", name: "Güneş Gözlüğü", price: 150 },
+    { type: "ozel_aksesuar", name: "Özel Aksesuar", price: 200 },
+    { type: "parti_sapkasi", name: "Parti Şapkası", price: 250 }
+  ];
+
+  function getTotalGold() {
+    try {
+      var val = window.localStorage.getItem(GOLD_KEY);
+      return val !== null ? parseInt(val, 10) : 150;
+    } catch (e) { return 150; }
+  }
+  function addGold(n) {
+    var cur = getTotalGold() + n;
+    try { window.localStorage.setItem(GOLD_KEY, String(cur)); } catch (e) {}
+    return cur;
+  }
+  function spendGold(n) {
+    var cur = getTotalGold();
+    if (cur < n) return false;
+    try { window.localStorage.setItem(GOLD_KEY, String(cur - n)); } catch (e) {}
+    return true;
+  }
+  function getPurchasedOutfits() {
+    try {
+      return JSON.parse(window.localStorage.getItem(OUTFITS_PURCHASED_KEY) || "{}");
+    } catch (e) { return {}; }
+  }
+  function getEquippedOutfits() {
+    try {
+      return JSON.parse(window.localStorage.getItem(OUTFITS_EQUIPPED_KEY) || "{}");
+    } catch (e) { return {}; }
+  }
+  function isOutfitPurchased(charKey, type) {
+    var p = getPurchasedOutfits();
+    return !!(p[charKey] && p[charKey][type]);
+  }
+  function isOutfitEquipped(charKey, type) {
+    if (!isOutfitPurchased(charKey, type)) return false;
+    var eq = getEquippedOutfits();
+    return !!(eq[charKey] && eq[charKey][type]);
+  }
+  function purchaseOutfit(charKey, type, price) {
+    if (isOutfitPurchased(charKey, type)) return true;
+    if (!spendGold(price)) return false;
+    var p = getPurchasedOutfits();
+    if (!p[charKey]) p[charKey] = {};
+    p[charKey][type] = true;
+    try { window.localStorage.setItem(OUTFITS_PURCHASED_KEY, JSON.stringify(p)); } catch (e) {}
+    setOutfitEquipped(charKey, type, true);
+    return true;
+  }
+  function setOutfitEquipped(charKey, type, equip) {
+    var eq = getEquippedOutfits();
+    if (!eq[charKey]) eq[charKey] = {};
+    eq[charKey][type] = !!equip;
+    try { window.localStorage.setItem(OUTFITS_EQUIPPED_KEY, JSON.stringify(eq)); } catch (e) {}
+  }
+  function toggleOutfitEquip(charKey, type) {
+    var cur = isOutfitEquipped(charKey, type);
+    setOutfitEquipped(charKey, type, !cur);
+    return !cur;
+  }
+
+  function renderWardrobeModal() {
+    var world = WORLDS[selectedCharId] || WORLDS.classic;
+    var charKey = world.key;
+    var totalGoldEl = document.getElementById("wardrobeTotalGold");
+    var listEl = document.getElementById("wardrobeItemsList");
+    var msgEl = document.getElementById("wardrobeStatusMsg");
+    if (totalGoldEl) totalGoldEl.textContent = "🪙 Toplam Altın: " + getTotalGold();
+    if (msgEl) msgEl.textContent = "";
+
+    if (!listEl) return;
+    listEl.innerHTML = WARDROBE_ITEMS.map(function(item) {
+      var isBought = isOutfitPurchased(charKey, item.type);
+      var isEquipped = isOutfitEquipped(charKey, item.type);
+      var imgSrc = "Assets/Resources/Sprites/Kiyafetler/kiyafet_" + charKey + "_" + item.type + ".png";
+
+      var actionBtnHtml = "";
+      if (!isBought) {
+        actionBtnHtml = '<button class="wardrobe-action-btn" style="background:#ffd166;color:#05070d;" data-action="buy" data-type="' + item.type + '" data-price="' + item.price + '">SATIN AL</button>';
+      } else if (isEquipped) {
+        actionBtnHtml = '<button class="wardrobe-action-btn" style="background:#ef476f;color:#fff;" data-action="toggle" data-type="' + item.type + '">ÇIKAR</button>';
+      } else {
+        actionBtnHtml = '<button class="wardrobe-action-btn" style="background:#06d6a0;color:#05070d;" data-action="toggle" data-type="' + item.type + '">GİY</button>';
+      }
+
+      var priceHtml = isBought ? '<span style="color:#06d6a0;">Sahipsin</span>' : (item.price + " 🪙");
+
+      return '<div class="wardrobe-row">' +
+        '<img src="' + imgSrc + '" alt="' + item.name + '">' +
+        '<div class="wardrobe-info">' +
+          '<div class="wardrobe-name">' + item.name + '</div>' +
+          '<div class="wardrobe-price">' + priceHtml + '</div>' +
+        '</div>' +
+        actionBtnHtml +
+      '</div>';
+    }).join("");
+
+    var btns = listEl.querySelectorAll(".wardrobe-action-btn");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener("click", function(e) {
+        e.stopPropagation();
+        var act = this.getAttribute("data-action");
+        var typ = this.getAttribute("data-type");
+        if (act === "buy") {
+          var price = parseInt(this.getAttribute("data-price"), 10);
+          if (purchaseOutfit(charKey, typ, price)) {
+            arpeggio([523, 659, 784, 1046], 0.1);
+            if (msgEl) {
+              msgEl.style.color = "#06d6a0";
+              msgEl.textContent = "🎉 Satın alındı ve giyildi!";
+            }
+          } else {
+            beep(200, 0.2, "sawtooth", 0.25);
+            if (msgEl) {
+              msgEl.style.color = "#ef476f";
+              msgEl.textContent = "⚠️ Yetersiz altın! Koşarak topla.";
+            }
+          }
+        } else if (act === "toggle") {
+          var nowEq = toggleOutfitEquip(charKey, typ);
+          beep(nowEq ? 600 : 400, 0.1, "sine", 0.15);
+          if (msgEl) {
+            msgEl.style.color = nowEq ? "#06d6a0" : "#a0aec0";
+            msgEl.textContent = nowEq ? "✅ Kıyafet giyildi!" : "ℹ️ Kıyafet çıkarıldı.";
+          }
+        }
+        renderWardrobeModal();
+      });
+    }
+  }
+
+  if (wardrobeBtn) {
+    wardrobeBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      renderWardrobeModal();
+      if (wardrobeModal) wardrobeModal.classList.remove("hidden");
+    });
+  }
+  if (closeWardrobeBtn) {
+    closeWardrobeBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      if (wardrobeModal) wardrobeModal.classList.add("hidden");
+    });
+  }
+  if (wardrobeModal) {
+    wardrobeModal.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
   }
 
   // ---- audio (synth, no assets) ----
@@ -618,6 +845,7 @@
     comboPopupTimer = 0;
     effects = { slowUntil: 0, multiUntil: 0 };
     wasNewBest = false;
+    runGold = 0;
     bgTransition.fromTier = 0;
     bgTransition.toTier = 0;
     bgTransition.progress = 1.0;
@@ -641,6 +869,7 @@
 
   function updateHud() {
     scoreLabel.textContent = "Skor: " + Math.floor(score);
+    if (goldLabel) goldLabel.textContent = "🪙 " + runGold;
     bestLabel.textContent = "En iyi: " + Math.floor(best);
 
     var badges = [];
@@ -759,6 +988,7 @@
       saveBest();
     }
     saveHistory(score);
+    addGold(runGold);
     updateHud();
     vibrate(120);
     if (wasNewBest) {
@@ -790,6 +1020,7 @@
       newBestLine +
       '<div class="big-score">' + Math.floor(score) + "</div>" +
       '<div class="best">En iyi skor: ' + Math.floor(best) + "</div>" +
+      '<div style="color:#ffd166;font-size:14px;font-weight:700;margin:6px 0 10px;">+' + runGold + ' 🪙  (Toplam: ' + getTotalGold() + ')</div>' +
       '<div class="history">' + histLine + "</div>" +
       '<button id="retryBtn">Tekrar Oyna</button>' +
       "</div>"
@@ -902,8 +1133,11 @@
       if (o.x + o.w < -10) {
         obstacles.splice(j, 1);
         comboCount++;
+        var addG = multiActive ? 2 : 1;
+        runGold += addG;
         if (comboCount % 5 === 0) {
           score += 10;
+          runGold += 5;
           comboPopupText = "Kombo x" + comboCount + "! +10";
           comboPopupTimer = 1.2;
           arpeggio([660, 880], 0.08);
@@ -1120,10 +1354,17 @@
     var x = player.x - (w - player.w) / 2;
     var y = player.y + (player.h - h);
     var charInfo = getCharacter();
+    var world = WORLDS[selectedCharId] || WORLDS.classic;
+    var charKey = world.key;
     var oImgs = outfitImages[selectedCharId] || outfitImages.classic;
 
+    var isPelerinEquipped = isOutfitEquipped(charKey, "pelerin");
+    var isGozlukEquipped = isOutfitEquipped(charKey, "gunes_gozlugu");
+    var isAksesuarEquipped = isOutfitEquipped(charKey, "ozel_aksesuar");
+    var isSapkaEquipped = isOutfitEquipped(charKey, "parti_sapkasi");
+
     // 1. Pelerin (Cape - Karakterin Arkasında)
-    if (oImgs && oImgs.pelerin && oImgs.pelerin.complete && oImgs.pelerin.naturalWidth > 0) {
+    if (isPelerinEquipped && oImgs && oImgs.pelerin && oImgs.pelerin.complete && oImgs.pelerin.naturalWidth > 0) {
       ctx.drawImage(oImgs.pelerin, x, y, w, h);
     }
 
@@ -1153,13 +1394,13 @@
 
     // 2. Aksesuarlar (Gözlük, Özel Aksesuar, Parti Şapkası - Karakterin Üstünde)
     if (oImgs) {
-      if (oImgs.gozluk && oImgs.gozluk.complete && oImgs.gozluk.naturalWidth > 0) {
+      if (isGozlukEquipped && oImgs.gozluk && oImgs.gozluk.complete && oImgs.gozluk.naturalWidth > 0) {
         ctx.drawImage(oImgs.gozluk, x, y, w, h);
       }
-      if (oImgs.aksesuar && oImgs.aksesuar.complete && oImgs.aksesuar.naturalWidth > 0) {
+      if (isAksesuarEquipped && oImgs.aksesuar && oImgs.aksesuar.complete && oImgs.aksesuar.naturalWidth > 0) {
         ctx.drawImage(oImgs.aksesuar, x, y, w, h);
       }
-      if (oImgs.sapka && oImgs.sapka.complete && oImgs.sapka.naturalWidth > 0) {
+      if (isSapkaEquipped && oImgs.sapka && oImgs.sapka.complete && oImgs.sapka.naturalWidth > 0) {
         ctx.drawImage(oImgs.sapka, x, y, w, h);
       }
     }

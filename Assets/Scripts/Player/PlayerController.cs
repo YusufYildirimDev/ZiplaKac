@@ -390,7 +390,8 @@ namespace ZiplaKac.Player
                 Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_pelerin");
                 capeSpriteRenderer.sprite = sp;
                 capeSpriteRenderer.color = Color.white;
-                capeSpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+                bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, "pelerin");
+                capeSpriteRenderer.gameObject.SetActive(outfitEnabled && isEquipped && sp != null);
             }
 
             // 2. Güneş Gözlüğü (Glasses)
@@ -399,7 +400,8 @@ namespace ZiplaKac.Player
                 Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_gunes_gozlugu");
                 glassesSpriteRenderer.sprite = sp;
                 glassesSpriteRenderer.color = Color.white;
-                glassesSpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+                bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, "gunes_gozlugu");
+                glassesSpriteRenderer.gameObject.SetActive(outfitEnabled && isEquipped && sp != null);
             }
 
             // 3. Özel Aksesuar (Accessory)
@@ -408,7 +410,8 @@ namespace ZiplaKac.Player
                 Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_ozel_aksesuar");
                 accessorySpriteRenderer.sprite = sp;
                 accessorySpriteRenderer.color = Color.white;
-                accessorySpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+                bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, "ozel_aksesuar");
+                accessorySpriteRenderer.gameObject.SetActive(outfitEnabled && isEquipped && sp != null);
             }
 
             // 4. Parti Şapkası (Hat)
@@ -417,7 +420,8 @@ namespace ZiplaKac.Player
                 Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_parti_sapkasi");
                 hatSpriteRenderer.sprite = sp;
                 hatSpriteRenderer.color = Color.white;
-                hatSpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+                bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, "parti_sapkasi");
+                hatSpriteRenderer.gameObject.SetActive(outfitEnabled && isEquipped && sp != null);
             }
         }
 

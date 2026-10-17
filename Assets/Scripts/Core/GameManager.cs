@@ -39,6 +39,7 @@ namespace ZiplaKac.Core
         public float CurrentScore { get; private set; }
         public int HighScore { get; private set; }
         public int CurrentTierIndex { get; private set; } = 0;
+        public int CurrentRunGold { get; private set; } = 0;
 
         [Header("Güçlendirme Durumları")]
         public bool isShieldActive = false;
@@ -114,6 +115,7 @@ namespace ZiplaKac.Core
                     CurrentScore = 0f;
                     CurrentSpeed = baseSpeed;
                     CurrentTierIndex = 0;
+                    CurrentRunGold = 0;
                     if (WorldThemeManager.Instance != null)
                     {
                         WorldThemeManager.Instance.SyncFromSavedCharacter();
@@ -125,7 +127,6 @@ namespace ZiplaKac.Core
                     Obstacles.Obstacle.ClearAllActiveObstacles();
                     PowerUps.PowerUp.ClearAllActivePowerUps();
                     break;
-
                 case GameState.GameOver:
                     Time.timeScale = 1.0f; // Varsa son patlama animasyonları için
                     int finalScoreInt = Mathf.FloorToInt(CurrentScore);
@@ -133,6 +134,10 @@ namespace ZiplaKac.Core
                     if (isNewRecord)
                     {
                         HighScore = finalScoreInt;
+                    }
+                    if (CurrentRunGold > 0)
+                    {
+                        SaveSystem.AddGold(CurrentRunGold);
                     }
                     break;
             }
@@ -168,12 +173,17 @@ namespace ZiplaKac.Core
         {
             if (State != GameState.Playing) return;
 
+            // Her geçilen engel için altın kazanılır (x2 puan varsa +2 altın)
+            int goldEarned = isDoubleScoreActive ? 2 : 1;
+            CurrentRunGold += goldEarned;
+
             consecutivePassedObstacles++;
             if (consecutivePassedObstacles % 5 == 0)
             {
                 comboCount++;
                 int bonusPoints = 10;
                 CurrentScore += bonusPoints;
+                CurrentRunGold += 5; // Her 5'li komboda ekstra +5 bonus altın
                 OnComboAchieved?.Invoke(comboCount, obstaclePosition);
                 AudioManager.Instance?.PlayComboSound();
             }

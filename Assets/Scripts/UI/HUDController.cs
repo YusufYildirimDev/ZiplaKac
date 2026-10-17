@@ -15,6 +15,7 @@ namespace ZiplaKac.UI
         [Header("Metin Bileşenleri")]
         public Text currentScoreText;
         public Text highScoreText;
+        public Text goldText;
         public Text controlTipText;
 
         [Header("Güçlendirme Rozetleri (Badges)")]
@@ -178,10 +179,11 @@ namespace ZiplaKac.UI
                 return;
             }
 
-            // 1. Skor Güncellemeleri
+            // 1. Skor ve Altın Güncellemeleri
             int scoreInt = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
             if (currentScoreText != null) currentScoreText.text = $"Skor: {scoreInt}";
             if (highScoreText != null) highScoreText.text = $"En iyi: {GameManager.Instance.HighScore}";
+            if (goldText != null) goldText.text = $"🪙 {GameManager.Instance.CurrentRunGold}";
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler
             UpdatePowerUpBadges();

@@ -58,6 +58,100 @@ namespace ZiplaKac.Core
         }
 
         private const string KEY_OUTFIT_ENABLED = "ZiplaKac_OutfitEnabled";
+        private const string KEY_TOTAL_GOLD = "ZiplaKac_TotalGold";
+        private const string KEY_PURCHASED_OUTFITS = "ZiplaKac_PurchasedOutfits";
+        private const string KEY_EQUIPPED_OUTFITS = "ZiplaKac_EquippedOutfits";
+
+        public static int GetTotalGold()
+        {
+            // Başlangıçta oyuncuya hemen 150 altın verilir (ilk eşyayı alabilmesi için)
+            return PlayerPrefs.GetInt(KEY_TOTAL_GOLD, 150);
+        }
+
+        public static void AddGold(int amount)
+        {
+            if (amount <= 0) return;
+            int total = GetTotalGold() + amount;
+            PlayerPrefs.SetInt(KEY_TOTAL_GOLD, total);
+            PlayerPrefs.Save();
+        }
+
+        public static bool SpendGold(int amount)
+        {
+            int total = GetTotalGold();
+            if (total >= amount)
+            {
+                PlayerPrefs.SetInt(KEY_TOTAL_GOLD, total - amount);
+                PlayerPrefs.Save();
+                return true;
+            }
+            return false;
+        }
+
+        public static bool IsOutfitPurchased(string characterId, string outfitType)
+        {
+            // Klasik pelerin başlangıçta hediye olarak açıktır
+            if (characterId == "klasik" && outfitType == "pelerin") return true;
+
+            string key = $"{characterId}_{outfitType}".ToLowerInvariant();
+            string purchased = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "klasik_pelerin");
+            return purchased.Contains(key);
+        }
+
+        public static bool PurchaseOutfit(string characterId, string outfitType, int cost)
+        {
+            if (IsOutfitPurchased(characterId, outfitType)) return true;
+
+            if (SpendGold(cost))
+            {
+                string key = $"{characterId}_{outfitType}".ToLowerInvariant();
+                string purchased = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "klasik_pelerin");
+                purchased += "," + key;
+                PlayerPrefs.SetString(KEY_PURCHASED_OUTFITS, purchased);
+
+                // Satın alınınca otomatik olarak giyilsin
+                SetOutfitEquipped(characterId, outfitType, true);
+                PlayerPrefs.Save();
+                return true;
+            }
+            return false;
+        }
+
+        public static bool IsOutfitEquipped(string characterId, string outfitType)
+        {
+            if (!IsOutfitPurchased(characterId, outfitType)) return false;
+
+            string key = $"{characterId}_{outfitType}".ToLowerInvariant();
+            // Varsayılan olarak klasik pelerin giyili
+            string equipped = PlayerPrefs.GetString(KEY_EQUIPPED_OUTFITS, "klasik_pelerin");
+            return equipped.Contains(key);
+        }
+
+        public static void SetOutfitEquipped(string characterId, string outfitType, bool isEquipped)
+        {
+            string key = $"{characterId}_{outfitType}".ToLowerInvariant();
+            string equipped = PlayerPrefs.GetString(KEY_EQUIPPED_OUTFITS, "klasik_pelerin");
+            List<string> list = new List<string>(equipped.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries));
+
+            if (isEquipped)
+            {
+                if (!list.Contains(key)) list.Add(key);
+            }
+            else
+            {
+                list.Remove(key);
+            }
+
+            PlayerPrefs.SetString(KEY_EQUIPPED_OUTFITS, string.Join(",", list));
+            PlayerPrefs.Save();
+        }
+
+        public static bool ToggleOutfitEquipped(string characterId, string outfitType)
+        {
+            bool currentlyEquipped = IsOutfitEquipped(characterId, outfitType);
+            SetOutfitEquipped(characterId, outfitType, !currentlyEquipped);
+            return !currentlyEquipped;
+        }
 
         public static bool IsOutfitEnabled()
         {

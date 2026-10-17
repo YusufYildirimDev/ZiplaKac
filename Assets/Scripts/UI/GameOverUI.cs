@@ -15,6 +15,7 @@ namespace ZiplaKac.UI
         [Header("Skor Metinleri")]
         public Text finalScoreText;
         public Text highScoreText;
+        public Text goldEarnedText;
         public GameObject newRecordBadge;
 
         [Header("Skor Geçmişi")]
@@ -104,6 +105,13 @@ namespace ZiplaKac.UI
 
             if (finalScoreText != null) finalScoreText.text = $"{finalScore}";
             if (highScoreText != null) highScoreText.text = $"EN İYİ SKOR: {highScore}";
+
+            if (goldEarnedText != null)
+            {
+                int runGold = GameManager.Instance.CurrentRunGold;
+                int totalGold = SaveSystem.GetTotalGold();
+                goldEarnedText.text = $"+{runGold} 🪙  (Toplam: {totalGold})";
+            }
 
             // Yeni Rekor Rozeti Kontrolü
             bool isNewRecord = finalScore >= highScore && finalScore > 0;
