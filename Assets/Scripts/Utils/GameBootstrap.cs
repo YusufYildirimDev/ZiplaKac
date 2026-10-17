@@ -542,6 +542,9 @@ namespace ZiplaKac.Utils
 
                 // 5. Gardırop / Kıyafetler Modalı
                 CreateWardrobeModal(canvasObj.transform);
+
+                // 6. Başlangıç & Kurallar Onboarding Modalı
+                CreateOnboardingModal(canvasObj.transform);
             }
 
             // EventSystem Kontrolü (iOS & New Input System tam uyumluluk)
@@ -735,8 +738,19 @@ namespace ZiplaKac.Utils
                 }
             });
 
+            // 📖 Nasıl Oynanır & Rehber Butonu (#4cc9f0 / Neon Cyan)
+            Color cyanColor = new Color(0.30f, 0.79f, 0.94f);
+            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR? (REHBER)", new Vector2(0f, -415f), new Vector2(540f, 82f), cyanColor, darkNavy, 28);
+            Button rulesBtn = rulesBtnObj.GetComponent<Button>();
+            rulesBtn.onClick.AddListener(() => {
+                if (UI.OnboardingModalUI.Instance != null)
+                {
+                    UI.OnboardingModalUI.Instance.OpenModal();
+                }
+            });
+
             // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 26, new Vector2(0f, -440f), new Color(0.55f, 0.65f, 0.8f), false);
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -505f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
@@ -1058,6 +1072,408 @@ namespace ZiplaKac.Utils
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
             modal.SetActive(false);
+        }
+
+        private void CreateOnboardingModal(Transform parent)
+        {
+            GameObject modal = new GameObject("OnboardingModal");
+            modal.transform.SetParent(parent, false);
+            RectTransform rt = modal.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+
+            Image bg = modal.AddComponent<Image>();
+            bg.color = new Color(0.02f, 0.03f, 0.07f, 0.96f);
+            bg.raycastTarget = true;
+
+            UI.OnboardingModalUI modalUI = modal.AddComponent<UI.OnboardingModalUI>();
+
+            // Onboarding Card (940x1520)
+            GameObject card = CreateCardContainer(modal.transform, "OnboardingCard", new Vector2(940f, 1520f));
+            card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            modalUI.modalCard = card;
+
+            // 1. Üst Rozet & Başlık
+            modalUI.stepBadgeText = CreateText(card.transform, "StepBadge", "REHBER • ADIM 1 / 4", 24, new Vector2(0f, 660f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            modalUI.titleText = CreateText(card.transform, "TitleText", "OYUN KURALLARI & KONTROLLER", 38, new Vector2(0f, 605f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+
+            // Sağ Üst "✕ ATLA" Butonu
+            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ ATLA", new Vector2(370f, 660f), new Vector2(130f, 52f), new Color(0.15f, 0.20f, 0.32f, 0.85f), new Color(0.85f, 0.90f, 1f), 22);
+            modalUI.closeButton = skipBtnObj.GetComponent<Button>();
+            modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
+
+            modalUI.slides = new GameObject[4];
+
+            // -------------------------------------------------------------
+            // SLIDE 0: OYUN KURALLARI & TEMEL MEKANİKLER
+            // -------------------------------------------------------------
+            GameObject slide0 = new GameObject("Slide_Rules");
+            slide0.transform.SetParent(card.transform, false);
+            RectTransform s0Rt = slide0.AddComponent<RectTransform>();
+            s0Rt.anchorMin = Vector2.zero; s0Rt.anchorMax = Vector2.one;
+            s0Rt.offsetMin = Vector2.zero; s0Rt.offsetMax = Vector2.zero;
+            modalUI.slides[0] = slide0;
+
+            CreateText(slide0.transform, "Sub0", "Zıpla, engellerden kaç ve rekorunu kır!", 26, new Vector2(0f, 525f), new Color(0.70f, 0.80f, 0.95f), false);
+
+            CreateOnboardingRow(slide0.transform, "Row0_1", 380f, 150f, "👆", "Tek Dokunuşla Zıpla", "Ekrana dokunarak veya Space tuşuna basarak yaklaşan sivri dikenlerin, kaktüs ve kayaların üzerinden atla.", new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingRow(slide0.transform, "Row0_2", 205f, 150f, "🚀", "Çift Zıplama (Double Jump)", "Havada bir kez daha dokunarak ikinci kez zıpla! Yüksek ve arka arkaya gelen engelleri aşmak için en önemli yeteneğin.", new Color(0.30f, 0.79f, 0.94f));
+            CreateOnboardingRow(slide0.transform, "Row0_3", 30f, 150f, "🔥", "Kombo Serisi & Bonus Altın", "Engelleri çarpmadan art arda geç. Her 5 engelde ekstra kombo puanı ve çarpanlı altın ödülleri kazanırsın!", new Color(1.0f, 0.82f, 0.40f));
+            CreateOnboardingRow(slide0.transform, "Row0_4", -145f, 150f, "🌅", "3 Zorluk Aşaması (Gündüz, Akşam, Gece)", "Puanın arttıkça dünya değişir, oyun hızlanır ve reflekslerini sonuna kadar zorlar!", new Color(1.0f, 0.42f, 0.21f));
+
+            // -------------------------------------------------------------
+            // SLIDE 1: 5 KARAKTER & SIRALI 2500 SKOR KİLİT SİSTEMİ
+            // -------------------------------------------------------------
+            GameObject slide1 = new GameObject("Slide_Characters");
+            slide1.transform.SetParent(card.transform, false);
+            RectTransform s1Rt = slide1.AddComponent<RectTransform>();
+            s1Rt.anchorMin = Vector2.zero; s1Rt.anchorMax = Vector2.one;
+            s1Rt.offsetMin = Vector2.zero; s1Rt.offsetMax = Vector2.zero;
+            modalUI.slides[1] = slide1;
+
+            CreateText(slide1.transform, "Sub1", "İlk başta sadece Klasik açıktır! Her karakterle 2500 skor yaparak sıradakini aç:", 24, new Vector2(0f, 525f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+
+            CreateOnboardingCharacterRow(slide1.transform, "Char_classic", 395f, "classic", "Klasik", "🔓 BAŞLANGIÇTA AÇIK", "Çayır Diyarı • Kalıcı +%15 ekstra skor yeteneği!", new Color(1.0f, 0.82f, 0.40f), new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_fire", 255f, "fire", "Ateş", "🔒 Klasik ile 2500 Skor Yap", "Volkan & Lav Diyarı • Ateş topu ve kor alev dünyası!", new Color(1.0f, 0.42f, 0.21f), new Color(1.0f, 0.65f, 0.20f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_ice", 115f, "ice", "Buz", "🔒 Ateş ile 2500 Skor Yap", "Buzul & Kar Dağları • Dondurucu soğuk ve kutup gecesi!", new Color(0.30f, 0.79f, 0.94f), new Color(0.30f, 0.79f, 0.94f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_toxic", -25f, "toxic", "Zehir", "🔒 Buz ile 2500 Skor Yap", "Toksik Sis Ormanı • Kombo ödüllerini x1.25 katına çıkarır!", new Color(0.49f, 0.95f, 0.61f), new Color(0.49f, 0.95f, 0.61f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_shadow", -165f, "shadow", "Gece", "🔒 Zehir ile 2500 Skor Yap", "Derin Uzay & Nebula • Engellerden %28 otomatik sıyrılma!", new Color(0.61f, 0.36f, 0.90f), new Color(0.61f, 0.36f, 0.90f));
+
+            // -------------------------------------------------------------
+            // SLIDE 2: GÜÇLER, YÜKSELTMELER VE BİLETLER
+            // -------------------------------------------------------------
+            GameObject slide2 = new GameObject("Slide_Powers");
+            slide2.transform.SetParent(card.transform, false);
+            RectTransform s2Rt = slide2.AddComponent<RectTransform>();
+            s2Rt.anchorMin = Vector2.zero; s2Rt.anchorMax = Vector2.one;
+            s2Rt.offsetMin = Vector2.zero; s2Rt.offsetMax = Vector2.zero;
+            modalUI.slides[2] = slide2;
+
+            CreateText(slide2.transform, "Sub2", "Oyundaki güçlendirmeleri topla ve mağazadan kalıcı yetenekler edin!", 26, new Vector2(0f, 525f), new Color(0.70f, 0.80f, 0.95f), false);
+
+            CreateOnboardingPowerRow(slide2.transform, "Power_Shield", 380f, "shield", "🛡️", "Koruyucu Kalkan (Shield)", "Bir engele çarpışmayı tamamen emer, engelleri temizler ve koşunu kurtarır.", new Color(0.30f, 0.79f, 0.94f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_Slow", 205f, "slow", "⏱️", "Zamanı Yavaşlatma (Slow-Mo)", "5 saniye boyunca dünya hızını %40 düşürerek karmaşık engellerden kolayca sıyrılmanı sağlar.", new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_Multi", 30f, "multi", "✖️2️⃣", "x2 Çift Skor & Altın Çarpanı", "Aktif olduğu sürece kazanılan tüm koşu puanlarını ve engellerden gelen altınları 2 katına çıkarır!", new Color(1.0f, 0.82f, 0.40f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_SecondChance", -145f, "second_chance", "🎫", "İkinci Şans Bileti & Kalıcı Güçler", "Mağaza'dan İkinci Şans Bileti alıp yandığın yerden devam edebilir, zıplama ve kombo süreni geliştirebilirsin.", new Color(0.61f, 0.36f, 0.90f));
+
+            // -------------------------------------------------------------
+            // SLIDE 3: GÜNLÜK SANDIK, ALTIN EKONOMİSİ & GARDIROP
+            // -------------------------------------------------------------
+            GameObject slide3 = new GameObject("Slide_Economy");
+            slide3.transform.SetParent(card.transform, false);
+            RectTransform s3Rt = slide3.AddComponent<RectTransform>();
+            s3Rt.anchorMin = Vector2.zero; s3Rt.anchorMax = Vector2.one;
+            s3Rt.offsetMin = Vector2.zero; s3Rt.offsetMax = Vector2.zero;
+            modalUI.slides[3] = slide3;
+
+            CreateText(slide3.transform, "Sub3", "Her gün giriş yap, sandığını aç ve altınlarınla tarzını yarat!", 26, new Vector2(0f, 525f), new Color(0.70f, 0.80f, 0.95f), false);
+
+            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Chest", 345f, 200f, "Sprites/treasure_chest", "🎁 Günlük Ödül Sandığı", "Her gün oyuna girerek sandığını aç! Günlük seri yaptıkça (Streak) kazandığın altın miktarı 20'den 50'ye kadar katlanır.", new Color(1.0f, 0.82f, 0.40f));
+            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Gold", 115f, 200f, null, "🪙 Altın Toplama & Yeni Rekorlar", "Engelleri aştıkça, kombo yaptıkça ve rekor kırdıkça altın topla. Her koşu sonunda kasan zenginleşir!", new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Wardrobe", -115f, 200f, null, "👔 Gardırop & Kostümler", "Topladığın altınlarla kahramanlarına süper kahraman pelerini, havalı güneş gözlükleri ve maskeler satın al!", new Color(0.61f, 0.36f, 0.90f));
+
+            // -------------------------------------------------------------
+            // ALT NAVİGASYON (Dots + Önceki + Sonraki Butonları)
+            // -------------------------------------------------------------
+            GameObject dotsObj = new GameObject("DotsContainer");
+            dotsObj.transform.SetParent(card.transform, false);
+            RectTransform dotsRt = dotsObj.AddComponent<RectTransform>();
+            dotsRt.anchoredPosition = new Vector2(0f, -540f);
+            dotsRt.sizeDelta = new Vector2(240f, 24f);
+
+            modalUI.pageDots = new Image[4];
+            float[] dotXs = new float[] { -48f, -16f, 16f, 48f };
+            for (int d = 0; d < 4; d++)
+            {
+                GameObject dObj = new GameObject($"Dot_{d}");
+                dObj.transform.SetParent(dotsObj.transform, false);
+                RectTransform dRt = dObj.AddComponent<RectTransform>();
+                dRt.anchoredPosition = new Vector2(dotXs[d], 0f);
+                dRt.sizeDelta = new Vector2(14f, 12f);
+
+                Image dImg = dObj.AddComponent<Image>();
+                dImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.white, Color.clear, 0f, 6, 32, 32);
+                dImg.type = Image.Type.Sliced;
+                dImg.raycastTarget = false;
+                modalUI.pageDots[d] = dImg;
+            }
+
+            // Önceki Butonu (Sol Alt)
+            GameObject prevBtnObj = CreatePillButton(card.transform, "PrevButton", "◀ ÖNCEKİ", new Vector2(-220f, -630f), new Vector2(340f, 92f), new Color(0.12f, 0.16f, 0.28f, 0.95f), Color.white, 30);
+            modalUI.prevButton = prevBtnObj.GetComponent<Button>();
+            modalUI.prevButton.onClick.AddListener(modalUI.PreviousSlide);
+
+            // Sonraki Butonu (Sağ Alt / Mint Yeşili)
+            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
+            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
+            GameObject nextBtnObj = CreatePillButton(card.transform, "NextButton", "SONRAKİ ➔", new Vector2(220f, -630f), new Vector2(380f, 96f), mintColor, darkNavy, 32);
+            modalUI.nextButton = nextBtnObj.GetComponent<Button>();
+            modalUI.nextButtonText = nextBtnObj.GetComponentInChildren<Text>();
+            modalUI.nextButton.onClick.AddListener(modalUI.NextSlide);
+
+            modal.SetActive(false);
+        }
+
+        private static void CreateOnboardingRow(Transform parent, string name, float yPos, float height, string emoji, string title, string desc, Color titleColor)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            RectTransform rt = row.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, yPos);
+            rt.sizeDelta = new Vector2(860f, height);
+
+            Image bg = row.AddComponent<Image>();
+            bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.10f, 0.13f, 0.24f, 0.95f), new Color(1f, 1f, 1f, 0.10f), 1.5f, 22);
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+
+            // Emoji / İkon Kutusu (80x80)
+            GameObject iconObj = new GameObject("Emoji");
+            iconObj.transform.SetParent(row.transform, false);
+            RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+            iconRt.anchoredPosition = new Vector2(-365f, 0f);
+            iconRt.sizeDelta = new Vector2(80f, 80f);
+            Text emojiTxt = iconObj.AddComponent<Text>();
+            emojiTxt.font = GetSafeDefaultFont();
+            emojiTxt.text = emoji;
+            emojiTxt.fontSize = 44;
+            emojiTxt.alignment = TextAnchor.MiddleCenter;
+            emojiTxt.color = Color.white;
+            emojiTxt.raycastTarget = false;
+
+            // Başlık
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(row.transform, false);
+            RectTransform titleRt = titleObj.AddComponent<RectTransform>();
+            titleRt.anchoredPosition = new Vector2(40f, 28f);
+            titleRt.sizeDelta = new Vector2(680f, 40f);
+            Text titleTxt = titleObj.AddComponent<Text>();
+            titleTxt.font = GetSafeDefaultFont();
+            titleTxt.text = title;
+            titleTxt.fontSize = 28;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.alignment = TextAnchor.MiddleLeft;
+            titleTxt.color = titleColor;
+            titleTxt.raycastTarget = false;
+
+            // Açıklama
+            GameObject descObj = new GameObject("Desc");
+            descObj.transform.SetParent(row.transform, false);
+            RectTransform descRt = descObj.AddComponent<RectTransform>();
+            descRt.anchoredPosition = new Vector2(40f, -28f);
+            descRt.sizeDelta = new Vector2(680f, 65f);
+            Text descTxt = descObj.AddComponent<Text>();
+            descTxt.font = GetSafeDefaultFont();
+            descTxt.text = desc;
+            descTxt.fontSize = 21;
+            descTxt.alignment = TextAnchor.MiddleLeft;
+            descTxt.color = new Color(0.80f, 0.88f, 0.98f);
+            descTxt.raycastTarget = false;
+        }
+
+        private static void CreateOnboardingCharacterRow(Transform parent, string name, float yPos, string charId, string charName, string reqText, string desc, Color charColor, Color reqColor)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            RectTransform rt = row.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, yPos);
+            rt.sizeDelta = new Vector2(860f, 125f);
+
+            Image bg = row.AddComponent<Image>();
+            bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.10f, 0.13f, 0.24f, 0.95f), new Color(1f, 1f, 1f, 0.10f), 1.5f, 22);
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+
+            // Karakter Avatar İkonu (84x84)
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(row.transform, false);
+            RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+            iconRt.anchoredPosition = new Vector2(-365f, 0f);
+            iconRt.sizeDelta = new Vector2(84f, 84f);
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.sprite = ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/{charId}_hero", () => ProceduralSpriteGenerator.CreateMiniCharacterIcon(charColor, 128));
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+
+            // Karakter Adı
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(row.transform, false);
+            RectTransform titleRt = titleObj.AddComponent<RectTransform>();
+            titleRt.anchoredPosition = new Vector2(40f, 24f);
+            titleRt.sizeDelta = new Vector2(300f, 36f);
+            Text titleTxt = titleObj.AddComponent<Text>();
+            titleTxt.font = GetSafeDefaultFont();
+            titleTxt.text = charName;
+            titleTxt.fontSize = 28;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.alignment = TextAnchor.MiddleLeft;
+            titleTxt.color = charColor;
+            titleTxt.raycastTarget = false;
+
+            // Kilit Gereksinim Rozeti (Sağ üst)
+            GameObject reqObj = new GameObject("Req");
+            reqObj.transform.SetParent(row.transform, false);
+            RectTransform reqRt = reqObj.AddComponent<RectTransform>();
+            reqRt.anchoredPosition = new Vector2(170f, 24f);
+            reqRt.sizeDelta = new Vector2(420f, 36f);
+            Text reqTxt = reqObj.AddComponent<Text>();
+            reqTxt.font = GetSafeDefaultFont();
+            reqTxt.text = reqText;
+            reqTxt.fontSize = 22;
+            reqTxt.fontStyle = FontStyle.Bold;
+            reqTxt.alignment = TextAnchor.MiddleRight;
+            reqTxt.color = reqColor;
+            reqTxt.raycastTarget = false;
+
+            // Dünya ve Pasif Açıklaması (Alt satır)
+            GameObject descObj = new GameObject("Desc");
+            descObj.transform.SetParent(row.transform, false);
+            RectTransform descRt = descObj.AddComponent<RectTransform>();
+            descRt.anchoredPosition = new Vector2(40f, -22f);
+            descRt.sizeDelta = new Vector2(680f, 42f);
+            Text descTxt = descObj.AddComponent<Text>();
+            descTxt.font = GetSafeDefaultFont();
+            descTxt.text = desc;
+            descTxt.fontSize = 21;
+            descTxt.alignment = TextAnchor.MiddleLeft;
+            descTxt.color = new Color(0.80f, 0.88f, 0.98f);
+            descTxt.raycastTarget = false;
+        }
+
+        private static void CreateOnboardingPowerRow(Transform parent, string name, float yPos, string shopId, string fallbackEmoji, string title, string desc, Color titleColor)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            RectTransform rt = row.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, yPos);
+            rt.sizeDelta = new Vector2(860f, 150f);
+
+            Image bg = row.AddComponent<Image>();
+            bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.10f, 0.13f, 0.24f, 0.95f), new Color(1f, 1f, 1f, 0.10f), 1.5f, 22);
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+
+            // İkon (88x88)
+            Sprite sp = Resources.Load<Sprite>($"Sprites/Shop/shop_{shopId}");
+            if (sp == null && shopId == "slow") sp = Resources.Load<Sprite>("Sprites/slow_powerup");
+            if (sp == null && shopId == "multi") sp = Resources.Load<Sprite>("Sprites/multi_powerup");
+
+            if (sp != null)
+            {
+                GameObject iconObj = new GameObject("Icon");
+                iconObj.transform.SetParent(row.transform, false);
+                RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+                iconRt.anchoredPosition = new Vector2(-365f, 0f);
+                iconRt.sizeDelta = new Vector2(88f, 88f);
+                Image iconImg = iconObj.AddComponent<Image>();
+                iconImg.sprite = sp;
+                iconImg.preserveAspect = true;
+                iconImg.raycastTarget = false;
+            }
+            else
+            {
+                GameObject iconObj = new GameObject("Emoji");
+                iconObj.transform.SetParent(row.transform, false);
+                RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+                iconRt.anchoredPosition = new Vector2(-365f, 0f);
+                iconRt.sizeDelta = new Vector2(88f, 88f);
+                Text emojiTxt = iconObj.AddComponent<Text>();
+                emojiTxt.font = GetSafeDefaultFont();
+                emojiTxt.text = fallbackEmoji;
+                emojiTxt.fontSize = 44;
+                emojiTxt.alignment = TextAnchor.MiddleCenter;
+                emojiTxt.color = Color.white;
+                emojiTxt.raycastTarget = false;
+            }
+
+            // Başlık
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(row.transform, false);
+            RectTransform titleRt = titleObj.AddComponent<RectTransform>();
+            titleRt.anchoredPosition = new Vector2(40f, 28f);
+            titleRt.sizeDelta = new Vector2(680f, 40f);
+            Text titleTxt = titleObj.AddComponent<Text>();
+            titleTxt.font = GetSafeDefaultFont();
+            titleTxt.text = title;
+            titleTxt.fontSize = 28;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.alignment = TextAnchor.MiddleLeft;
+            titleTxt.color = titleColor;
+            titleTxt.raycastTarget = false;
+
+            // Açıklama
+            GameObject descObj = new GameObject("Desc");
+            descObj.transform.SetParent(row.transform, false);
+            RectTransform descRt = descObj.AddComponent<RectTransform>();
+            descRt.anchoredPosition = new Vector2(40f, -28f);
+            descRt.sizeDelta = new Vector2(680f, 65f);
+            Text descTxt = descObj.AddComponent<Text>();
+            descTxt.font = GetSafeDefaultFont();
+            descTxt.text = desc;
+            descTxt.fontSize = 21;
+            descTxt.alignment = TextAnchor.MiddleLeft;
+            descTxt.color = new Color(0.80f, 0.88f, 0.98f);
+            descTxt.raycastTarget = false;
+        }
+
+        private static void CreateOnboardingShowcaseRow(Transform parent, string name, float yPos, float height, string spritePath, string title, string desc, Color titleColor)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            RectTransform rt = row.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, yPos);
+            rt.sizeDelta = new Vector2(860f, height);
+
+            Image bg = row.AddComponent<Image>();
+            bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.10f, 0.13f, 0.24f, 0.95f), new Color(1f, 1f, 1f, 0.10f), 1.5f, 22);
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+
+            // İkon (110x110)
+            Sprite sp = !string.IsNullOrEmpty(spritePath) ? Resources.Load<Sprite>(spritePath) : null;
+            if (sp == null && name.Contains("Gold")) sp = ProceduralSpriteGenerator.CreateGoldCoinSprite(128);
+            if (sp == null && name.Contains("Wardrobe")) sp = Resources.Load<Sprite>("Sprites/Kiyafetler/kiyafet_klasik_pelerin");
+
+            if (sp != null)
+            {
+                GameObject iconObj = new GameObject("Icon");
+                iconObj.transform.SetParent(row.transform, false);
+                RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+                iconRt.anchoredPosition = new Vector2(-355f, 0f);
+                iconRt.sizeDelta = new Vector2(110f, 110f);
+                Image iconImg = iconObj.AddComponent<Image>();
+                iconImg.sprite = sp;
+                iconImg.preserveAspect = true;
+                iconImg.raycastTarget = false;
+            }
+
+            // Başlık
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(row.transform, false);
+            RectTransform titleRt = titleObj.AddComponent<RectTransform>();
+            titleRt.anchoredPosition = new Vector2(40f, 38f);
+            titleRt.sizeDelta = new Vector2(670f, 44f);
+            Text titleTxt = titleObj.AddComponent<Text>();
+            titleTxt.font = GetSafeDefaultFont();
+            titleTxt.text = title;
+            titleTxt.fontSize = 30;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.alignment = TextAnchor.MiddleLeft;
+            titleTxt.color = titleColor;
+            titleTxt.raycastTarget = false;
+
+            // Açıklama
+            GameObject descObj = new GameObject("Desc");
+            descObj.transform.SetParent(row.transform, false);
+            RectTransform descRt = descObj.AddComponent<RectTransform>();
+            descRt.anchoredPosition = new Vector2(40f, -24f);
+            descRt.sizeDelta = new Vector2(670f, 80f);
+            Text descTxt = descObj.AddComponent<Text>();
+            descTxt.font = GetSafeDefaultFont();
+            descTxt.text = desc;
+            descTxt.fontSize = 22;
+            descTxt.alignment = TextAnchor.MiddleLeft;
+            descTxt.color = new Color(0.80f, 0.88f, 0.98f);
+            descTxt.raycastTarget = false;
         }
 
         private static Text CreateText(Transform parent, string name, string content, int fontSize, Vector2 position, Color color, bool raycastTarget = false, FontStyle fontStyle = FontStyle.Normal)

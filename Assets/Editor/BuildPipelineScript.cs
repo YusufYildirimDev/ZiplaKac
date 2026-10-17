@@ -18,7 +18,7 @@ namespace ZiplaKac.Editor
             PlayerSettings.companyName = "YusufYildirim";
             PlayerSettings.productName = "ZiplaKac";
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.iOS, "com.yusufyldrm.ziplakac");
-            PlayerSettings.iOS.appleDeveloperTeamID = "29367Z6APG";
+            PlayerSettings.iOS.appleDeveloperTeamID = "5A4A2VUMDM";
             PlayerSettings.iOS.appleEnableAutomaticSigning = true;
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
