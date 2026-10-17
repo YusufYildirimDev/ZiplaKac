@@ -67,7 +67,7 @@ namespace ZiplaKac.UI
                 CreateDefaultCardsData();
             }
 
-            float cardSpacing = 145f;
+            float cardSpacing = 168f;
             float startX = -((characterCards.Count - 1) * cardSpacing) * 0.5f;
 
             for (int i = 0; i < characterCards.Count; i++)
@@ -80,11 +80,11 @@ namespace ZiplaKac.UI
                     cardObj.transform.SetParent(transform, false);
                     RectTransform rt = cardObj.AddComponent<RectTransform>();
                     rt.anchoredPosition = new Vector2(startX + i * cardSpacing, 0f);
-                    rt.sizeDelta = new Vector2(130f, 160f);
+                    rt.sizeDelta = new Vector2(150f, 195f);
 
                     // Tıklanabilir zemin kartı (raycastTarget = true)
                     Image cardBg = cardObj.AddComponent<Image>();
-                    cardBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(1f, 1f, 1f, 0.04f), new Color(1f, 1f, 1f, 0.08f), 1f, 18);
+                    cardBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(1f, 1f, 1f, 0.04f), new Color(1f, 1f, 1f, 0.08f), 1f, 22);
                     cardBg.type = Image.Type.Sliced;
                     cardBg.raycastTarget = true;
 
@@ -98,12 +98,12 @@ namespace ZiplaKac.UI
                     btn.colors = cb;
                     card.selectButton = btn;
 
-                    // Swatch (Yuvarlatılmış Renk Kutusu)
+                    // Swatch (Yuvarlatılmış Renk Kutusu - 115x115 Büyük Görsel)
                     GameObject swatchObj = new GameObject("Swatch");
                     swatchObj.transform.SetParent(cardObj.transform, false);
                     RectTransform swatchRt = swatchObj.AddComponent<RectTransform>();
-                    swatchRt.anchoredPosition = new Vector2(0f, 25f);
-                    swatchRt.sizeDelta = new Vector2(85f, 85f);
+                    swatchRt.anchoredPosition = new Vector2(0f, 28f);
+                    swatchRt.sizeDelta = new Vector2(115f, 115f);
                     Image swatchImg = swatchObj.AddComponent<Image>();
                     swatchImg.type = Image.Type.Simple;
                     swatchImg.preserveAspect = true;
@@ -116,23 +116,23 @@ namespace ZiplaKac.UI
                     borderObj.transform.SetParent(swatchObj.transform, false);
                     RectTransform borderRt = borderObj.AddComponent<RectTransform>();
                     borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
-                    borderRt.offsetMin = new Vector2(-4f, -4f); borderRt.offsetMax = new Vector2(4f, 4f);
+                    borderRt.offsetMin = new Vector2(-5f, -5f); borderRt.offsetMax = new Vector2(5f, 5f);
                     Image borderImg = borderObj.AddComponent<Image>();
                     borderImg.type = Image.Type.Sliced;
-                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.02f, 0.84f, 0.63f), 4f, 26);
+                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.02f, 0.84f, 0.63f), 4.5f, 32);
                     borderImg.raycastTarget = false;
                     card.borderHighlight = borderImg;
 
-                    // Karakter İsmi
+                    // Karakter İsmi (Büyük ve Kalın Yazı)
                     GameObject nameObj = new GameObject("Name");
                     nameObj.transform.SetParent(cardObj.transform, false);
                     RectTransform nameRt = nameObj.AddComponent<RectTransform>();
-                    nameRt.anchoredPosition = new Vector2(0f, -45f);
-                    nameRt.sizeDelta = new Vector2(110f, 32f);
+                    nameRt.anchoredPosition = new Vector2(0f, -58f);
+                    nameRt.sizeDelta = new Vector2(140f, 40f);
                     Text nameTxt = nameObj.AddComponent<Text>();
                     nameTxt.font = GetSafeFont();
                     nameTxt.text = card.characterName;
-                    nameTxt.fontSize = 22;
+                    nameTxt.fontSize = 26;
                     nameTxt.fontStyle = FontStyle.Bold;
                     nameTxt.alignment = TextAnchor.MiddleCenter;
                     nameTxt.color = new Color(0.96f, 0.96f, 0.98f, 0.85f);

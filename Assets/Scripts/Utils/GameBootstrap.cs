@@ -623,32 +623,32 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.45f);
 
-            // Centered Glassmorphic Card (760x920, Y: +120 so player is clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(760f, 920f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 120f);
+            // Centered Glassmorphic Card (920x1260, Y: +90 so player is clearly visible below)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
 
-            // Başlık "ZIPLA KAÇ"
-            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 54, new Vector2(0f, 340f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
+            // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin)
+            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 72, new Vector2(0f, 510f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
 
             // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 24, new Vector2(0f, 285f), new Color(0.6f, 0.7f, 0.85f), false);
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 30, new Vector2(0f, 435f), new Color(0.6f, 0.7f, 0.85f), false);
 
             // "KARAKTER SEÇ" etiketi
-            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 20, new Vector2(0f, 180f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
+            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 28, new Vector2(0f, 320f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
 
-            // Karakter Galerisi UI (Swatches)
+            // Karakter Galerisi UI (Swatches - Genişletilmiş Alan)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 75f);
-            galleryRt.sizeDelta = new Vector2(700f, 130f);
+            galleryRt.anchoredPosition = new Vector2(0f, 175f);
+            galleryRt.sizeDelta = new Vector2(880f, 210f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // Neon Mint "BAŞLA" Butonu (#06d6a0)
+            // Neon Mint "BAŞLA" Butonu (#06d6a0 - Büyük ve Çarpıcı)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -115f), new Vector2(400f, 78f), mintColor, darkNavy, 32);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -80f), new Vector2(540f, 104f), mintColor, darkNavy, 44);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
@@ -656,7 +656,7 @@ namespace ZiplaKac.Utils
 
             // 🛒 Mağaza & Gardırop (Yükseltmeler, Güçler, Kıyafetler) Butonu (#9b5de5 / Mor Vurgusu)
             Color purpleColor = new Color(0.61f, 0.36f, 0.90f);
-            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -200f), new Vector2(460f, 74f), purpleColor, Color.white, 26);
+            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -205f), new Vector2(540f, 92f), purpleColor, Color.white, 32);
             Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
             wardrobeBtn.onClick.AddListener(() => {
                 if (UI.WardrobeModalUI.Instance != null)
@@ -667,7 +667,7 @@ namespace ZiplaKac.Utils
 
             // 🎁 Günlük Ödül Sandığı Butonu (#ffd166 / Amber Vurgusu)
             Color goldColor = new Color(1.0f, 0.82f, 0.40f);
-            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -284f), new Vector2(460f, 74f), goldColor, darkNavy, 26);
+            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -315f), new Vector2(540f, 92f), goldColor, darkNavy, 32);
             Button rewardBtn = rewardBtnObj.GetComponent<Button>();
             rewardBtn.onClick.AddListener(() => {
                 if (DailyRewardModalUI.Instance != null)
@@ -677,7 +677,7 @@ namespace ZiplaKac.Utils
             });
 
             // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 20, new Vector2(0f, -365f), new Color(0.55f, 0.65f, 0.8f), false);
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 26, new Vector2(0f, -440f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
