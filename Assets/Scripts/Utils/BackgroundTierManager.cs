@@ -20,7 +20,7 @@ namespace ZiplaKac.Utils
         public SpriteRenderer fadeRenderer;
 
         [Header("Geçiş Süresi")]
-        public float fadeDuration = 0.8f;
+        public float fadeDuration = 3.5f;
 
         private int currentTier = 0;
         private string currentCharacterKey = "klasik";
@@ -184,10 +184,11 @@ namespace ZiplaKac.Utils
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / fadeDuration);
+                float smoothT = Mathf.SmoothStep(0f, 1f, t);
 
                 if (fadeRenderer != null)
                 {
-                    fadeRenderer.color = new Color(1f, 1f, 1f, t);
+                    fadeRenderer.color = new Color(1f, 1f, 1f, smoothT);
                 }
 
                 yield return null;

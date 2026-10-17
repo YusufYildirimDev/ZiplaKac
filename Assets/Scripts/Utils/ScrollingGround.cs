@@ -24,6 +24,7 @@ namespace ZiplaKac.Utils
         public float tileWidth = 6.8266f;
 
         private int currentTier = 0;
+        private Sprite pendingGroundSprite;
 
         private void Awake()
         {
@@ -139,6 +140,10 @@ namespace ZiplaKac.Utils
                     if (maxX > float.MinValue)
                     {
                         tiles[i].position = new Vector3(maxX + tileWidth - 0.005f, tiles[i].position.y, tiles[i].position.z);
+                        if (pendingGroundSprite != null && renderers != null && i < renderers.Length && renderers[i] != null)
+                        {
+                            renderers[i].sprite = pendingGroundSprite;
+                        }
                     }
                 }
             }
@@ -151,14 +156,23 @@ namespace ZiplaKac.Utils
             Sprite targetSprite = WorldThemeManager.Instance.GetGroundSprite(characterKey, stageIndex);
             if (targetSprite != null)
             {
-                if (renderers != null)
+                if (GameManager.Instance != null && GameManager.Instance.State == GameState.Playing)
                 {
-                    foreach (var r in renderers)
-                    {
-                        if (r != null) r.sprite = targetSprite;
-                    }
+                    // Koşu esnasında zeminin aniden değişmemesi için sağdan doğal akışla getir
+                    pendingGroundSprite = targetSprite;
                 }
-                UpdateTileWidth();
+                else
+                {
+                    pendingGroundSprite = null;
+                    if (renderers != null)
+                    {
+                        foreach (var r in renderers)
+                        {
+                            if (r != null) r.sprite = targetSprite;
+                        }
+                    }
+                    UpdateTileWidth();
+                }
             }
         }
 
@@ -217,6 +231,17 @@ namespace ZiplaKac.Utils
         /// </summary>
         public void ResetPositions()
         {
+            if (pendingGroundSprite != null)
+            {
+                if (renderers != null)
+                {
+                    foreach (var r in renderers)
+                    {
+                        if (r != null) r.sprite = pendingGroundSprite;
+                    }
+                }
+                pendingGroundSprite = null;
+            }
             UpdateTileWidth();
             if (tiles == null || tiles.Length == 0) return;
 

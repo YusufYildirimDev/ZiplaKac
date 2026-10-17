@@ -524,14 +524,24 @@
     comboPopupTimer = 0;
     effects = { slowUntil: 0, multiUntil: 0 };
     wasNewBest = false;
+    bgTransition.fromTier = 0;
+    bgTransition.toTier = 0;
+    bgTransition.progress = 1.0;
     state = "running";
     overlay.classList.add("hidden");
     updateHud();
   }
 
+  var bgTransition = {
+    fromTier: 0,
+    toTier: 0,
+    progress: 1.0,
+    duration: 3.5
+  };
+
   function getTier(s) {
-    if (s < 80) return 0;
-    if (s < 200) return 1;
+    if (s < 750) return 0;
+    if (s < 1500) return 1;
     return 2;
   }
 
@@ -571,9 +581,9 @@
   }
 
   var TIER_WEIGHTS = [
-    { cactus: 70, rock: 30 },
-    { cactus: 50, rock: 25, spiketall: 25 },
-    { cactus: 30, rock: 20, spiketall: 20, birdlow: 15, birdhigh: 15 }
+    { cactus: 60, rock: 25, spiketall: 15 },
+    { cactus: 35, rock: 20, spiketall: 25, birdlow: 20 },
+    { cactus: 25, rock: 15, spiketall: 20, birdlow: 20, birdhigh: 20 }
   ];
 
   function spawnObstacle() {
@@ -684,14 +694,23 @@
     var dt = Math.min(0.033, (ts - tLast) / 1000);
     tLast = ts;
 
-    var tier = getTier(score);
+    var targetTier = getTier(score);
+    if (targetTier !== bgTransition.toTier) {
+      bgTransition.fromTier = (bgTransition.progress < 1.0) ? bgTransition.toTier : bgTransition.fromTier;
+      bgTransition.toTier = targetTier;
+      bgTransition.progress = 0;
+    }
+    if (bgTransition.progress < 1.0) {
+      bgTransition.progress = Math.min(1.0, bgTransition.progress + dt / bgTransition.duration);
+    }
+
     ctx.clearRect(0, 0, W, H);
-    drawBackground(tier);
+    drawBackground();
 
     if (state === "running") {
       step(dt);
     }
-    drawGround(tier);
+    drawGround();
     drawPowerups();
     drawObstacles();
     drawPlayer();
@@ -805,20 +824,20 @@
     { top: "#0b0f2a", bottom: "#000000", ground: "#141430" }
   ];
 
-  function drawBackground(tier) {
+  function renderSingleBackground(t) {
     var world = WORLDS[selectedCharId] || WORLDS.classic;
     var wImgs = worldImages[selectedCharId] || worldImages.classic;
-    var img = wImgs && wImgs.bgs ? wImgs.bgs[tier] : null;
+    var img = wImgs && wImgs.bgs ? wImgs.bgs[t] : null;
     if (img && img.complete && img.naturalWidth > 0) {
       ctx.drawImage(img, 0, 0, W, H);
       return;
     }
     var g = ctx.createLinearGradient(0, 0, 0, H);
-    if (tier === 0) {
+    if (t === 0) {
       g.addColorStop(0, getVar("--bg-top"));
       g.addColorStop(1, getVar("--bg-bottom"));
     } else {
-      var c = TIER_BG[tier] || TIER_BG[1];
+      var c = TIER_BG[t] || TIER_BG[1];
       g.addColorStop(0, c.top);
       g.addColorStop(1, c.bottom);
     }
@@ -826,10 +845,25 @@
     ctx.fillRect(0, 0, W, H);
   }
 
-  function drawGround(tier) {
+  function drawBackground() {
+    if (bgTransition.progress >= 1.0) {
+      renderSingleBackground(bgTransition.toTier);
+    } else {
+      renderSingleBackground(bgTransition.fromTier);
+      var p = bgTransition.progress;
+      var alpha = p * p * (3 - 2 * p); // smoothstep ease-in-out
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      renderSingleBackground(bgTransition.toTier);
+      ctx.restore();
+    }
+  }
+
+  function drawGround() {
     var world = WORLDS[selectedCharId] || WORLDS.classic;
     var wImgs = worldImages[selectedCharId] || worldImages.classic;
-    var img = wImgs && wImgs.grounds ? wImgs.grounds[tier] : null;
+    var activeTier = (bgTransition.progress >= 0.5) ? bgTransition.toTier : bgTransition.fromTier;
+    var img = wImgs && wImgs.grounds ? wImgs.grounds[activeTier] : null;
     var gH = H - groundY;
     if (img && img.complete && img.naturalWidth > 0) {
       var tileW = (img.naturalWidth / img.naturalHeight) * gH;
@@ -840,7 +874,7 @@
       }
       return;
     }
-    ctx.fillStyle = tier === 0 ? getVar("--ground") : (TIER_BG[tier] ? TIER_BG[tier].ground : "#2d2350");
+    ctx.fillStyle = activeTier === 0 ? getVar("--ground") : (TIER_BG[activeTier] ? TIER_BG[activeTier].ground : "#2d2350");
     ctx.fillRect(0, groundY, W, gH);
   }
 

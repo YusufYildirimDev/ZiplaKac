@@ -247,12 +247,12 @@ namespace ZiplaKac.Core
             int calculatedTier = 0;
             int currentScoreInt = Mathf.FloorToInt(CurrentScore);
 
-            // 3 Aşama: 0-79 (Aşama 1), 80-199 (Aşama 2), 200+ (Aşama 3)
-            if (currentScoreInt >= 200)
+            // 3 Aşama: 0-749 (Aşama 1), 750-1499 (Aşama 2), 1500+ (Aşama 3)
+            if (currentScoreInt >= 1500)
             {
                 calculatedTier = 2;
             }
-            else if (currentScoreInt >= 80)
+            else if (currentScoreInt >= 750)
             {
                 calculatedTier = 1;
             }

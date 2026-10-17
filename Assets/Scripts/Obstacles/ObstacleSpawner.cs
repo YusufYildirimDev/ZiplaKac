@@ -143,51 +143,39 @@ namespace ZiplaKac.Obstacles
             // KOD İÇİ DİNAMİK TIER OLUŞTURMA (ScriptableObject assetleri atanmamışsa)
             tiers = new List<TierData>();
 
-            // Tier 0
+            // Tier 0 (0 - 749)
             TierData t0 = ScriptableObject.CreateInstance<TierData>();
-            t0.tierIndex = 0; t0.minScore = 0; t0.maxScore = 39;
+            t0.tierIndex = 0; t0.minScore = 0; t0.maxScore = 749;
             t0.backgroundColorTop = new Color(0.4f, 0.75f, 1.0f);
             t0.backgroundColorBottom = new Color(0.8f, 0.95f, 1.0f);
             t0.obstacleWeights = new List<WeightedObstacle>
             {
-                new WeightedObstacle { obstacleType = ObstacleType.Cactus, poolTag = "Cactus", weight = 70 },
-                new WeightedObstacle { obstacleType = ObstacleType.Rock, poolTag = "Rock", weight = 30 }
+                new WeightedObstacle { obstacleType = ObstacleType.Cactus, poolTag = "Cactus", weight = 60 },
+                new WeightedObstacle { obstacleType = ObstacleType.Rock, poolTag = "Rock", weight = 25 },
+                new WeightedObstacle { obstacleType = ObstacleType.Spike, poolTag = "Spike", weight = 15 }
             };
             tiers.Add(t0);
 
-            // Tier 1
+            // Tier 1 (750 - 1499)
             TierData t1 = ScriptableObject.CreateInstance<TierData>();
-            t1.tierIndex = 1; t1.minScore = 40; t1.maxScore = 99;
+            t1.tierIndex = 1; t1.minScore = 750; t1.maxScore = 1499;
             t1.backgroundColorTop = new Color(1.0f, 0.45f, 0.2f);
             t1.backgroundColorBottom = new Color(0.9f, 0.2f, 0.3f);
             t1.obstacleWeights = new List<WeightedObstacle>
-            {
-                new WeightedObstacle { obstacleType = ObstacleType.Cactus, poolTag = "Cactus", weight = 50 },
-                new WeightedObstacle { obstacleType = ObstacleType.Rock, poolTag = "Rock", weight = 25 },
-                new WeightedObstacle { obstacleType = ObstacleType.Spike, poolTag = "Spike", weight = 25 }
-            };
-            tiers.Add(t1);
-
-            // Tier 2
-            TierData t2 = ScriptableObject.CreateInstance<TierData>();
-            t2.tierIndex = 2; t2.minScore = 100; t2.maxScore = 199;
-            t2.backgroundColorTop = new Color(0.4f, 0.2f, 0.6f);
-            t2.backgroundColorBottom = new Color(0.15f, 0.1f, 0.35f);
-            t2.obstacleWeights = new List<WeightedObstacle>
             {
                 new WeightedObstacle { obstacleType = ObstacleType.Cactus, poolTag = "Cactus", weight = 35 },
                 new WeightedObstacle { obstacleType = ObstacleType.Rock, poolTag = "Rock", weight = 20 },
                 new WeightedObstacle { obstacleType = ObstacleType.Spike, poolTag = "Spike", weight = 25 },
                 new WeightedObstacle { obstacleType = ObstacleType.LowBird, poolTag = "LowBird", weight = 20 }
             };
-            tiers.Add(t2);
+            tiers.Add(t1);
 
-            // Tier 3
-            TierData t3 = ScriptableObject.CreateInstance<TierData>();
-            t3.tierIndex = 3; t3.minScore = 200; t3.maxScore = 99999;
-            t3.backgroundColorTop = new Color(0.05f, 0.05f, 0.15f);
-            t3.backgroundColorBottom = new Color(0.02f, 0.02f, 0.08f);
-            t3.obstacleWeights = new List<WeightedObstacle>
+            // Tier 2 (1500+)
+            TierData t2 = ScriptableObject.CreateInstance<TierData>();
+            t2.tierIndex = 2; t2.minScore = 1500; t2.maxScore = 999999;
+            t2.backgroundColorTop = new Color(0.05f, 0.05f, 0.15f);
+            t2.backgroundColorBottom = new Color(0.02f, 0.02f, 0.08f);
+            t2.obstacleWeights = new List<WeightedObstacle>
             {
                 new WeightedObstacle { obstacleType = ObstacleType.Cactus, poolTag = "Cactus", weight = 25 },
                 new WeightedObstacle { obstacleType = ObstacleType.Rock, poolTag = "Rock", weight = 15 },
@@ -195,7 +183,7 @@ namespace ZiplaKac.Obstacles
                 new WeightedObstacle { obstacleType = ObstacleType.LowBird, poolTag = "LowBird", weight = 20 },
                 new WeightedObstacle { obstacleType = ObstacleType.HighBird, poolTag = "HighBird", weight = 20 }
             };
-            tiers.Add(t3);
+            tiers.Add(t2);
         }
     }
 }
