@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +21,8 @@ namespace ZiplaKac.UI
 
     /// <summary>
     /// Ana menüdeki 5 varyantlı (Klasik, Ateş, Buz, Zehir, Gece) karakter seçim galerisi.
-    /// Dokunulduğunda oyunu başlatmaz, PlayerPrefs seçimini günceller ve vurgulu çerçeveyi yeniler.
+    /// Başlangıçta sadece Klasik açıktır; sonraki avatarlar sırayla 2500 skor yapılarak açılır.
+    /// Kilitli karakterlere dokunulduğunda görsel/işitsel uyarı verir.
     /// </summary>
     public class CharacterSelectorUI : MonoBehaviour
     {
@@ -28,18 +30,36 @@ namespace ZiplaKac.UI
         public List<CharacterCardUI> characterCards = new List<CharacterCardUI>();
 
         private string currentSelectedId;
+        private GameObject lockNoticeObj;
+        private Text lockNoticeText;
+        private Coroutine lockNoticeCoroutine;
 
         private void Start()
         {
+            SaveSystem.EnsureAvatarChainInitialized();
             currentSelectedId = SaveSystem.GetSelectedCharacterId("classic");
+            if (!SaveSystem.IsCharacterUnlocked(currentSelectedId))
+            {
+                currentSelectedId = "classic";
+                SaveSystem.SaveSelectedCharacterId("classic");
+            }
+
             SetupCards();
+            CreateLockNoticeBanner();
             RefreshSelectionVisuals();
             WorldThemeManager.Instance?.SetCharacter(currentSelectedId);
         }
 
         private void OnEnable()
         {
+            SaveSystem.EnsureAvatarChainInitialized();
             currentSelectedId = SaveSystem.GetSelectedCharacterId("classic");
+            if (!SaveSystem.IsCharacterUnlocked(currentSelectedId))
+            {
+                currentSelectedId = "classic";
+                SaveSystem.SaveSelectedCharacterId("classic");
+            }
+
             RefreshSelectionVisuals();
             WorldThemeManager.Instance?.SetCharacter(currentSelectedId);
         }
@@ -58,6 +78,42 @@ namespace ZiplaKac.UI
             } catch {}
             Font[] fonts = Resources.FindObjectsOfTypeAll<Font>();
             return fonts != null && fonts.Length > 0 ? fonts[0] : null;
+        }
+
+        private void CreateLockNoticeBanner()
+        {
+            if (lockNoticeObj != null) return;
+
+            lockNoticeObj = new GameObject("LockNoticeBanner");
+            lockNoticeObj.transform.SetParent(transform, false);
+            RectTransform rt = lockNoticeObj.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, 135f);
+            rt.sizeDelta = new Vector2(800f, 54f);
+
+            Image bg = lockNoticeObj.AddComponent<Image>();
+            bg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.12f, 0.08f, 0.06f, 0.95f),
+                new Color(1f, 0.45f, 0.20f, 0.85f),
+                2f, 20
+            );
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+
+            GameObject textObj = new GameObject("NoticeText");
+            textObj.transform.SetParent(lockNoticeObj.transform, false);
+            RectTransform textRt = textObj.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero; textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(16f, 0f); textRt.offsetMax = new Vector2(-16f, 0f);
+
+            lockNoticeText = textObj.AddComponent<Text>();
+            lockNoticeText.font = GetSafeFont();
+            lockNoticeText.fontSize = 22;
+            lockNoticeText.fontStyle = FontStyle.Bold;
+            lockNoticeText.alignment = TextAnchor.MiddleCenter;
+            lockNoticeText.color = new Color(1.0f, 0.85f, 0.35f);
+            lockNoticeText.raycastTarget = false;
+
+            lockNoticeObj.SetActive(false);
         }
 
         private void SetupCards()
@@ -123,6 +179,50 @@ namespace ZiplaKac.UI
                     borderImg.raycastTarget = false;
                     card.borderHighlight = borderImg;
 
+                    // Kilit Katmanı (Lock Overlay - Swatch üzerine tam oturan cam buzlu panel)
+                    GameObject lockObj = new GameObject("LockOverlay");
+                    lockObj.transform.SetParent(swatchObj.transform, false);
+                    RectTransform lockRt = lockObj.AddComponent<RectTransform>();
+                    lockRt.anchorMin = Vector2.zero; lockRt.anchorMax = Vector2.one;
+                    lockRt.offsetMin = Vector2.zero; lockRt.offsetMax = Vector2.zero;
+
+                    Image lockBg = lockObj.AddComponent<Image>();
+                    lockBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                        new Color(0.04f, 0.06f, 0.10f, 0.84f),
+                        new Color(1f, 1f, 1f, 0.14f),
+                        1.5f, 24
+                    );
+                    lockBg.type = Image.Type.Sliced;
+                    lockBg.raycastTarget = false;
+
+                    // Asma Kilit İkonu (Padlock)
+                    GameObject lockIconObj = new GameObject("LockIcon");
+                    lockIconObj.transform.SetParent(lockObj.transform, false);
+                    RectTransform lockIconRt = lockIconObj.AddComponent<RectTransform>();
+                    lockIconRt.anchoredPosition = new Vector2(0f, 10f);
+                    lockIconRt.sizeDelta = new Vector2(50f, 50f);
+                    Image lockIconImg = lockIconObj.AddComponent<Image>();
+                    lockIconImg.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/icon_lock", () => Utils.ProceduralSpriteGenerator.CreateLockIconSprite(128));
+                    lockIconImg.preserveAspect = true;
+                    lockIconImg.raycastTarget = false;
+
+                    // Kilit Gereksinim Metni ("2500 Skor")
+                    GameObject lockTextObj = new GameObject("LockText");
+                    lockTextObj.transform.SetParent(lockObj.transform, false);
+                    RectTransform lockTextRt = lockTextObj.AddComponent<RectTransform>();
+                    lockTextRt.anchoredPosition = new Vector2(0f, -28f);
+                    lockTextRt.sizeDelta = new Vector2(110f, 24f);
+                    Text lockTxt = lockTextObj.AddComponent<Text>();
+                    lockTxt.font = GetSafeFont();
+                    lockTxt.text = "2500 Skor";
+                    lockTxt.fontSize = 17;
+                    lockTxt.fontStyle = FontStyle.Bold;
+                    lockTxt.alignment = TextAnchor.MiddleCenter;
+                    lockTxt.color = new Color(1f, 0.85f, 0.35f, 0.95f);
+                    lockTxt.raycastTarget = false;
+
+                    card.lockOverlay = lockObj;
+
                     // Karakter İsmi (Büyük ve Kalın Yazı)
                     GameObject nameObj = new GameObject("Name");
                     nameObj.transform.SetParent(cardObj.transform, false);
@@ -148,6 +248,16 @@ namespace ZiplaKac.UI
 
         public void OnCharacterSelected(string characterId)
         {
+            // Eğer karakter kilitliyse seçilmesini engelle ve gereksinimi bildir
+            if (!SaveSystem.IsCharacterUnlocked(characterId))
+            {
+                AudioManager.Instance?.PlayShieldHitSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                string req = SaveSystem.GetUnlockRequirementText(characterId);
+                ShowLockNotice(req);
+                return;
+            }
+
             currentSelectedId = characterId;
             SaveSystem.SaveSelectedCharacterId(characterId);
             RefreshSelectionVisuals();
@@ -173,11 +283,44 @@ namespace ZiplaKac.UI
             WorldThemeManager.Instance?.SetCharacter(characterId);
         }
 
+        private void ShowLockNotice(string requirementText)
+        {
+            if (lockNoticeObj == null) CreateLockNoticeBanner();
+            if (lockNoticeObj == null || lockNoticeText == null) return;
+
+            lockNoticeText.text = $"🔒 KİLİTLİ: Bu karakteri açmak için {requirementText}!";
+            lockNoticeObj.SetActive(true);
+
+            if (lockNoticeCoroutine != null) StopCoroutine(lockNoticeCoroutine);
+            lockNoticeCoroutine = StartCoroutine(HideLockNoticeRoutine());
+        }
+
+        private IEnumerator HideLockNoticeRoutine()
+        {
+            yield return new WaitForSeconds(2.8f);
+            if (lockNoticeObj != null)
+            {
+                lockNoticeObj.SetActive(false);
+            }
+            lockNoticeCoroutine = null;
+        }
+
         private void RefreshSelectionVisuals()
         {
             foreach (var card in characterCards)
             {
-                bool isSelected = card.characterId == currentSelectedId;
+                bool isUnlocked = SaveSystem.IsCharacterUnlocked(card.characterId);
+                bool isSelected = isUnlocked && (card.characterId == currentSelectedId);
+
+                if (card.lockOverlay != null)
+                {
+                    card.lockOverlay.SetActive(!isUnlocked);
+                }
+
+                if (card.iconImage != null)
+                {
+                    card.iconImage.color = isUnlocked ? Color.white : new Color(0.40f, 0.40f, 0.45f, 0.60f);
+                }
 
                 if (card.borderHighlight != null)
                 {
@@ -192,13 +335,27 @@ namespace ZiplaKac.UI
                     Image bg = card.selectButton.GetComponent<Image>();
                     if (bg != null)
                     {
-                        bg.color = isSelected ? new Color(0.024f, 0.839f, 0.627f, 0.22f) : new Color(1f, 1f, 1f, 0.04f);
+                        if (!isUnlocked)
+                        {
+                            bg.color = new Color(0f, 0f, 0f, 0.20f);
+                        }
+                        else
+                        {
+                            bg.color = isSelected ? new Color(0.024f, 0.839f, 0.627f, 0.22f) : new Color(1f, 1f, 1f, 0.04f);
+                        }
                     }
                 }
 
                 if (card.nameText != null)
                 {
-                    card.nameText.color = isSelected ? new Color(0.024f, 0.839f, 0.627f) : new Color(0.96f, 0.96f, 0.98f, 0.85f);
+                    if (!isUnlocked)
+                    {
+                        card.nameText.color = new Color(0.55f, 0.55f, 0.60f, 0.65f);
+                    }
+                    else
+                    {
+                        card.nameText.color = isSelected ? new Color(0.024f, 0.839f, 0.627f) : new Color(0.96f, 0.96f, 0.98f, 0.85f);
+                    }
                 }
             }
         }
@@ -216,3 +373,4 @@ namespace ZiplaKac.UI
         }
     }
 }
+

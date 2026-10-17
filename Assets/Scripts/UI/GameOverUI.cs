@@ -133,6 +133,25 @@ namespace ZiplaKac.UI
                 AudioManager.Instance?.PlayNewRecordSound();
             }
 
+            // Yeni Karakter Kilidi Açılma Kutlaması
+            if (!string.IsNullOrEmpty(GameManager.NewlyUnlockedCharacterId))
+            {
+                EnsureUnlockBadge();
+                if (newCharacterUnlockedBadge != null)
+                {
+                    newCharacterUnlockedBadge.SetActive(true);
+                    if (newCharacterUnlockedText != null)
+                    {
+                        string charName = SaveSystem.GetCharacterDisplayName(GameManager.NewlyUnlockedCharacterId);
+                        newCharacterUnlockedText.text = $"🎉 YENİ KARAKTER AÇILDI: {charName.ToUpper()}! 🎉";
+                    }
+                }
+            }
+            else if (newCharacterUnlockedBadge != null)
+            {
+                newCharacterUnlockedBadge.SetActive(false);
+            }
+
             // Son 5 Skor Listesi (index.html: Son skorlar: 45, 32, 28)
             List<int> history = SaveSystem.GetLastFiveScores();
             if (scoreHistoryListText != null)
@@ -146,6 +165,53 @@ namespace ZiplaKac.UI
                     scoreHistoryListText.text = "Son skorlar: " + string.Join(", ", history);
                 }
             }
+        }
+
+        private GameObject newCharacterUnlockedBadge;
+        private Text newCharacterUnlockedText;
+
+        private void EnsureUnlockBadge()
+        {
+            if (newCharacterUnlockedBadge != null) return;
+
+            Transform parentTransform = newRecordBadge != null ? newRecordBadge.transform.parent : transform;
+            newCharacterUnlockedBadge = new GameObject("NewCharacterUnlockedBadge");
+            newCharacterUnlockedBadge.transform.SetParent(parentTransform, false);
+
+            RectTransform rt = newCharacterUnlockedBadge.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, 148f);
+            rt.sizeDelta = new Vector2(750f, 50f);
+
+            Image bg = newCharacterUnlockedBadge.AddComponent<Image>();
+            bg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.10f, 0.28f, 0.18f, 0.95f),
+                new Color(0.024f, 0.839f, 0.627f, 0.95f),
+                2f, 18
+            );
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+
+            GameObject textObj = new GameObject("UnlockText");
+            textObj.transform.SetParent(newCharacterUnlockedBadge.transform, false);
+            RectTransform textRt = textObj.AddComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero; textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = Vector2.zero; textRt.offsetMax = Vector2.zero;
+
+            newCharacterUnlockedText = textObj.AddComponent<Text>();
+            try
+            {
+                newCharacterUnlockedText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            } catch {}
+            if (newCharacterUnlockedText.font == null)
+            {
+                Font[] fonts = Resources.FindObjectsOfTypeAll<Font>();
+                if (fonts != null && fonts.Length > 0) newCharacterUnlockedText.font = fonts[0];
+            }
+            newCharacterUnlockedText.fontSize = 24;
+            newCharacterUnlockedText.fontStyle = FontStyle.Bold;
+            newCharacterUnlockedText.alignment = TextAnchor.MiddleCenter;
+            newCharacterUnlockedText.color = new Color(0.024f, 0.839f, 0.627f);
+            newCharacterUnlockedText.raycastTarget = false;
         }
 
         private void OnRestartButtonClicked()

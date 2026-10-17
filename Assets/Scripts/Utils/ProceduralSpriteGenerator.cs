@@ -674,6 +674,116 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
+        /// <summary>
+        /// Kilitli karakterler için yüksek kaliteli metalik/parlak asma kilit (padlock) ikonu üretir.
+        /// </summary>
+        public static Sprite CreateLockIconSprite(int resolution = 128)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Vector2 center = new Vector2(resolution * 0.5f, resolution * 0.5f);
+
+            // 1. Kilit halkası (Shackle - U şeklinde kavis ve bacaklar)
+            float shackleCenterX = center.x;
+            float shackleCenterY = resolution * 0.60f;
+            float shackleOuterR = resolution * 0.22f;
+            float shackleInnerR = resolution * 0.13f;
+            float shackleBottomY = resolution * 0.42f;
+
+            Color shackleCol = new Color(0.95f, 0.96f, 0.98f, 1f);
+            Color shackleShadow = new Color(0.62f, 0.66f, 0.74f, 1f);
+
+            for (int y = Mathf.FloorToInt(shackleBottomY); y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float dx = Mathf.Abs(pt.x - shackleCenterX);
+
+                    bool inShackle = false;
+                    float distToCenter = Vector2.Distance(pt, new Vector2(shackleCenterX, shackleCenterY));
+                    if (pt.y >= shackleCenterY)
+                    {
+                        if (distToCenter <= shackleOuterR && distToCenter >= shackleInnerR) inShackle = true;
+                    }
+                    else
+                    {
+                        if (dx <= shackleOuterR && dx >= shackleInnerR && pt.y >= shackleBottomY) inShackle = true;
+                    }
+
+                    if (inShackle)
+                    {
+                        float t = (pt.x - (shackleCenterX - shackleOuterR)) / (shackleOuterR * 2f);
+                        Color c = Color.Lerp(shackleShadow, shackleCol, Mathf.Sin(Mathf.Clamp01(t) * Mathf.PI));
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+
+            // 2. Kilit gövdesi (Rounded Rect)
+            Vector2 bodyMin = new Vector2(resolution * 0.20f, resolution * 0.12f);
+            Vector2 bodyMax = new Vector2(resolution * 0.80f, resolution * 0.52f);
+            float cornerR = resolution * 0.08f;
+
+            Color bodyGoldTop = new Color(1.0f, 0.86f, 0.35f, 1f);
+            Color bodyGoldBottom = new Color(0.88f, 0.58f, 0.08f, 1f);
+            Color bodyBorder = new Color(0.68f, 0.40f, 0.04f, 1f);
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d = SignedDistanceRoundedRect(pt, bodyMin, bodyMax, cornerR);
+                    if (d <= 0f)
+                    {
+                        float vertT = (pt.y - bodyMin.y) / (bodyMax.y - bodyMin.y);
+                        Color c = Color.Lerp(bodyGoldBottom, bodyGoldTop, vertT);
+
+                        if (d > -2.5f) c = Color.Lerp(c, bodyBorder, 0.75f);
+                        tex.SetPixel(x, y, c);
+                    }
+                    else if (d <= 1.2f)
+                    {
+                        float a = (1f - d / 1.2f);
+                        tex.SetPixel(x, y, new Color(bodyBorder.r, bodyBorder.g, bodyBorder.b, a));
+                    }
+                }
+            }
+
+            // 3. Anahtar deliği (Keyhole)
+            Vector2 keyholeCenter = new Vector2(shackleCenterX, resolution * 0.35f);
+            float keyHoleCircleR = resolution * 0.055f;
+            Color keyholeCol = new Color(0.14f, 0.08f, 0.04f, 0.95f);
+
+            for (int y = Mathf.FloorToInt(resolution * 0.20f); y <= Mathf.CeilToInt(keyholeCenter.y + keyHoleCircleR + 1f); y++)
+            {
+                for (int x = Mathf.FloorToInt(shackleCenterX - keyHoleCircleR - 2f); x <= Mathf.CeilToInt(shackleCenterX + keyHoleCircleR + 2f); x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float dCircle = Vector2.Distance(pt, keyholeCenter);
+                    bool isHole = false;
+                    if (dCircle <= keyHoleCircleR) isHole = true;
+
+                    float dx = Mathf.Abs(pt.x - shackleCenterX);
+                    if (pt.y <= keyholeCenter.y && pt.y >= resolution * 0.20f)
+                    {
+                        float halfW = Mathf.Lerp(resolution * 0.04f, resolution * 0.022f, (pt.y - resolution * 0.20f) / (keyholeCenter.y - resolution * 0.20f));
+                        if (dx <= halfW) isHole = true;
+                    }
+
+                    if (isHole)
+                    {
+                        tex.SetPixel(x, y, keyholeCol);
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
         #region Helper Matematik Fonksiyonları
         private static void ClearTexture(Texture2D tex)
         {

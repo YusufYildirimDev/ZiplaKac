@@ -44,6 +44,7 @@ namespace ZiplaKac.Core
         public int RunComboGold { get; private set; } = 0;
         public int RunScoreGold { get; private set; } = 0;
         public int RunRecordGold { get; private set; } = 0;
+        public static string NewlyUnlockedCharacterId { get; set; } = null;
 
         [Header("Güçlendirme Durumları")]
         public bool isShieldActive = false;
@@ -142,6 +143,7 @@ namespace ZiplaKac.Core
                     RunRecordGold = 0;
                     isTemporaryInvulnerable = false;
                     invulnerabilityTimer = 0f;
+                    NewlyUnlockedCharacterId = null;
 
                     if (WorldThemeManager.Instance != null)
                     {
@@ -166,6 +168,17 @@ namespace ZiplaKac.Core
                     {
                         HighScore = finalScoreInt;
                         RunRecordGold = 50; // Yeni rekor bonusu
+                    }
+
+                    // Aktif oynanan karakter için skoru kaydet ve sıralı kilit açılımını kontrol et
+                    string activeCharId = SaveSystem.GetSelectedCharacterId("classic");
+                    SaveSystem.SaveCharacterScore(activeCharId, finalScoreInt);
+
+                    NewlyUnlockedCharacterId = null;
+                    if (SaveSystem.CheckAndUnlockNextCharacter(activeCharId, finalScoreInt, out string unlockedNextChar))
+                    {
+                        NewlyUnlockedCharacterId = unlockedNextChar;
+                        AudioManager.Instance?.PlayPowerUpSound();
                     }
 
                     // Skorun %10'u kadar altın

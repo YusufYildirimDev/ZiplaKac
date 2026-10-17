@@ -315,22 +315,175 @@ namespace ZiplaKac.Core
             return goldBonus;
         }
 
+        #region Karakter Kilidi Açma ve Sıralı İlerleme Sistemi (2500 Skor Kuralı)
+        public const int AVATAR_UNLOCK_SCORE_THRESHOLD = 2500;
+        public static readonly string[] CharacterChain = new string[] { "classic", "fire", "ice", "toxic", "shadow" };
+        private const string KEY_AVATAR_CHAIN_INIT = "ZiplaKac_AvatarChain_v1";
+
+        public static string CanonicalizeCharacterId(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return "classic";
+            string lower = id.ToLowerInvariant();
+            if (lower.Contains("fire") || lower.Contains("ates")) return "fire";
+            if (lower.Contains("ice") || lower.Contains("buz")) return "ice";
+            if (lower.Contains("toxic") || lower.Contains("zehir") || lower.Contains("poison")) return "toxic";
+            if (lower.Contains("shadow") || lower.Contains("gece") || lower.Contains("night")) return "shadow";
+            return "classic";
+        }
+
+        public static string GetCharacterDisplayName(string id)
+        {
+            string canonical = CanonicalizeCharacterId(id);
+            switch (canonical)
+            {
+                case "fire": return "Ateş";
+                case "ice": return "Buz";
+                case "toxic": return "Zehir";
+                case "shadow": return "Gece";
+                default: return "Klasik";
+            }
+        }
+
+        public static string GetPreviousCharacterInChain(string id)
+        {
+            string canonical = CanonicalizeCharacterId(id);
+            for (int i = 1; i < CharacterChain.Length; i++)
+            {
+                if (CharacterChain[i] == canonical)
+                {
+                    return CharacterChain[i - 1];
+                }
+            }
+            return null;
+        }
+
+        public static string GetNextCharacterInChain(string id)
+        {
+            string canonical = CanonicalizeCharacterId(id);
+            for (int i = 0; i < CharacterChain.Length - 1; i++)
+            {
+                if (CharacterChain[i] == canonical)
+                {
+                    return CharacterChain[i + 1];
+                }
+            }
+            return null;
+        }
+
+        public static string GetUnlockRequirementText(string id)
+        {
+            string canonical = CanonicalizeCharacterId(id);
+            if (canonical == "classic") return "Açık";
+
+            string prev = GetPreviousCharacterInChain(canonical);
+            string prevName = GetCharacterDisplayName(prev);
+            return $"{prevName} ile {AVATAR_UNLOCK_SCORE_THRESHOLD} skor yap";
+        }
+
+        public static int GetCharacterHighScore(string id)
+        {
+            string canonical = CanonicalizeCharacterId(id);
+            return PlayerPrefs.GetInt($"ZiplaKac_CharHighScore_{canonical}", 0);
+        }
+
+        public static bool SaveCharacterScore(string id, int score)
+        {
+            string canonical = CanonicalizeCharacterId(id);
+            int currentHigh = GetCharacterHighScore(canonical);
+            if (score > currentHigh)
+            {
+                PlayerPrefs.SetInt($"ZiplaKac_CharHighScore_{canonical}", score);
+                PlayerPrefs.Save();
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// İlk açılışta 4 avatarın kilitli olmasını garanti eder. Sadece Klasik açıktır.
+        /// </summary>
+        public static void EnsureAvatarChainInitialized()
+        {
+            if (PlayerPrefs.GetInt(KEY_AVATAR_CHAIN_INIT, 0) == 0)
+            {
+                PlayerPrefs.SetInt(KEY_AVATAR_CHAIN_INIT, 1);
+                PlayerPrefs.SetInt("ZiplaKac_Unlocked_classic", 1);
+                PlayerPrefs.SetInt("ZiplaKac_Unlocked_fire", 0);
+                PlayerPrefs.SetInt("ZiplaKac_Unlocked_ice", 0);
+                PlayerPrefs.SetInt("ZiplaKac_Unlocked_toxic", 0);
+                PlayerPrefs.SetInt("ZiplaKac_Unlocked_shadow", 0);
+                PlayerPrefs.SetString(KEY_UNLOCKED_CHARACTERS, "classic");
+
+                // Eğer aktif seçili karakter kilitli birinde kalmışsa hemen klasiğe çek
+                string currentSelected = GetSelectedCharacterId("classic");
+                if (CanonicalizeCharacterId(currentSelected) != "classic")
+                {
+                    SaveSelectedCharacterId("classic");
+                }
+                PlayerPrefs.Save();
+            }
+        }
+
         public static bool IsCharacterUnlocked(string id)
         {
-            if (id == "classic") return true;
-            string unlocked = PlayerPrefs.GetString(KEY_UNLOCKED_CHARACTERS, "classic");
-            return unlocked.Contains(id);
+            EnsureAvatarChainInitialized();
+            string canonical = CanonicalizeCharacterId(id);
+            if (canonical == "classic") return true;
+
+            // 1. Zaten kalıcı olarak açılmış mı?
+            if (PlayerPrefs.GetInt($"ZiplaKac_Unlocked_{canonical}", 0) == 1)
+            {
+                return true;
+            }
+
+            // 2. Bir önceki karakter ile 2500 veya üstü skor yapılmış mı?
+            string prev = GetPreviousCharacterInChain(canonical);
+            if (!string.IsNullOrEmpty(prev))
+            {
+                if (GetCharacterHighScore(prev) >= AVATAR_UNLOCK_SCORE_THRESHOLD)
+                {
+                    UnlockCharacter(canonical);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static void UnlockCharacter(string id)
         {
+            string canonical = CanonicalizeCharacterId(id);
+            PlayerPrefs.SetInt($"ZiplaKac_Unlocked_{canonical}", 1);
+
             string unlocked = PlayerPrefs.GetString(KEY_UNLOCKED_CHARACTERS, "classic");
-            if (!unlocked.Contains(id))
+            if (!unlocked.Contains(canonical))
             {
-                unlocked += "," + id;
+                unlocked += "," + canonical;
                 PlayerPrefs.SetString(KEY_UNLOCKED_CHARACTERS, unlocked);
-                PlayerPrefs.Save();
             }
+            PlayerPrefs.Save();
         }
+
+        /// <summary>
+        /// Mevcut oynanan karakterle 2500+ skor yapıldığında sıradaki karakterin kilidini açar.
+        /// Eğer yeni bir kilit açıldıysa true döner ve açılan karakterin ID'sini verir.
+        /// </summary>
+        public static bool CheckAndUnlockNextCharacter(string currentCharacterId, int scoreAchieved, out string unlockedCharacterId)
+        {
+            unlockedCharacterId = null;
+            if (scoreAchieved < AVATAR_UNLOCK_SCORE_THRESHOLD) return false;
+
+            string canonical = CanonicalizeCharacterId(currentCharacterId);
+            string next = GetNextCharacterInChain(canonical);
+            if (!string.IsNullOrEmpty(next) && !IsCharacterUnlocked(next))
+            {
+                UnlockCharacter(next);
+                unlockedCharacterId = next;
+                return true;
+            }
+
+            return false;
+        }
+        #endregion
     }
 }
