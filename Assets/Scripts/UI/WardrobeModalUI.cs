@@ -45,6 +45,7 @@ namespace ZiplaKac.UI
     /// Zıpla Kaç Mağaza & Gardırop Modalı.
     /// 1. Sekme: Güçler & Yükseltmeler (Tek Kullanımlık Consumables + Kalıcı Karakter Yükseltmeleri).
     /// 2. Sekme: Gardırop (Kıyafet Satın Alma & Giyme/Çıkarma).
+    /// Kaydırılabilir liste (ScrollRect) ve taşma yapmayan dinamik kart yuvaları barındırır.
     /// </summary>
     public class WardrobeModalUI : MonoBehaviour
     {
@@ -64,8 +65,9 @@ namespace ZiplaKac.UI
         public Text tabUpgradesText;
         public Text tabOutfitsText;
 
-        [Header("Eşya Yuvaları")]
+        [Header("Eşya Yuvaları ve Kaydırma")]
         public Transform itemsContainer;
+        public ScrollRect itemsScrollRect;
 
         public ShopTab currentTab = ShopTab.Upgrades;
 
@@ -102,7 +104,22 @@ namespace ZiplaKac.UI
 
         private void OnEnable()
         {
+            // Ana Menü metinlerinin arkadan gözükmemesi için ana menü panelini geçici gizle
+            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
+            {
+                UIManager.Instance.mainMenuPanel.SetActive(false);
+            }
+
             RefreshUI();
+            if (itemsScrollRect != null) itemsScrollRect.verticalNormalizedPosition = 1f;
+        }
+
+        private void OnDisable()
+        {
+            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
+            {
+                UIManager.Instance.mainMenuPanel.SetActive(true);
+            }
         }
 
         public void SwitchTab(ShopTab tab)
@@ -110,6 +127,7 @@ namespace ZiplaKac.UI
             currentTab = tab;
             AudioManager.Instance?.PlayJumpSound();
             RefreshUI();
+            if (itemsScrollRect != null) itemsScrollRect.verticalNormalizedPosition = 1f;
         }
 
         public void RefreshUI()
@@ -165,21 +183,32 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float startY = 170f;
-            float rowHeight = 74f;
+            float rowHeight = 92f;
+            float spacing = 12f;
+            float topPadding = 12f;
+            int totalItems = consumableConfigs.Count + upgradeConfigs.Count;
+            float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
+
+            RectTransform containerRt = itemsContainer.GetComponent<RectTransform>();
+            if (containerRt != null)
+            {
+                containerRt.sizeDelta = new Vector2(0f, totalHeight);
+                containerRt.anchoredPosition = Vector2.zero;
+            }
+
             int rowIndex = 0;
 
             // 1. Tek Kullanımlıklar (Consumables)
             for (int i = 0; i < consumableConfigs.Count; i++)
             {
                 var cfg = consumableConfigs[i];
-                float yPos = startY - (rowIndex * rowHeight);
+                float yPos = -topPadding - (rowIndex * (rowHeight + spacing)) - (rowHeight / 2f);
                 rowIndex++;
 
                 int count = SaveSystem.GetConsumableCount(cfg.id);
                 string subtitle = $"{cfg.description} · <color=#06d6a0>Envanter: {count}</color>";
 
-                GameObject row = CreateRowObject($"Consumable_{cfg.id}", yPos, cfg.displayName, subtitle, cfg.price, "AL", font, () => {
+                GameObject row = CreateRowObject($"Consumable_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, cfg.price, "AL", font, () => {
                     if (SaveSystem.PurchaseConsumable(cfg.id, cfg.price))
                     {
                         AudioManager.Instance?.PlayNewRecordSound();
@@ -200,7 +229,7 @@ namespace ZiplaKac.UI
             for (int i = 0; i < upgradeConfigs.Count; i++)
             {
                 var cfg = upgradeConfigs[i];
-                float yPos = startY - (rowIndex * rowHeight);
+                float yPos = -topPadding - (rowIndex * (rowHeight + spacing)) - (rowHeight / 2f);
                 rowIndex++;
 
                 int currentLvl = SaveSystem.GetUpgradeLevel(charKey, cfg.id);
@@ -213,7 +242,7 @@ namespace ZiplaKac.UI
                 string btnLabel = isMax ? "MAX" : (cfg.maxLevel > 1 ? "YÜKSELT" : "AÇ");
                 Color btnColor = isMax ? new Color(0.3f, 0.35f, 0.45f) : new Color(0.024f, 0.839f, 0.627f);
 
-                GameObject row = CreateRowObject($"Upgrade_{cfg.id}", yPos, cfg.displayName, subtitle, isMax ? 0 : cfg.price, btnLabel, font, () => {
+                GameObject row = CreateRowObject($"Upgrade_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, isMax ? 0 : cfg.price, btnLabel, font, () => {
                     if (isMax) return;
                     if (SaveSystem.PurchaseUpgrade(charKey, cfg.id, cfg.price, cfg.maxLevel))
                     {
@@ -238,13 +267,23 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float startY = 130f;
-            float rowHeight = 90f;
+            float rowHeight = 114f;
+            float spacing = 16f;
+            float topPadding = 16f;
+            int totalItems = outfitConfigs.Count;
+            float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
+
+            RectTransform containerRt = itemsContainer.GetComponent<RectTransform>();
+            if (containerRt != null)
+            {
+                containerRt.sizeDelta = new Vector2(0f, totalHeight);
+                containerRt.anchoredPosition = Vector2.zero;
+            }
 
             for (int i = 0; i < outfitConfigs.Count; i++)
             {
                 var cfg = outfitConfigs[i];
-                float yPos = startY - (i * rowHeight);
+                float yPos = -topPadding - (i * (rowHeight + spacing)) - (rowHeight / 2f);
 
                 bool isPurchased = SaveSystem.IsOutfitPurchased(charKey, cfg.outfitType);
                 bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, cfg.outfitType);
@@ -256,7 +295,7 @@ namespace ZiplaKac.UI
                 string currentType = cfg.outfitType;
                 int cost = cfg.price;
 
-                GameObject row = CreateRowObject($"Outfit_{cfg.outfitType}", yPos, cfg.displayName, subtitle, isPurchased ? 0 : cfg.price, btnLabel, font, () => {
+                GameObject row = CreateRowObject($"Outfit_{cfg.outfitType}", yPos, rowHeight, cfg.displayName, subtitle, isPurchased ? 0 : cfg.price, btnLabel, font, () => {
                     if (!isPurchased)
                     {
                         if (SaveSystem.PurchaseOutfit(charKey, currentType, cost))
@@ -282,19 +321,45 @@ namespace ZiplaKac.UI
                         PlayerController.Instance?.UpdateCharacterAppearance();
                         RefreshUI();
                     }
-                }, btnColor);
+                }, btnColor, cfg.outfitType, charKey);
 
-                // Kıyafet ikonu ekle
+                spawnedRows.Add(row);
+            }
+        }
+
+        private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null)
+        {
+            GameObject rowObj = new GameObject(name);
+            rowObj.transform.SetParent(itemsContainer, false);
+            RectTransform rt = rowObj.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 1f);
+            rt.anchorMax = new Vector2(0.5f, 1f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = new Vector2(0f, yPos);
+            rt.sizeDelta = new Vector2(760f, rowHeight);
+
+            Image bg = rowObj.AddComponent<Image>();
+            bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.10f, 0.13f, 0.24f, 0.96f),
+                new Color(1f, 1f, 1f, 0.10f),
+                1.5f, 18, 128, 128);
+            bg.type = Image.Type.Sliced;
+
+            // 1. Kıyafet İkonu (Varsa)
+            bool hasIcon = !string.IsNullOrEmpty(outfitType);
+            if (hasIcon)
+            {
                 GameObject iconObj = new GameObject("Icon");
-                iconObj.transform.SetParent(row.transform, false);
+                iconObj.transform.SetParent(rowObj.transform, false);
                 RectTransform iconRt = iconObj.AddComponent<RectTransform>();
                 iconRt.anchorMin = new Vector2(0f, 0.5f);
                 iconRt.anchorMax = new Vector2(0f, 0.5f);
-                iconRt.anchoredPosition = new Vector2(40f, 0f);
-                iconRt.sizeDelta = new Vector2(60f, 60f);
+                iconRt.pivot = new Vector2(0f, 0.5f);
+                iconRt.anchoredPosition = new Vector2(24f, 0f);
+                iconRt.sizeDelta = new Vector2(74f, 74f);
 
                 Image iconImg = iconObj.AddComponent<Image>();
-                Sprite itemSprite = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_{cfg.outfitType}");
+                Sprite itemSprite = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_{outfitType}");
                 if (itemSprite != null)
                 {
                     iconImg.sprite = itemSprite;
@@ -304,52 +369,48 @@ namespace ZiplaKac.UI
                 {
                     iconImg.color = new Color(1f, 1f, 1f, 0.2f);
                 }
-
-                spawnedRows.Add(row);
             }
-        }
 
-        private GameObject CreateRowObject(string name, float yPos, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null)
-        {
-            GameObject rowObj = new GameObject(name);
-            rowObj.transform.SetParent(itemsContainer, false);
-            RectTransform rt = rowObj.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.5f, 0.5f);
-            rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = new Vector2(0f, yPos);
-            rt.sizeDelta = new Vector2(640f, 68f);
+            // 2. Metin Alanı (Kesinlikle taşma yapmaz, sola dayalı temiz margin)
+            float textLeft = hasIcon ? 116f : 28f;
+            float textWidth = hasIcon ? 420f : 500f;
 
-            Image bg = rowObj.AddComponent<Image>();
-            bg.color = new Color(0.09f, 0.12f, 0.22f, 0.92f);
-
-            // Metin Alanı
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(rowObj.transform, false);
             RectTransform labelRt = labelObj.AddComponent<RectTransform>();
             labelRt.anchorMin = new Vector2(0f, 0.5f);
             labelRt.anchorMax = new Vector2(0f, 0.5f);
-            labelRt.anchoredPosition = new Vector2(85f, 0f);
-            labelRt.sizeDelta = new Vector2(360f, 60f);
+            labelRt.pivot = new Vector2(0f, 0.5f);
+            labelRt.anchoredPosition = new Vector2(textLeft, 0f);
+            labelRt.sizeDelta = new Vector2(textWidth, rowHeight - 16f);
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;
-            labelText.fontSize = 20;
+            labelText.fontSize = 21;
             labelText.fontStyle = FontStyle.Bold;
             labelText.alignment = TextAnchor.MiddleLeft;
+            labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            labelText.verticalOverflow = VerticalWrapMode.Truncate;
             labelText.color = Color.white;
             labelText.text = $"{title}\n<size=15><color=#a0aec0>{subtitle}</color></size>";
 
-            // Buton Alanı
+            // 3. Buton Alanı (Sağ kenara sabit 24px içeride)
             GameObject btnObj = new GameObject("ActionBtn");
             btnObj.transform.SetParent(rowObj.transform, false);
             RectTransform btnRt = btnObj.AddComponent<RectTransform>();
             btnRt.anchorMin = new Vector2(1f, 0.5f);
             btnRt.anchorMax = new Vector2(1f, 0.5f);
-            btnRt.anchoredPosition = new Vector2(-95f, 0f);
-            btnRt.sizeDelta = new Vector2(160f, 50f);
+            btnRt.pivot = new Vector2(1f, 0.5f);
+            btnRt.anchoredPosition = new Vector2(-24f, 0f);
+            btnRt.sizeDelta = new Vector2(180f, 56f);
 
             Image btnBg = btnObj.AddComponent<Image>();
-            btnBg.color = btnColor ?? new Color(1.0f, 0.82f, 0.40f);
+            Color finalBtnColor = btnColor ?? new Color(1.0f, 0.82f, 0.40f);
+            btnBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                finalBtnColor,
+                Color.clear,
+                0f, 16, 128, 64);
+            btnBg.type = Image.Type.Sliced;
 
             Button btn = btnObj.AddComponent<Button>();
             btn.onClick.AddListener(onClick);
@@ -364,10 +425,10 @@ namespace ZiplaKac.UI
 
             Text bTxt = btnTxtObj.AddComponent<Text>();
             bTxt.font = font;
-            bTxt.fontSize = 18;
+            bTxt.fontSize = 19;
             bTxt.fontStyle = FontStyle.Bold;
             bTxt.alignment = TextAnchor.MiddleCenter;
-            bTxt.color = (btnBg.color.r > 0.6f && btnBg.color.g > 0.6f) ? new Color(0.05f, 0.08f, 0.13f) : Color.white;
+            bTxt.color = (finalBtnColor.r > 0.6f && finalBtnColor.g > 0.6f) ? new Color(0.05f, 0.08f, 0.13f) : Color.white;
             bTxt.text = (price > 0 && !btnText.Contains("🪙")) ? $"{btnText} ({price}🪙)" : btnText;
 
             return rowObj;
