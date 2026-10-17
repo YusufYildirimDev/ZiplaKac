@@ -59,8 +59,17 @@ namespace ZiplaKac.UI
         public void OpenModal()
         {
             gameObject.SetActive(true);
+            transform.SetAsLastSibling();
             currentSlideIndex = 0;
             UpdateSlideDisplay();
+
+            CanvasGroup cg = GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                cg.alpha = 1f;
+                cg.interactable = true;
+                cg.blocksRaycasts = true;
+            }
 
             if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null)
             {
@@ -74,7 +83,7 @@ namespace ZiplaKac.UI
             PlayerPrefs.Save();
             gameObject.SetActive(false);
 
-            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
+            if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(true);
             }

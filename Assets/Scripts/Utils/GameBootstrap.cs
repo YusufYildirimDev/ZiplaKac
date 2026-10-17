@@ -610,6 +610,7 @@ namespace ZiplaKac.Utils
             img.raycastTarget = true;
 
             Button btn = obj.AddComponent<Button>();
+            btn.targetGraphic = img;
             ColorBlock colors = btn.colors;
             colors.normalColor = Color.white;
             colors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
@@ -618,7 +619,12 @@ namespace ZiplaKac.Utils
 
             Text labelTxt = CreateText(obj.transform, "Label", label, fontSize, Vector2.zero, textColor, false, FontStyle.Bold);
             RectTransform labelRt = labelTxt.GetComponent<RectTransform>();
-            labelRt.sizeDelta = size;
+            labelRt.sizeDelta = new Vector2(size.x - 24f, size.y);
+            labelTxt.resizeTextForBestFit = true;
+            labelTxt.resizeTextMinSize = 20;
+            labelTxt.resizeTextMaxSize = fontSize;
+            labelTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+            labelTxt.verticalOverflow = VerticalWrapMode.Truncate;
 
             return obj;
         }
@@ -747,12 +753,21 @@ namespace ZiplaKac.Utils
 
             // 📖 Nasıl Oynanır & Rehber Butonu (#4cc9f0 - Standart 540x96)
             Color cyanColor = new Color(0.30f, 0.79f, 0.94f);
-            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR? (REHBER)", new Vector2(0f, -400f), new Vector2(540f, 96f), cyanColor, darkNavy, 32);
+            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -400f), new Vector2(540f, 96f), cyanColor, darkNavy, 32);
             Button rulesBtn = rulesBtnObj.GetComponent<Button>();
             rulesBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
                 if (UI.OnboardingModalUI.Instance != null)
                 {
                     UI.OnboardingModalUI.Instance.OpenModal();
+                }
+                else
+                {
+                    var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true);
+                    if (found != null)
+                    {
+                        found.OpenModal();
+                    }
                 }
             });
 
@@ -1103,8 +1118,8 @@ namespace ZiplaKac.Utils
             modalUI.stepBadgeText = CreateText(card.transform, "StepBadge", "REHBER • ADIM 1 / 4", 24, new Vector2(0f, 660f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
             modalUI.titleText = CreateText(card.transform, "TitleText", "OYUN KURALLARI & KONTROLLER", 38, new Vector2(0f, 605f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
 
-            // Sağ Üst "✕ ATLA" Butonu
-            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ ATLA", new Vector2(370f, 660f), new Vector2(130f, 52f), new Color(0.15f, 0.20f, 0.32f, 0.85f), new Color(0.85f, 0.90f, 1f), 22);
+            // Sağ Üst "✕ KAPAT" Butonu
+            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ KAPAT", new Vector2(365f, 660f), new Vector2(140f, 52f), new Color(0.15f, 0.20f, 0.32f, 0.85f), new Color(0.85f, 0.90f, 1f), 22);
             modalUI.closeButton = skipBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
