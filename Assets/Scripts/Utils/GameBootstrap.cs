@@ -915,8 +915,8 @@ namespace ZiplaKac.Utils
 
             UI.WardrobeModalUI modalUI = modal.AddComponent<UI.WardrobeModalUI>();
 
-            // Modal Card (860x1360) - Geniş, ekrana sığan modern kart
-            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(860f, 1360f));
+            // Modal Card (940x1520) - Geniş, ferah ve büyük ekran kartı
+            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(940f, 1520f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             Image cardImg = card.GetComponent<Image>();
             cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -924,26 +924,26 @@ namespace ZiplaKac.Utils
                 new Color(1f, 1f, 1f, 0.15f),
                 2f, 28, 128, 128);
 
-            // Başlık (Üstte)
-            modalUI.titleText = CreateText(card.transform, "Title", "⚡ GÜÇLER & YÜKSELTMELER", 34, new Vector2(0f, 580f), new Color(0.61f, 0.36f, 0.90f), false, FontStyle.Bold);
+            // Başlık (Üstte - Büyük ve Belirgin)
+            modalUI.titleText = CreateText(card.transform, "Title", "⚡ GÜÇLER & YÜKSELTMELER", 42, new Vector2(0f, 660f), new Color(0.65f, 0.40f, 0.95f), false, FontStyle.Bold);
 
-            // Toplam Altın Göstergesi
-            modalUI.totalGoldText = CreateText(card.transform, "TotalGold", "🪙 Toplam Altın: 150", 26, new Vector2(0f, 525f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            // Toplam Altın Göstergesi (Büyük)
+            modalUI.totalGoldText = CreateText(card.transform, "TotalGold", "🪙 Toplam Altın: 150", 32, new Vector2(0f, 600f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
 
             // Durum / Hata Mesajı
-            modalUI.statusMessageText = CreateText(card.transform, "StatusMsg", "", 18, new Vector2(0f, 480f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            modalUI.statusMessageText = CreateText(card.transform, "StatusMsg", "", 22, new Vector2(0f, 550f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
 
-            // Sekmeler Çubuğu (Tabs Bar)
+            // Sekmeler Çubuğu (Tabs Bar - Genişletilmiş ve Büyük Butonlar)
             Color tabActive = new Color(0.61f, 0.36f, 0.90f);
             Color tabInactive = new Color(0.12f, 0.15f, 0.28f, 0.9f);
 
-            GameObject tabUpgradesObj = CreatePillButton(card.transform, "TabUpgradesBtn", "⚡ YÜKSELTMELER", new Vector2(-195f, 420f), new Vector2(370f, 58f), tabActive, Color.white, 22);
+            GameObject tabUpgradesObj = CreatePillButton(card.transform, "TabUpgradesBtn", "⚡ YÜKSELTMELER", new Vector2(-220f, 475f), new Vector2(420f, 74f), tabActive, Color.white, 26);
             modalUI.tabUpgradesButton = tabUpgradesObj.GetComponent<Button>();
             modalUI.tabUpgradesBg = tabUpgradesObj.GetComponent<Image>();
             modalUI.tabUpgradesText = tabUpgradesObj.GetComponentInChildren<Text>();
             modalUI.tabUpgradesButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.Upgrades));
 
-            GameObject tabOutfitsObj = CreatePillButton(card.transform, "TabOutfitsBtn", "👔 GARDIROP", new Vector2(195f, 420f), new Vector2(370f, 58f), tabInactive, new Color(0.7f, 0.8f, 0.9f), 22);
+            GameObject tabOutfitsObj = CreatePillButton(card.transform, "TabOutfitsBtn", "👔 GARDIROP", new Vector2(220f, 475f), new Vector2(420f, 74f), tabInactive, new Color(0.7f, 0.8f, 0.9f), 26);
             modalUI.tabOutfitsButton = tabOutfitsObj.GetComponent<Button>();
             modalUI.tabOutfitsBg = tabOutfitsObj.GetComponent<Image>();
             modalUI.tabOutfitsText = tabOutfitsObj.GetComponentInChildren<Text>();
@@ -954,7 +954,7 @@ namespace ZiplaKac.Utils
             scrollViewObj.transform.SetParent(card.transform, false);
             RectTransform scrollRt = scrollViewObj.AddComponent<RectTransform>();
             scrollRt.anchoredPosition = new Vector2(0f, -40f);
-            scrollRt.sizeDelta = new Vector2(800f, 780f);
+            scrollRt.sizeDelta = new Vector2(890f, 920f);
 
             Image scrollBg = scrollViewObj.AddComponent<Image>();
             scrollBg.color = Color.clear;
@@ -967,7 +967,7 @@ namespace ZiplaKac.Utils
             scrollRect.vertical = true;
             scrollRect.movementType = ScrollRect.MovementType.Elastic;
             scrollRect.elasticity = 0.1f;
-            scrollRect.scrollSensitivity = 30f;
+            scrollRect.scrollSensitivity = 35f;
 
             GameObject contentObj = new GameObject("Content");
             contentObj.transform.SetParent(scrollViewObj.transform, false);
@@ -976,7 +976,7 @@ namespace ZiplaKac.Utils
             contentRt.anchorMax = new Vector2(0.5f, 1f);
             contentRt.pivot = new Vector2(0.5f, 1f);
             contentRt.anchoredPosition = Vector2.zero;
-            contentRt.sizeDelta = new Vector2(800f, 800f);
+            contentRt.sizeDelta = new Vector2(890f, 920f);
 
             scrollRect.content = contentRt;
             scrollRect.viewport = scrollRt;
@@ -984,8 +984,8 @@ namespace ZiplaKac.Utils
             modalUI.itemsContainer = contentRt;
             modalUI.itemsScrollRect = scrollRect;
 
-            // Kapat Butonu (En altta güvenli mesafede sabit)
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -590f), new Vector2(340f, 72f), new Color(0.15f, 0.20f, 0.35f, 0.95f), Color.white, 24);
+            // Kapat Butonu (En altta güvenli mesafede büyük buton)
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -675f), new Vector2(400f, 84f), new Color(0.15f, 0.20f, 0.35f, 0.95f), Color.white, 30);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 

@@ -183,9 +183,9 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 92f;
-            float spacing = 12f;
-            float topPadding = 12f;
+            float rowHeight = 132f;
+            float spacing = 16f;
+            float topPadding = 16f;
             int totalItems = consumableConfigs.Count + upgradeConfigs.Count;
             float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
 
@@ -208,6 +208,12 @@ namespace ZiplaKac.UI
                 int count = SaveSystem.GetConsumableCount(cfg.id);
                 string subtitle = $"{cfg.description} · <color=#06d6a0>Envanter: {count}</color>";
 
+                string emoji = "⚡";
+                if (cfg.id == "shield") emoji = "🛡️";
+                else if (cfg.id == "slow_start") emoji = "🐢";
+                else if (cfg.id == "lucky_pu") emoji = "🍀";
+                else if (cfg.id == "second_chance") emoji = "🎟️";
+
                 GameObject row = CreateRowObject($"Consumable_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, cfg.price, "AL", font, () => {
                     if (SaveSystem.PurchaseConsumable(cfg.id, cfg.price))
                     {
@@ -221,7 +227,7 @@ namespace ZiplaKac.UI
                         AudioManager.Instance?.PlayGameOverSound();
                         ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
                     }
-                });
+                }, null, null, null, emoji);
                 spawnedRows.Add(row);
             }
 
@@ -242,6 +248,12 @@ namespace ZiplaKac.UI
                 string btnLabel = isMax ? "MAX" : (cfg.maxLevel > 1 ? "YÜKSELT" : "AÇ");
                 Color btnColor = isMax ? new Color(0.3f, 0.35f, 0.45f) : new Color(0.024f, 0.839f, 0.627f);
 
+                string emoji = "⭐";
+                if (cfg.id == "pu_duration") emoji = "⏳";
+                else if (cfg.id == "double_jump") emoji = "🦘";
+                else if (cfg.id == "combo_memory") emoji = "🧠";
+                else if (cfg.id == "signature") emoji = "⚡";
+
                 GameObject row = CreateRowObject($"Upgrade_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, isMax ? 0 : cfg.price, btnLabel, font, () => {
                     if (isMax) return;
                     if (SaveSystem.PurchaseUpgrade(charKey, cfg.id, cfg.price, cfg.maxLevel))
@@ -256,7 +268,7 @@ namespace ZiplaKac.UI
                         AudioManager.Instance?.PlayGameOverSound();
                         ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
                     }
-                }, btnColor);
+                }, btnColor, null, null, emoji);
                 spawnedRows.Add(row);
             }
         }
@@ -267,9 +279,9 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 114f;
-            float spacing = 16f;
-            float topPadding = 16f;
+            float rowHeight = 146f;
+            float spacing = 18f;
+            float topPadding = 18f;
             int totalItems = outfitConfigs.Count;
             float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
 
@@ -327,7 +339,7 @@ namespace ZiplaKac.UI
             }
         }
 
-        private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null)
+        private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null, string iconEmoji = null)
         {
             GameObject rowObj = new GameObject(name);
             rowObj.transform.SetParent(itemsContainer, false);
@@ -336,18 +348,21 @@ namespace ZiplaKac.UI
             rt.anchorMax = new Vector2(0.5f, 1f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = new Vector2(0f, yPos);
-            rt.sizeDelta = new Vector2(760f, rowHeight);
+            rt.sizeDelta = new Vector2(850f, rowHeight);
 
             Image bg = rowObj.AddComponent<Image>();
             bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 new Color(0.10f, 0.13f, 0.24f, 0.96f),
-                new Color(1f, 1f, 1f, 0.10f),
-                1.5f, 18, 128, 128);
+                new Color(1f, 1f, 1f, 0.12f),
+                1.5f, 22, 128, 128);
             bg.type = Image.Type.Sliced;
 
-            // 1. Kıyafet İkonu (Varsa)
-            bool hasIcon = !string.IsNullOrEmpty(outfitType);
-            if (hasIcon)
+            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme Rozeti
+            bool hasOutfit = !string.IsNullOrEmpty(outfitType);
+            bool hasEmoji = !string.IsNullOrEmpty(iconEmoji);
+            bool hasVisual = hasOutfit || hasEmoji;
+
+            if (hasOutfit)
             {
                 GameObject iconObj = new GameObject("Icon");
                 iconObj.transform.SetParent(rowObj.transform, false);
@@ -355,8 +370,8 @@ namespace ZiplaKac.UI
                 iconRt.anchorMin = new Vector2(0f, 0.5f);
                 iconRt.anchorMax = new Vector2(0f, 0.5f);
                 iconRt.pivot = new Vector2(0f, 0.5f);
-                iconRt.anchoredPosition = new Vector2(24f, 0f);
-                iconRt.sizeDelta = new Vector2(74f, 74f);
+                iconRt.anchoredPosition = new Vector2(26f, 0f);
+                iconRt.sizeDelta = new Vector2(104f, 104f);
 
                 Image iconImg = iconObj.AddComponent<Image>();
                 Sprite itemSprite = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_{outfitType}");
@@ -367,13 +382,46 @@ namespace ZiplaKac.UI
                 }
                 else
                 {
-                    iconImg.color = new Color(1f, 1f, 1f, 0.2f);
+                    iconImg.color = new Color(1f, 1f, 1f, 0.25f);
                 }
             }
+            else if (hasEmoji)
+            {
+                // Güçlendirme / Yetenek Rozet İkonu
+                GameObject badgeObj = new GameObject("IconBadge");
+                badgeObj.transform.SetParent(rowObj.transform, false);
+                RectTransform badgeRt = badgeObj.AddComponent<RectTransform>();
+                badgeRt.anchorMin = new Vector2(0f, 0.5f);
+                badgeRt.anchorMax = new Vector2(0f, 0.5f);
+                badgeRt.pivot = new Vector2(0f, 0.5f);
+                badgeRt.anchoredPosition = new Vector2(26f, 0f);
+                badgeRt.sizeDelta = new Vector2(96f, 96f);
 
-            // 2. Metin Alanı (Kesinlikle taşma yapmaz, sola dayalı temiz margin)
-            float textLeft = hasIcon ? 116f : 28f;
-            float textWidth = hasIcon ? 420f : 500f;
+                Image badgeImg = badgeObj.AddComponent<Image>();
+                badgeImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                    new Color(0.15f, 0.19f, 0.35f, 0.85f),
+                    new Color(1f, 1f, 1f, 0.12f),
+                    1f, 20, 128, 128);
+                badgeImg.type = Image.Type.Sliced;
+
+                GameObject emojiTxtObj = new GameObject("Emoji");
+                emojiTxtObj.transform.SetParent(badgeObj.transform, false);
+                RectTransform emojiRt = emojiTxtObj.AddComponent<RectTransform>();
+                emojiRt.anchorMin = Vector2.zero;
+                emojiRt.anchorMax = Vector2.one;
+                emojiRt.offsetMin = Vector2.zero;
+                emojiRt.offsetMax = Vector2.zero;
+
+                Text emojiTxt = emojiTxtObj.AddComponent<Text>();
+                emojiTxt.font = font;
+                emojiTxt.fontSize = 46;
+                emojiTxt.alignment = TextAnchor.MiddleCenter;
+                emojiTxt.text = iconEmoji;
+            }
+
+            // 2. Metin Alanı (Daha büyük ve okunaklı)
+            float textLeft = hasVisual ? 146f : 30f;
+            float textWidth = hasVisual ? 460f : 570f;
 
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(rowObj.transform, false);
@@ -386,15 +434,15 @@ namespace ZiplaKac.UI
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;
-            labelText.fontSize = 21;
+            labelText.fontSize = 28;
             labelText.fontStyle = FontStyle.Bold;
             labelText.alignment = TextAnchor.MiddleLeft;
             labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelText.verticalOverflow = VerticalWrapMode.Truncate;
             labelText.color = Color.white;
-            labelText.text = $"{title}\n<size=15><color=#a0aec0>{subtitle}</color></size>";
+            labelText.text = $"{title}\n<size=20><color=#b8c8dc>{subtitle}</color></size>";
 
-            // 3. Buton Alanı (Sağ kenara sabit 24px içeride)
+            // 3. Buton Alanı (Genişletilmiş ve büyük)
             GameObject btnObj = new GameObject("ActionBtn");
             btnObj.transform.SetParent(rowObj.transform, false);
             RectTransform btnRt = btnObj.AddComponent<RectTransform>();
@@ -402,14 +450,14 @@ namespace ZiplaKac.UI
             btnRt.anchorMax = new Vector2(1f, 0.5f);
             btnRt.pivot = new Vector2(1f, 0.5f);
             btnRt.anchoredPosition = new Vector2(-24f, 0f);
-            btnRt.sizeDelta = new Vector2(180f, 56f);
+            btnRt.sizeDelta = new Vector2(200f, 68f);
 
             Image btnBg = btnObj.AddComponent<Image>();
             Color finalBtnColor = btnColor ?? new Color(1.0f, 0.82f, 0.40f);
             btnBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 finalBtnColor,
                 Color.clear,
-                0f, 16, 128, 64);
+                0f, 18, 128, 64);
             btnBg.type = Image.Type.Sliced;
 
             Button btn = btnObj.AddComponent<Button>();
@@ -425,7 +473,7 @@ namespace ZiplaKac.UI
 
             Text bTxt = btnTxtObj.AddComponent<Text>();
             bTxt.font = font;
-            bTxt.fontSize = 19;
+            bTxt.fontSize = 23;
             bTxt.fontStyle = FontStyle.Bold;
             bTxt.alignment = TextAnchor.MiddleCenter;
             bTxt.color = (finalBtnColor.r > 0.6f && finalBtnColor.g > 0.6f) ? new Color(0.05f, 0.08f, 0.13f) : Color.white;
