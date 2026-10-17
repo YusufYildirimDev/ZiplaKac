@@ -57,6 +57,19 @@ namespace ZiplaKac.Core
             PlayerPrefs.Save();
         }
 
+        private const string KEY_OUTFIT_ENABLED = "ZiplaKac_OutfitEnabled";
+
+        public static bool IsOutfitEnabled()
+        {
+            return PlayerPrefs.GetInt(KEY_OUTFIT_ENABLED, 1) == 1;
+        }
+
+        public static void SetOutfitEnabled(bool enabled)
+        {
+            PlayerPrefs.SetInt(KEY_OUTFIT_ENABLED, enabled ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
         public static List<int> GetLastFiveScores()
         {
             string json = PlayerPrefs.GetString(KEY_SCORE_HISTORY, "");

@@ -558,6 +558,31 @@
       imgG.src = WORLDS[wKey].grounds[sIdx];
       worldImages[wKey].grounds[sIdx] = imgG;
     }
+  var obstacleImages = {};
+  var outfitImages = {};
+  for (var k in WORLDS) {
+    var key = WORLDS[k].key;
+    obstacleImages[k] = {
+      bitki: new Image(),
+      kaya: new Image(),
+      diken: new Image(),
+      ucan: new Image()
+    };
+    obstacleImages[k].bitki.src = "Assets/Resources/Sprites/Obstacles/engel_" + key + "_bitki.png";
+    obstacleImages[k].kaya.src = "Assets/Resources/Sprites/Obstacles/engel_" + key + "_kaya.png";
+    obstacleImages[k].diken.src = "Assets/Resources/Sprites/Obstacles/engel_" + key + "_diken.png";
+    obstacleImages[k].ucan.src = "Assets/Resources/Sprites/Obstacles/engel_" + key + "_ucan.png";
+
+    outfitImages[k] = {
+      pelerin: new Image(),
+      gozluk: new Image(),
+      aksesuar: new Image(),
+      sapka: new Image()
+    };
+    outfitImages[k].pelerin.src = "Assets/Resources/Sprites/Kiyafetler/kiyafet_" + key + "_pelerin.png";
+    outfitImages[k].gozluk.src = "Assets/Resources/Sprites/Kiyafetler/kiyafet_" + key + "_gunes_gozlugu.png";
+    outfitImages[k].aksesuar.src = "Assets/Resources/Sprites/Kiyafetler/kiyafet_" + key + "_ozel_aksesuar.png";
+    outfitImages[k].sapka.src = "Assets/Resources/Sprites/Kiyafetler/kiyafet_" + key + "_parti_sapkasi.png";
   }
 
   var birdSpriteImg = new Image();
@@ -977,11 +1002,28 @@
 
   function drawObstacles() {
     var world = WORLDS[selectedCharId] || WORLDS.classic;
+    var obsImgs = obstacleImages[selectedCharId] || obstacleImages.classic;
+
     for (var i = 0; i < obstacles.length; i++) {
       var o = obstacles[i];
       var isAir = o.kind === "birdlow" || o.kind === "birdhigh";
       var bob = isAir ? Math.sin(gameTime * 6 + o.phase) * 4 : 0;
       var oy = o.y + bob;
+
+      // Tematik engel görseli varsa çiz
+      var themedImg = null;
+      if (obsImgs) {
+        if (o.kind === "cactus") themedImg = obsImgs.bitki;
+        else if (o.kind === "rock") themedImg = obsImgs.kaya;
+        else if (o.kind === "spiketall") themedImg = obsImgs.diken;
+        else if (isAir) themedImg = obsImgs.ucan;
+      }
+
+      if (themedImg && themedImg.complete && themedImg.naturalWidth > 0) {
+        ctx.drawImage(themedImg, o.x, oy, o.w, o.h);
+        continue;
+      }
+
       ctx.fillStyle = isAir ? world.obstacleAir : world.obstacle;
 
       if (o.kind === "spiketall") {
@@ -1078,6 +1120,12 @@
     var x = player.x - (w - player.w) / 2;
     var y = player.y + (player.h - h);
     var charInfo = getCharacter();
+    var oImgs = outfitImages[selectedCharId] || outfitImages.classic;
+
+    // 1. Pelerin (Cape - Karakterin Arkasında)
+    if (oImgs && oImgs.pelerin && oImgs.pelerin.complete && oImgs.pelerin.naturalWidth > 0) {
+      ctx.drawImage(oImgs.pelerin, x, y, w, h);
+    }
 
     ctx.save();
     if (player.shielded) {
@@ -1102,6 +1150,19 @@
     ctx.beginPath();
     ctx.arc(x + w * 0.82, y + h * 0.38, 2.4, 0, Math.PI * 2);
     ctx.fill();
+
+    // 2. Aksesuarlar (Gözlük, Özel Aksesuar, Parti Şapkası - Karakterin Üstünde)
+    if (oImgs) {
+      if (oImgs.gozluk && oImgs.gozluk.complete && oImgs.gozluk.naturalWidth > 0) {
+        ctx.drawImage(oImgs.gozluk, x, y, w, h);
+      }
+      if (oImgs.aksesuar && oImgs.aksesuar.complete && oImgs.aksesuar.naturalWidth > 0) {
+        ctx.drawImage(oImgs.aksesuar, x, y, w, h);
+      }
+      if (oImgs.sapka && oImgs.sapka.complete && oImgs.sapka.naturalWidth > 0) {
+        ctx.drawImage(oImgs.sapka, x, y, w, h);
+      }
+    }
   }
 
   function drawParticles(dt) {

@@ -58,11 +58,39 @@ namespace ZiplaKac.Obstacles
             if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer == null) return;
 
+            string charKey = "klasik";
             if (WorldThemeManager.Instance != null)
             {
-                var palette = WorldThemeManager.Instance.GetCurrentPalette();
-                bool isAir = poolTag.Contains("Bird");
-                spriteRenderer.color = isAir ? palette.airObstacleColor : palette.groundObstacleColor;
+                charKey = WorldThemeManager.Instance.CurrentCharacterKey;
+            }
+
+            // poolTag eşlemesi:
+            // Cactus -> bitki
+            // Rock -> kaya
+            // Spike -> diken
+            // LowBird / HighBird -> ucan
+            string kind = "kaya";
+            if (poolTag.Contains("Cactus")) kind = "bitki";
+            else if (poolTag.Contains("Rock")) kind = "kaya";
+            else if (poolTag.Contains("Spike")) kind = "diken";
+            else if (poolTag.Contains("Bird")) kind = "ucan";
+
+            string spritePath = $"Sprites/Obstacles/engel_{charKey}_{kind}";
+            Sprite themedSprite = Resources.Load<Sprite>(spritePath);
+
+            if (themedSprite != null)
+            {
+                spriteRenderer.sprite = themedSprite;
+                spriteRenderer.color = Color.white;
+            }
+            else
+            {
+                if (WorldThemeManager.Instance != null)
+                {
+                    var palette = WorldThemeManager.Instance.GetCurrentPalette();
+                    bool isAir = poolTag.Contains("Bird");
+                    spriteRenderer.color = isAir ? palette.airObstacleColor : palette.groundObstacleColor;
+                }
             }
         }
 

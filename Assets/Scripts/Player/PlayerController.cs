@@ -34,6 +34,12 @@ namespace ZiplaKac.Player
         public GameObject shieldRingObject;
         public SpriteRenderer shieldRingSpriteRenderer;
 
+        [Header("Kıyafet / Aksesuar Katmanları")]
+        public SpriteRenderer capeSpriteRenderer;
+        public SpriteRenderer glassesSpriteRenderer;
+        public SpriteRenderer accessorySpriteRenderer;
+        public SpriteRenderer hatSpriteRenderer;
+
         // Durum değişkenleri
         private Rigidbody2D rb;
         private bool isGrounded = true;
@@ -312,6 +318,106 @@ namespace ZiplaKac.Player
                 {
                     glowSpriteRenderer.gameObject.SetActive(false);
                 }
+
+                // Kıyafet ve Aksesuar Katmanlarını Güncelle
+                UpdateOutfitVisuals(characterId);
+            }
+        }
+
+        private void EnsureOutfitRenderers()
+        {
+            if (bodySpriteRenderer == null) return;
+
+            int bodyOrder = bodySpriteRenderer.sortingOrder;
+            int bodyLayer = bodySpriteRenderer.sortingLayerID;
+
+            if (capeSpriteRenderer == null)
+            {
+                capeSpriteRenderer = GetOrCreateChildRenderer("Cape", bodyLayer, bodyOrder - 1);
+            }
+            if (glassesSpriteRenderer == null)
+            {
+                glassesSpriteRenderer = GetOrCreateChildRenderer("Glasses", bodyLayer, bodyOrder + 1);
+            }
+            if (accessorySpriteRenderer == null)
+            {
+                accessorySpriteRenderer = GetOrCreateChildRenderer("Accessory", bodyLayer, bodyOrder + 2);
+            }
+            if (hatSpriteRenderer == null)
+            {
+                hatSpriteRenderer = GetOrCreateChildRenderer("Hat", bodyLayer, bodyOrder + 3);
+            }
+        }
+
+        private SpriteRenderer GetOrCreateChildRenderer(string childName, int sortingLayerID, int sortingOrder)
+        {
+            Transform child = transform.Find(childName);
+            GameObject obj;
+            if (child != null)
+            {
+                obj = child.gameObject;
+            }
+            else
+            {
+                obj = new GameObject(childName);
+                obj.transform.SetParent(transform, false);
+                obj.transform.localPosition = Vector3.zero;
+                obj.transform.localScale = Vector3.one;
+                obj.transform.localRotation = Quaternion.identity;
+            }
+
+            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            if (sr == null) sr = obj.AddComponent<SpriteRenderer>();
+
+            sr.sortingLayerID = sortingLayerID;
+            sr.sortingOrder = sortingOrder;
+            if (bodySpriteRenderer != null && bodySpriteRenderer.sharedMaterial != null)
+            {
+                sr.sharedMaterial = bodySpriteRenderer.sharedMaterial;
+            }
+            return sr;
+        }
+
+        private void UpdateOutfitVisuals(string characterId)
+        {
+            EnsureOutfitRenderers();
+            string charKey = WorldThemeManager.NormalizeCharacterKey(characterId);
+            bool outfitEnabled = SaveSystem.IsOutfitEnabled();
+
+            // 1. Pelerin (Cape)
+            if (capeSpriteRenderer != null)
+            {
+                Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_pelerin");
+                capeSpriteRenderer.sprite = sp;
+                capeSpriteRenderer.color = Color.white;
+                capeSpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+            }
+
+            // 2. Güneş Gözlüğü (Glasses)
+            if (glassesSpriteRenderer != null)
+            {
+                Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_gunes_gozlugu");
+                glassesSpriteRenderer.sprite = sp;
+                glassesSpriteRenderer.color = Color.white;
+                glassesSpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+            }
+
+            // 3. Özel Aksesuar (Accessory)
+            if (accessorySpriteRenderer != null)
+            {
+                Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_ozel_aksesuar");
+                accessorySpriteRenderer.sprite = sp;
+                accessorySpriteRenderer.color = Color.white;
+                accessorySpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
+            }
+
+            // 4. Parti Şapkası (Hat)
+            if (hatSpriteRenderer != null)
+            {
+                Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_parti_sapkasi");
+                hatSpriteRenderer.sprite = sp;
+                hatSpriteRenderer.color = Color.white;
+                hatSpriteRenderer.gameObject.SetActive(outfitEnabled && sp != null);
             }
         }
 

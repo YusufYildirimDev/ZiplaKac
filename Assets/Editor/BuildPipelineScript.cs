@@ -51,9 +51,9 @@ namespace ZiplaKac.Editor
             Debug.Log("[BuildPipelineScript] Refreshing AssetDatabase...");
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-            string[] searchFolders = new[] { "Assets/Resources/Sprites/Worlds", "Assets/Art/Sprites/Worlds" };
+            string[] searchFolders = new[] { "Assets/Resources/Sprites", "Assets/Art/Sprites" };
             string[] guids = AssetDatabase.FindAssets("t:Texture2D", searchFolders);
-            Debug.Log($"[BuildPipelineScript] Found {guids.Length} world textures.");
+            Debug.Log($"[BuildPipelineScript] Found {guids.Length} total game textures.");
 
             int reimported = 0;
             foreach (var guid in guids)
@@ -99,6 +99,16 @@ namespace ZiplaKac.Editor
                             changed = true;
                         }
                     }
+                    else
+                    {
+                        // Kiyafetler, Obstacles, Heroes: PPU 400
+                        if (Mathf.Abs(ti.spritePixelsPerUnit - 400f) > 0.01f || ti.wrapMode != TextureWrapMode.Clamp)
+                        {
+                            ti.spritePixelsPerUnit = 400f;
+                            ti.wrapMode = TextureWrapMode.Clamp;
+                            changed = true;
+                        }
+                    }
 
                     if (changed)
                     {
@@ -111,7 +121,7 @@ namespace ZiplaKac.Editor
             AssetDatabase.SaveAssets();
             Debug.Log($"[BuildPipelineScript] Processed {reimported} textures into Sprites.");
 
-            // Verify Resources.Load works
+            // Verify Resources.Load works for Worlds, Obstacles, and Kiyafetler
             string[] testKeys = new[] { "klasik", "ates", "buz", "zehir", "gece" };
             var names = new System.Collections.Generic.Dictionary<string, string[]>
             {
@@ -129,7 +139,13 @@ namespace ZiplaKac.Editor
                 string zeminPath = $"Sprites/Worlds/zemin_{k}_{names[k][0]}";
                 Sprite spZemin = Resources.Load<Sprite>(zeminPath);
 
-                Debug.Log($"[VERIFY_SPRITE] '{k}': bg={(spBg != null ? spBg.name : "NULL")} | zemin={(spZemin != null ? spZemin.name : "NULL")}");
+                string obsKaya = $"Sprites/Obstacles/engel_{k}_kaya";
+                Sprite spKaya = Resources.Load<Sprite>(obsKaya);
+
+                string kiyPelerin = $"Sprites/Kiyafetler/kiyafet_{k}_pelerin";
+                Sprite spPelerin = Resources.Load<Sprite>(kiyPelerin);
+
+                Debug.Log($"[VERIFY_SPRITE] '{k}': bg={(spBg != null ? "OK" : "NULL")} | zemin={(spZemin != null ? "OK" : "NULL")} | obs={(spKaya != null ? "OK" : "NULL")} | kiy={(spPelerin != null ? "OK" : "NULL")}");
             }
         }
     }
