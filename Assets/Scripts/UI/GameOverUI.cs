@@ -24,6 +24,10 @@ namespace ZiplaKac.UI
         [Header("Butonlar")]
         public Button reviveButton;
         public Text reviveButtonText;
+        public Image reviveButtonImage;
+        public Image reviveCoinIcon;
+        public Text revivePriceText;
+
         public Button restartButton;
         public Button mainMenuButton;
         public Button rewardedAdButton;
@@ -54,7 +58,7 @@ namespace ZiplaKac.UI
                 rewardedAdButton.interactable = true;
                 rewardedAdButton.onClick.RemoveAllListeners();
                 rewardedAdButton.onClick.AddListener(OnRewardedAdButtonClicked);
-                if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎁 REKLAM İZLE: +100 ALTIN";
+                if (rewardedAdButtonText != null) rewardedAdButtonText.text = "REKLAM İZLE: +100 ALTIN";
             }
 
             RefreshGameOverStats();
@@ -107,22 +111,14 @@ namespace ZiplaKac.UI
             int finalScore = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
             int highScore = GameManager.Instance.HighScore;
 
-            if (finalScoreText != null) finalScoreText.text = $"{finalScore}";
-            if (highScoreText != null) highScoreText.text = $"EN İYİ SKOR: {highScore}";
+            if (finalScoreText != null) finalScoreText.text = $"{finalScore:N0}";
+            if (highScoreText != null) highScoreText.text = $"🏆 En İyi Skor: {highScore:N0}";
 
             if (goldEarnedText != null)
             {
                 int runGold = GameManager.Instance.CurrentRunGold;
-                int scoreGold = GameManager.Instance.RunScoreGold;
-                int comboGold = GameManager.Instance.RunComboGold;
-                int recGold = GameManager.Instance.RunRecordGold;
                 int totalGold = SaveSystem.GetTotalGold();
-
-                string breakdown = $"+{runGold} 🪙 (Skor: +{scoreGold}, Kombo: +{comboGold}";
-                if (recGold > 0) breakdown += $", Rekor: +{recGold}";
-                breakdown += $")\n<size=28><color=#ffd166>Kasa: {totalGold} 🪙</color></size>";
-
-                goldEarnedText.text = breakdown;
+                goldEarnedText.text = $"+{runGold} ALTIN KAZANDIN   •   KASA: {totalGold} ALTIN";
             }
 
             // Yeni Rekor Rozeti Kontrolü
@@ -156,7 +152,7 @@ namespace ZiplaKac.UI
                 newCharacterUnlockedBadge.SetActive(false);
             }
 
-            // Son 5 Skor Listesi (index.html: Son skorlar: 45, 32, 28)
+            // Son 5 Skor Listesi
             List<int> history = SaveSystem.GetLastFiveScores();
             if (scoreHistoryListText != null)
             {
@@ -166,7 +162,7 @@ namespace ZiplaKac.UI
                 }
                 else
                 {
-                    scoreHistoryListText.text = "Son skorlar: " + string.Join(", ", history);
+                    scoreHistoryListText.text = "Son Skorlar: " + string.Join(" • ", history);
                 }
             }
 
@@ -176,9 +172,27 @@ namespace ZiplaKac.UI
             {
                 bool canAfford = currentGold >= 500;
                 reviveButton.interactable = canAfford;
+
+                if (reviveButtonImage != null)
+                {
+                    reviveButtonImage.color = canAfford ? new Color(0.94f, 0.28f, 0.44f, 1f) : new Color(0.32f, 0.18f, 0.24f, 0.85f);
+                }
+
                 if (reviveButtonText != null)
                 {
-                    reviveButtonText.text = canAfford ? "❤️ CAN AL & DEVAM ET (500 🪙)" : "❤️ CAN AL (500 🪙 GEREKİR)";
+                    reviveButtonText.text = canAfford ? "CAN AL & DEVAM ET" : "CAN AL";
+                    reviveButtonText.color = canAfford ? Color.white : new Color(0.75f, 0.75f, 0.75f);
+                }
+
+                if (revivePriceText != null)
+                {
+                    revivePriceText.text = canAfford ? "500" : "500 GEREKİR";
+                    revivePriceText.color = canAfford ? new Color(1f, 0.90f, 0.2f) : new Color(0.9f, 0.4f, 0.4f);
+                }
+
+                if (reviveCoinIcon != null)
+                {
+                    reviveCoinIcon.gameObject.SetActive(true);
                 }
             }
         }
