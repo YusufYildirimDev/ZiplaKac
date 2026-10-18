@@ -966,18 +966,18 @@ namespace ZiplaKac.Utils
             goUI.newRecordBadge = recBadge;
             goUI.newRecordBadge.SetActive(false);
 
-            // 4. Altın & Kasa Bilgi Şeridi (İçerik Tam Ortada!)
+            // 4. Altın & Kasa Bilgi Şeridi (Büyük ve Belirgin!)
             GameObject earnBanner = new GameObject("EarningsBanner");
             earnBanner.transform.SetParent(card.transform, false);
             RectTransform ebRt = earnBanner.AddComponent<RectTransform>();
             ebRt.anchoredPosition = new Vector2(0f, 100f);
-            ebRt.sizeDelta = new Vector2(780f, 54f);
+            ebRt.sizeDelta = new Vector2(780f, 66f);
 
             Image ebBg = earnBanner.AddComponent<Image>();
             ebBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.11f, 0.20f, 0.85f),
-                new Color(0.20f, 0.27f, 0.38f, 0.50f),
-                1f, 16, 128, 64
+                new Color(0.08f, 0.11f, 0.20f, 0.90f),
+                new Color(0.96f, 0.70f, 0.18f, 0.40f),
+                1.5f, 18, 128, 64
             );
             ebBg.type = Image.Type.Sliced;
             ebBg.raycastTarget = false;
@@ -990,7 +990,7 @@ namespace ZiplaKac.Utils
 
             HorizontalLayoutGroup ebHlg = ebContent.AddComponent<HorizontalLayoutGroup>();
             ebHlg.childAlignment = TextAnchor.MiddleCenter;
-            ebHlg.spacing = 10f;
+            ebHlg.spacing = 12f;
             ebHlg.childControlWidth = true;
             ebHlg.childControlHeight = false;
             ebHlg.childForceExpandWidth = false;
@@ -999,12 +999,12 @@ namespace ZiplaKac.Utils
             GameObject ebCoin = new GameObject("CoinIcon");
             ebCoin.transform.SetParent(ebContent.transform, false);
             RectTransform ebCoinRt = ebCoin.AddComponent<RectTransform>();
-            ebCoinRt.sizeDelta = new Vector2(26f, 26f);
+            ebCoinRt.sizeDelta = new Vector2(32f, 32f);
             LayoutElement coinLe = ebCoin.AddComponent<LayoutElement>();
-            coinLe.preferredWidth = 26f;
-            coinLe.preferredHeight = 26f;
-            coinLe.minWidth = 26f;
-            coinLe.minHeight = 26f;
+            coinLe.preferredWidth = 32f;
+            coinLe.preferredHeight = 32f;
+            coinLe.minWidth = 32f;
+            coinLe.minHeight = 32f;
             coinLe.flexibleWidth = 0f;
 
             Image ebCoinImg = ebCoin.AddComponent<Image>();
@@ -1016,14 +1016,19 @@ namespace ZiplaKac.Utils
             ebTextObj.transform.SetParent(ebContent.transform, false);
             goUI.goldEarnedText = ebTextObj.AddComponent<Text>();
             goUI.goldEarnedText.font = GetSafeDefaultFont();
-            goUI.goldEarnedText.fontSize = 22;
+            goUI.goldEarnedText.fontSize = 24;
             goUI.goldEarnedText.fontStyle = FontStyle.Bold;
-            goUI.goldEarnedText.color = new Color(0.85f, 0.89f, 0.95f);
-            goUI.goldEarnedText.text = "+0 Altın Kazanıldı   •   Toplam Kasa: 0 Altın";
+            goUI.goldEarnedText.color = Color.white;
+            goUI.goldEarnedText.supportRichText = true;
+            goUI.goldEarnedText.text = "<size=32><color=#ffd166><b>+0</b></color></size> <color=#ffffff>ALTIN KAZANDIN</color>    <color=#64748b>•</color>    <color=#94a3b8>KASA:</color> <size=32><color=#ffd166><b>0</b></color></size> <color=#ffd166>ALTIN</color>";
             goUI.goldEarnedText.alignment = TextAnchor.MiddleLeft;
             goUI.goldEarnedText.horizontalOverflow = HorizontalWrapMode.Overflow;
             goUI.goldEarnedText.verticalOverflow = VerticalWrapMode.Overflow;
             goUI.goldEarnedText.raycastTarget = false;
+
+            Shadow txtShadow = ebTextObj.AddComponent<Shadow>();
+            txtShadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            txtShadow.effectDistance = new Vector2(2f, -2f);
 
             // 5. Son 5 Skor Listesi
             goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 50f), new Color(0.40f, 0.46f, 0.56f), false);

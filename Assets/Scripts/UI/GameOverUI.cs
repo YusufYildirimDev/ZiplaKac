@@ -133,7 +133,8 @@ namespace ZiplaKac.UI
             {
                 int runGold = GameManager.Instance.CurrentRunGold;
                 int totalGold = SaveSystem.GetTotalGold();
-                goldEarnedText.text = $"+{runGold} ALTIN KAZANDIN   •   KASA: {totalGold} ALTIN";
+                goldEarnedText.supportRichText = true;
+                goldEarnedText.text = $"<size=32><color=#ffd166><b>+{runGold}</b></color></size> <color=#ffffff>ALTIN KAZANDIN</color>    <color=#64748b>•</color>    <color=#94a3b8>KASA:</color> <size=32><color=#ffd166><b>{totalGold:N0}</b></color></size> <color=#ffd166>ALTIN</color>";
                 if (goldEarnedText.transform.parent != null)
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(goldEarnedText.transform.parent.GetComponent<RectTransform>());
