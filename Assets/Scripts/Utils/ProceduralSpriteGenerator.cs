@@ -948,6 +948,54 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
+        public static Sprite CreateTitleAccentSprite(bool isLeft, int w = 48, int h = 36)
+        {
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Color col = new Color(0.98f, 0.80f, 0.22f, 1f);
+
+            Vector2 topA = isLeft ? new Vector2(14f, 25f) : new Vector2(12f, 25f);
+            Vector2 topB = isLeft ? new Vector2(36f, 25f) : new Vector2(34f, 25f);
+            Vector2 botA = isLeft ? new Vector2(10f, 11f) : new Vector2(16f, 11f);
+            Vector2 botB = isLeft ? new Vector2(32f, 11f) : new Vector2(38f, 11f);
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d1 = DistToSegment(pt, topA, topB);
+                    float d2 = DistToSegment(pt, botA, botB);
+                    float d = Mathf.Min(d1, d2);
+
+                    if (d <= 3.2f)
+                    {
+                        tex.SetPixel(x, y, col);
+                    }
+                    else if (d <= 4.2f)
+                    {
+                        float alpha = (1f - (d - 3.2f)) * col.a;
+                        tex.SetPixel(x, y, new Color(col.r, col.g, col.b, alpha));
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        private static float DistToSegment(Vector2 p, Vector2 a, Vector2 b)
+        {
+            Vector2 ab = b - a;
+            Vector2 ap = p - a;
+            float l2 = ab.sqrMagnitude;
+            if (l2 < 0.0001f) return Vector2.Distance(p, a);
+            float t = Mathf.Clamp01(Vector2.Dot(ap, ab) / l2);
+            Vector2 proj = a + t * ab;
+            return Vector2.Distance(p, proj);
+        }
+
         #region Helper Matematik Fonksiyonları
         private static void ClearTexture(Texture2D tex)
         {
