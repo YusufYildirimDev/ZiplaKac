@@ -1029,7 +1029,7 @@ namespace ZiplaKac.Utils
             ebTxtRt.sizeDelta = new Vector2(900f, 60f);
             goUI.goldEarnedText = ebTextObj.AddComponent<Text>();
             goUI.goldEarnedText.font = GetSafeDefaultFont();
-            goUI.goldEarnedText.fontSize = 40;
+            goUI.goldEarnedText.fontSize = 35;
             goUI.goldEarnedText.fontStyle = FontStyle.Bold;
             goUI.goldEarnedText.color = Color.white;
             goUI.goldEarnedText.supportRichText = true;
@@ -1156,7 +1156,7 @@ namespace ZiplaKac.Utils
             videoRt.anchorMax = new Vector2(0f, 0.5f);
             videoRt.pivot = new Vector2(0f, 0.5f);
             videoRt.anchoredPosition = new Vector2(0f, 0f);
-            videoRt.sizeDelta = new Vector2(40f, 30f);
+            videoRt.sizeDelta = new Vector2(52f, 39f);
             Image videoImg = videoIconObj.AddComponent<Image>();
             videoImg.sprite = ProceduralSpriteGenerator.CreateVideoIconSprite(64);
             videoImg.preserveAspect = true;
@@ -1168,7 +1168,7 @@ namespace ZiplaKac.Utils
             adTxtRt.anchorMin = new Vector2(0f, 0.5f);
             adTxtRt.anchorMax = new Vector2(0f, 0.5f);
             adTxtRt.pivot = new Vector2(0f, 0.5f);
-            adTxtRt.anchoredPosition = new Vector2(52f, 0f);
+            adTxtRt.anchoredPosition = new Vector2(66f, 0f);
             adTxtRt.sizeDelta = new Vector2(280f, 48f);
 
             Text adText = adTxtObj.AddComponent<Text>();
@@ -1231,7 +1231,7 @@ namespace ZiplaKac.Utils
             heartRt.anchorMax = new Vector2(0f, 0.5f);
             heartRt.pivot = new Vector2(0f, 0.5f);
             heartRt.anchoredPosition = new Vector2(0f, 0f);
-            heartRt.sizeDelta = new Vector2(36f, 36f);
+            heartRt.sizeDelta = new Vector2(50f, 50f);
             Image heartImg = heartIconObj.AddComponent<Image>();
             heartImg.sprite = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
             heartImg.preserveAspect = true;
@@ -1244,7 +1244,7 @@ namespace ZiplaKac.Utils
             revTxtRt.anchorMin = new Vector2(0f, 0.5f);
             revTxtRt.anchorMax = new Vector2(0f, 0.5f);
             revTxtRt.pivot = new Vector2(0f, 0.5f);
-            revTxtRt.anchoredPosition = new Vector2(48f, 0f);
+            revTxtRt.anchoredPosition = new Vector2(62f, 0f);
             revTxtRt.sizeDelta = new Vector2(240f, 70f);
 
             Text revText = revTxtObj.AddComponent<Text>();
@@ -1297,7 +1297,7 @@ namespace ZiplaKac.Utils
             homeRt.anchorMax = new Vector2(0f, 0.5f);
             homeRt.pivot = new Vector2(0f, 0.5f);
             homeRt.anchoredPosition = new Vector2(0f, 0f);
-            homeRt.sizeDelta = new Vector2(34f, 34f);
+            homeRt.sizeDelta = new Vector2(48f, 48f);
             Image homeImg = homeIconObj.AddComponent<Image>();
             homeImg.sprite = ProceduralSpriteGenerator.CreateHomeIconSprite(64);
             homeImg.preserveAspect = true;
@@ -1309,7 +1309,7 @@ namespace ZiplaKac.Utils
             menuTxtRt.anchorMin = new Vector2(0f, 0.5f);
             menuTxtRt.anchorMax = new Vector2(0f, 0.5f);
             menuTxtRt.pivot = new Vector2(0f, 0.5f);
-            menuTxtRt.anchoredPosition = new Vector2(48f, 0f);
+            menuTxtRt.anchoredPosition = new Vector2(62f, 0f);
             menuTxtRt.sizeDelta = new Vector2(280f, 55f);
 
             Text menuText = menuTxtObj.AddComponent<Text>();
