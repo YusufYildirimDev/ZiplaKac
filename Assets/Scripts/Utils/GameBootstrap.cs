@@ -724,19 +724,17 @@ namespace ZiplaKac.Utils
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 1. "BAŞLA" Butonu (Hero Action - Şık Safir Mavi #2563eb - Standart 540x86)
+            // 1. "BAŞLA" Butonu (Hero Action - Şık Safir Mavi #2563eb - Standart 540x86, Çerçevesiz)
             Color primaryBlue = new Color(0.14f, 0.40f, 0.90f);
-            Color primaryBorder = new Color(0.35f, 0.60f, 1.0f, 0.75f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -60f), new Vector2(540f, 86f), primaryBlue, Color.white, 32, primaryBorder, 1.5f);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -60f), new Vector2(540f, 86f), primaryBlue, Color.white, 32);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // 2. 🛒 Mağaza & Gardırop Butonu (Şık Ametist / Asil Mor #6d28d9 - Standart 540x86)
+            // 2. 🛒 Mağaza & Gardırop Butonu (Şık Ametist / Asil Mor #6d28d9 - Standart 540x86, Çerçevesiz)
             Color purpleBg = new Color(0.42f, 0.22f, 0.78f);
-            Color purpleBorder = new Color(0.65f, 0.45f, 0.95f, 0.75f);
-            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -165f), new Vector2(540f, 86f), purpleBg, Color.white, 30, purpleBorder, 1.5f);
+            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -165f), new Vector2(540f, 86f), purpleBg, Color.white, 30);
             Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
             wardrobeBtn.onClick.AddListener(() => {
                 if (UI.WardrobeModalUI.Instance != null)
@@ -745,10 +743,9 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // 3. 🎁 Günlük Ödül Sandığı Butonu (Sıcak Kehribar / Hazine Altını #d97706 - Standart 540x86)
+            // 3. 🎁 Günlük Ödül Sandığı Butonu (Sıcak Kehribar / Hazine Altını #d97706 - Standart 540x86, Çerçevesiz)
             Color goldBg = new Color(0.85f, 0.52f, 0.08f);
-            Color goldBorder = new Color(1.0f, 0.78f, 0.25f, 0.80f);
-            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -270f), new Vector2(540f, 86f), goldBg, Color.white, 30, goldBorder, 1.5f);
+            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -270f), new Vector2(540f, 86f), goldBg, Color.white, 30);
             Button rewardBtn = rewardBtnObj.GetComponent<Button>();
             rewardBtn.onClick.AddListener(() => {
                 if (DailyRewardModalUI.Instance != null)
@@ -757,10 +754,9 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // 4. 📖 Nasıl Oynanır & Rehber Butonu (Derin Okyanus / Çelik Camgöbeği #0284c7 - Standart 540x86)
+            // 4. 📖 Nasıl Oynanır & Rehber Butonu (Derin Okyanus / Çelik Camgöbeği #0284c7 - Standart 540x86, Çerçevesiz)
             Color tealBg = new Color(0.08f, 0.50f, 0.72f);
-            Color tealBorder = new Color(0.25f, 0.72f, 0.95f, 0.75f);
-            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -375f), new Vector2(540f, 86f), tealBg, Color.white, 30, tealBorder, 1.5f);
+            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -375f), new Vector2(540f, 86f), tealBg, Color.white, 30);
             Button rulesBtn = rulesBtnObj.GetComponent<Button>();
             rulesBtn.onClick.AddListener(() => {
                 Debug.Log("[RulesButton] Clicked! Opening onboarding modal...");

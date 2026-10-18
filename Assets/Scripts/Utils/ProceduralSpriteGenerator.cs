@@ -313,20 +313,35 @@ namespace ZiplaKac.Utils
                     Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
                     float d = SignedDistanceRoundedRect(pt, min, max, cornerRadius);
 
-                    if (d <= -borderWidth)
+                    if (borderWidth <= 0f || borderColor.a <= 0f)
                     {
-                        tex.SetPixel(x, y, fillColor);
+                        if (d <= 0f)
+                        {
+                            tex.SetPixel(x, y, fillColor);
+                        }
+                        else if (d <= 1.0f)
+                        {
+                            float alpha = (1.0f - d) * fillColor.a;
+                            tex.SetPixel(x, y, new Color(fillColor.r, fillColor.g, fillColor.b, alpha));
+                        }
                     }
-                    else if (d <= 0f)
+                    else
                     {
-                        float t = (d + borderWidth) / Mathf.Max(0.1f, borderWidth);
-                        Color c = Color.Lerp(fillColor, borderColor, t);
-                        tex.SetPixel(x, y, c);
-                    }
-                    else if (d <= 1.0f)
-                    {
-                        float alpha = (1.0f - d) * borderColor.a;
-                        tex.SetPixel(x, y, new Color(borderColor.r, borderColor.g, borderColor.b, alpha));
+                        if (d <= -borderWidth)
+                        {
+                            tex.SetPixel(x, y, fillColor);
+                        }
+                        else if (d <= 0f)
+                        {
+                            float t = (d + borderWidth) / Mathf.Max(0.1f, borderWidth);
+                            Color c = Color.Lerp(fillColor, borderColor, t);
+                            tex.SetPixel(x, y, c);
+                        }
+                        else if (d <= 1.0f)
+                        {
+                            float alpha = (1.0f - d) * borderColor.a;
+                            tex.SetPixel(x, y, new Color(borderColor.r, borderColor.g, borderColor.b, alpha));
+                        }
                     }
                 }
             }
