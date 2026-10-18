@@ -799,6 +799,155 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
+        public static Sprite CreatePlayIconSprite(int resolution = 64)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            float cx = resolution * 0.48f;
+            float cy = resolution * 0.50f;
+            float size = resolution * 0.32f;
+
+            Vector2 p1 = new Vector2(cx - size * 0.65f, cy + size);
+            Vector2 p2 = new Vector2(cx - size * 0.65f, cy - size);
+            Vector2 p3 = new Vector2(cx + size * 0.85f, cy);
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d1 = (pt.x - p1.x) * (p2.y - p1.y) - (pt.y - p1.y) * (p2.x - p1.x);
+                    float d2 = (pt.x - p2.x) * (p3.y - p2.y) - (pt.y - p2.y) * (p3.x - p2.x);
+                    float d3 = (pt.x - p3.x) * (p1.y - p3.y) - (pt.y - p3.y) * (p1.x - p3.x);
+
+                    if (d1 >= 0f && d2 >= 0f && d3 >= 0f)
+                    {
+                        tex.SetPixel(x, y, Color.white);
+                    }
+                    else
+                    {
+                        float minD = Mathf.Min(Mathf.Min(d1, d2), d3);
+                        if (minD >= -1.2f)
+                        {
+                            float alpha = Mathf.Clamp01(1f + minD / 1.2f);
+                            tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                        }
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        public static Sprite CreateHeartIconSprite(int resolution = 64)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Color heartCol = new Color(0.95f, 0.22f, 0.27f, 1f);
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    float u = (x + 0.5f - resolution * 0.5f) / (resolution * 0.31f);
+                    float v = (y + 0.5f - resolution * 0.52f) / (resolution * 0.31f);
+
+                    float f = (u * u + v * v - 1f);
+                    float val = f * f * f - (u * u) * (v * v * v);
+
+                    if (val <= 0f)
+                    {
+                        tex.SetPixel(x, y, heartCol);
+                    }
+                    else if (val <= 0.15f)
+                    {
+                        float alpha = Mathf.Clamp01(1f - val / 0.15f);
+                        tex.SetPixel(x, y, new Color(heartCol.r, heartCol.g, heartCol.b, alpha));
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        public static Sprite CreateVideoIconSprite(int resolution = 64)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Color iconCol = Color.white;
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    if (x >= 10 && x <= 53 && y >= 17 && y <= 46)
+                    {
+                        bool isBorder = (x <= 13 || x >= 50 || y <= 20 || y >= 43);
+                        bool isSprocket = (x >= 16 && x <= 19 || x >= 44 && x <= 47) && ((y >= 23 && y <= 27) || (y >= 36 && y <= 40));
+
+                        bool isTriangle = false;
+                        if (x >= 28 && x <= 39)
+                        {
+                            float halfH = (39 - x) * (7.5f / 11f);
+                            if (Mathf.Abs(y - 31.5f) <= halfH) isTriangle = true;
+                        }
+
+                        if (isBorder || isSprocket || isTriangle)
+                        {
+                            tex.SetPixel(x, y, iconCol);
+                        }
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        public static Sprite CreateHomeIconSprite(int resolution = 64)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            Color iconCol = Color.white;
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    bool fill = false;
+                    if (y >= 33 && y <= 49)
+                    {
+                        float halfW = (49 - y) * (18f / 16f) + 2f;
+                        if (Mathf.Abs(x - 31.5f) <= halfW) fill = true;
+                    }
+                    else if (y >= 15 && y < 33)
+                    {
+                        if (x >= 19 && x <= 44)
+                        {
+                            if (!(x >= 27 && x <= 36 && y <= 26))
+                            {
+                                fill = true;
+                            }
+                        }
+                    }
+
+                    if (fill)
+                    {
+                        tex.SetPixel(x, y, iconCol);
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
         #region Helper Matematik Fonksiyonları
         private static void ClearTexture(Texture2D tex)
         {

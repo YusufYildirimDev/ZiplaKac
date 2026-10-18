@@ -26,6 +26,7 @@ namespace ZiplaKac.UI
         public Text reviveButtonText;
         public Image reviveButtonImage;
         public Image reviveCoinIcon;
+        public Image reviveHeartIcon;
         public Text revivePriceText;
 
         public Button restartButton;
@@ -63,9 +64,6 @@ namespace ZiplaKac.UI
                 if (rewardedAdButtonText != null)
                 {
                     rewardedAdButtonText.text = "REKLAM İZLE";
-                    rewardedAdButtonText.alignment = TextAnchor.MiddleLeft;
-                    rewardedAdButtonText.rectTransform.offsetMin = new Vector2(30f, 0f);
-                    rewardedAdButtonText.rectTransform.offsetMax = new Vector2(-140f, 0f);
                 }
             }
 
@@ -84,10 +82,7 @@ namespace ZiplaKac.UI
                     if (rewardedAdBadge != null) rewardedAdBadge.SetActive(false);
                     if (rewardedAdButtonText != null)
                     {
-                        rewardedAdButtonText.text = "🎉 +100 ALTIN KAZANDIN!";
-                        rewardedAdButtonText.alignment = TextAnchor.MiddleCenter;
-                        rewardedAdButtonText.rectTransform.offsetMin = new Vector2(20f, 0f);
-                        rewardedAdButtonText.rectTransform.offsetMax = new Vector2(-20f, 0f);
+                        rewardedAdButtonText.text = "✓ +100 ALTIN";
                     }
                 },
                 () => {
@@ -127,14 +122,14 @@ namespace ZiplaKac.UI
             int highScore = GameManager.Instance.HighScore;
 
             if (finalScoreText != null) finalScoreText.text = $"{finalScore:N0}";
-            if (highScoreText != null) highScoreText.text = $"🏆 En İyi Skor: {highScore:N0}";
+            if (highScoreText != null) highScoreText.text = $"En İyi Skor: {highScore:N0}";
 
             if (goldEarnedText != null)
             {
                 int runGold = GameManager.Instance.CurrentRunGold;
                 int totalGold = SaveSystem.GetTotalGold();
                 goldEarnedText.supportRichText = true;
-                goldEarnedText.text = $"<size=32><color=#ffd166><b>+{runGold}</b></color></size> <color=#ffffff>ALTIN KAZANDIN</color>    <color=#64748b>•</color>    <color=#94a3b8>KASA:</color> <size=32><color=#ffd166><b>{totalGold:N0}</b></color></size> <color=#ffd166>ALTIN</color>";
+                goldEarnedText.text = $"+<color=#f6c445><b>{runGold}</b></color> <color=#cbd5e1><b>ALTIN KAZANDIN</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>KASA:</b></color> <color=#f6c445><b>{totalGold:N0}</b></color> <color=#cbd5e1><b>ALTIN</b></color>";
                 if (goldEarnedText.transform.parent != null)
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(goldEarnedText.transform.parent.GetComponent<RectTransform>());
@@ -193,26 +188,15 @@ namespace ZiplaKac.UI
                 bool canAfford = currentGold >= 500;
                 reviveButton.interactable = canAfford;
 
-                if (reviveButtonImage != null)
-                {
-                    reviveButtonImage.color = canAfford ? new Color(0.88f, 0.11f, 0.28f, 1f) : new Color(0.12f, 0.16f, 0.24f, 0.85f);
-                }
-
                 if (reviveButtonText != null)
                 {
-                    reviveButtonText.text = canAfford ? "CAN AL & DEVAM ET" : "CAN AL (YETERSİZ)";
-                    reviveButtonText.color = canAfford ? Color.white : new Color(0.55f, 0.60f, 0.70f);
+                    reviveButtonText.text = canAfford ? "CAN AL\nDEVAM ET" : "CAN AL\n(500 ALTIN)";
+                    reviveButtonText.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
                 }
 
-                if (revivePriceText != null)
+                if (reviveHeartIcon != null)
                 {
-                    revivePriceText.text = "500";
-                    revivePriceText.color = canAfford ? new Color(0.98f, 0.75f, 0.14f) : new Color(0.8f, 0.35f, 0.35f);
-                }
-
-                if (reviveCoinIcon != null)
-                {
-                    reviveCoinIcon.color = canAfford ? Color.white : new Color(0.55f, 0.55f, 0.55f, 0.65f);
+                    reviveHeartIcon.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
                 }
             }
         }

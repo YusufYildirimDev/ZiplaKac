@@ -907,76 +907,84 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = panel.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.78f);
+            bg.color = new Color(0f, 0f, 0f, 0.65f);
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Kompakt & Şık Obsidian Glass Kart (860x1080, Y: +40)
-            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(860f, 1080f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 40f);
+            // Ana Kart (800x900 px, #18263b - Birebir Referans Mockup)
+            GameObject card = new GameObject("GameOverCard");
+            card.transform.SetParent(panel.transform, false);
+            RectTransform cardRt = card.AddComponent<RectTransform>();
+            cardRt.sizeDelta = new Vector2(800f, 900f);
+            cardRt.anchoredPosition = new Vector2(0f, 15f);
 
-            // 1. Başlık "OYUN BİTTİ" (Şık Beyaz #f8fafc)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 48, new Vector2(0f, 450f), new Color(0.97f, 0.98f, 0.99f), false, FontStyle.Bold);
+            Color cardBg = new Color(0.094f, 0.149f, 0.231f, 0.98f);
+            Color cardBorder = new Color(0.18f, 0.28f, 0.40f, 0.55f);
+            Image cardImg = card.AddComponent<Image>();
+            cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(cardBg, cardBorder, 1.5f, 36, 128, 128);
+            cardImg.type = Image.Type.Sliced;
+            cardImg.raycastTarget = true;
 
-            // Alt Bilgi "Bir engele çarptın" (Muted Slate #94a3b8)
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 22, new Vector2(0f, 402f), new Color(0.58f, 0.64f, 0.72f), false);
+            // 1. BAŞLIK VE AKSANLAR
+            // Orta Başlık: "OYUN BİTTİ"
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 46, new Vector2(0f, 335f), Color.white, false, FontStyle.Bold);
 
-            // 2. Özel Vurgulu Skor Kutusu (Glassmorphic Score Box)
+            // Sarı Çizgisel Aksanlar (Title Decor - Sol ve Sağ)
+            Sprite accentSprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.98f, 0.80f, 0.22f), Color.clear, 0f, 4, 32, 16);
+            CreateTitleAccent(card.transform, "AccentL1", new Vector2(-170f, 345f), new Vector2(22f, 6f), -20f, accentSprite);
+            CreateTitleAccent(card.transform, "AccentL2", new Vector2(-170f, 325f), new Vector2(22f, 6f), 20f, accentSprite);
+            CreateTitleAccent(card.transform, "AccentR1", new Vector2(170f, 345f), new Vector2(22f, 6f), 20f, accentSprite);
+            CreateTitleAccent(card.transform, "AccentR2", new Vector2(170f, 325f), new Vector2(22f, 6f), -20f, accentSprite);
+
+            // Alt Yazı: "Bir engele çarptın"
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 24, new Vector2(0f, 288f), new Color(0.49f, 0.62f, 0.74f), false);
+
+            // 2. SKOR KUTUSU (Recessed Dark Blue Box: 700x195 px, #111b2b)
             GameObject scoreBox = new GameObject("ScoreBox");
             scoreBox.transform.SetParent(card.transform, false);
             RectTransform sbRt = scoreBox.AddComponent<RectTransform>();
-            sbRt.anchoredPosition = new Vector2(0f, 275f);
-            sbRt.sizeDelta = new Vector2(780f, 190f);
+            sbRt.anchoredPosition = new Vector2(0f, 155f);
+            sbRt.sizeDelta = new Vector2(700f, 195f);
 
             Image sbBg = scoreBox.AddComponent<Image>();
             sbBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.11f, 0.20f, 0.92f),
-                new Color(0.20f, 0.27f, 0.38f, 0.75f),
-                1.5f, 20, 128, 128
+                new Color(0.067f, 0.106f, 0.169f, 1f),
+                new Color(0.13f, 0.20f, 0.30f, 0.75f),
+                1.5f, 26, 128, 128
             );
             sbBg.type = Image.Type.Sliced;
             sbBg.raycastTarget = false;
 
-            // Skor Kutusu İçi - Başlık
-            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 20, new Vector2(0f, 56f), new Color(0.58f, 0.64f, 0.72f), false, FontStyle.Bold);
+            // Skor Kutusu İçi - Üst Etiket
+            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 20, new Vector2(0f, 58f), new Color(0.45f, 0.57f, 0.70f), false, FontStyle.Bold);
 
-            // Skor Kutusu İçi - Büyük Net Rakam (78pt Bold - Bembeyaz & Kırpılmaz)
-            goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 78, new Vector2(0f, 2f), Color.white, false, FontStyle.Bold);
+            // Skor Kutusu İçi - Büyük Beyaz Skor Rakamı (90pt Bold)
+            goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 90, new Vector2(0f, 2f), Color.white, false, FontStyle.Bold);
 
-            // Skor Kutusu İçi - En İyi Skor
-            goUI.highScoreText = CreateText(scoreBox.transform, "HighScoreText", "🏆 En İyi Skor: 0", 22, new Vector2(0f, -56f), new Color(0.96f, 0.62f, 0.04f), false, FontStyle.Bold);
+            // Skor Kutusu İçi - En İyi Skor (Sarı/Altın)
+            goUI.highScoreText = CreateText(scoreBox.transform, "HighScoreText", "En İyi Skor: 0", 24, new Vector2(0f, -56f), new Color(0.96f, 0.77f, 0.27f), false, FontStyle.Bold);
 
-            // 3. Yeni Rekor Rozeti
+            // Yeni Rekor Rozeti (Varsa Skor Kutusu Üstünde Görünür)
             GameObject recBadge = new GameObject("NewRecordBadge");
             recBadge.transform.SetParent(card.transform, false);
             RectTransform recRt = recBadge.AddComponent<RectTransform>();
-            recRt.anchoredPosition = new Vector2(0f, 155f);
-            recRt.sizeDelta = new Vector2(340f, 36f);
+            recRt.anchoredPosition = new Vector2(0f, 262f);
+            recRt.sizeDelta = new Vector2(280f, 32f);
             Image recBg = recBadge.AddComponent<Image>();
-            recBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.96f, 0.62f, 0.04f), Color.white, 1f, 18, 128, 64);
+            recBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.96f, 0.77f, 0.27f), Color.white, 1f, 16, 128, 64);
             recBg.type = Image.Type.Sliced;
             recBg.raycastTarget = false;
-
-            Text recTxt = CreateText(recBadge.transform, "RecText", "★ YENİ REKOR! ★", 20, Vector2.zero, new Color(0.06f, 0.09f, 0.16f), false, FontStyle.Bold);
-            recTxt.rectTransform.sizeDelta = new Vector2(340f, 36f);
+            Text recTxt = CreateText(recBadge.transform, "RecText", "★ YENİ REKOR! ★", 18, Vector2.zero, new Color(0.06f, 0.09f, 0.16f), false, FontStyle.Bold);
+            recTxt.rectTransform.sizeDelta = new Vector2(280f, 32f);
             goUI.newRecordBadge = recBadge;
             goUI.newRecordBadge.SetActive(false);
 
-            // 4. Altın & Kasa Bilgi Şeridi (Büyük ve Belirgin!)
+            // 3. ALTIN & KASA BİLGİ ŞERİDİ (700x46 px)
             GameObject earnBanner = new GameObject("EarningsBanner");
             earnBanner.transform.SetParent(card.transform, false);
             RectTransform ebRt = earnBanner.AddComponent<RectTransform>();
-            ebRt.anchoredPosition = new Vector2(0f, 100f);
-            ebRt.sizeDelta = new Vector2(780f, 66f);
-
-            Image ebBg = earnBanner.AddComponent<Image>();
-            ebBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.11f, 0.20f, 0.90f),
-                new Color(0.96f, 0.70f, 0.18f, 0.40f),
-                1.5f, 18, 128, 64
-            );
-            ebBg.type = Image.Type.Sliced;
-            ebBg.raycastTarget = false;
+            ebRt.anchoredPosition = new Vector2(0f, 25f);
+            ebRt.sizeDelta = new Vector2(700f, 46f);
 
             GameObject ebContent = new GameObject("Content");
             ebContent.transform.SetParent(earnBanner.transform, false);
@@ -987,7 +995,7 @@ namespace ZiplaKac.Utils
             HorizontalLayoutGroup ebHlg = ebContent.AddComponent<HorizontalLayoutGroup>();
             ebHlg.childAlignment = TextAnchor.MiddleCenter;
             ebHlg.spacing = 12f;
-            ebHlg.childControlWidth = true;
+            ebHlg.childControlWidth = false;
             ebHlg.childControlHeight = false;
             ebHlg.childForceExpandWidth = false;
             ebHlg.childForceExpandHeight = false;
@@ -995,14 +1003,7 @@ namespace ZiplaKac.Utils
             GameObject ebCoin = new GameObject("CoinIcon");
             ebCoin.transform.SetParent(ebContent.transform, false);
             RectTransform ebCoinRt = ebCoin.AddComponent<RectTransform>();
-            ebCoinRt.sizeDelta = new Vector2(32f, 32f);
-            LayoutElement coinLe = ebCoin.AddComponent<LayoutElement>();
-            coinLe.preferredWidth = 32f;
-            coinLe.preferredHeight = 32f;
-            coinLe.minWidth = 32f;
-            coinLe.minHeight = 32f;
-            coinLe.flexibleWidth = 0f;
-
+            ebCoinRt.sizeDelta = new Vector2(34f, 34f);
             Image ebCoinImg = ebCoin.AddComponent<Image>();
             ebCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
             ebCoinImg.preserveAspect = true;
@@ -1010,218 +1011,246 @@ namespace ZiplaKac.Utils
 
             GameObject ebTextObj = new GameObject("GoldEarnedText");
             ebTextObj.transform.SetParent(ebContent.transform, false);
+            RectTransform ebTxtRt = ebTextObj.AddComponent<RectTransform>();
+            ebTxtRt.sizeDelta = new Vector2(620f, 44f);
             goUI.goldEarnedText = ebTextObj.AddComponent<Text>();
             goUI.goldEarnedText.font = GetSafeDefaultFont();
-            goUI.goldEarnedText.fontSize = 24;
+            goUI.goldEarnedText.fontSize = 22;
             goUI.goldEarnedText.fontStyle = FontStyle.Bold;
             goUI.goldEarnedText.color = Color.white;
             goUI.goldEarnedText.supportRichText = true;
-            goUI.goldEarnedText.text = "<size=32><color=#ffd166><b>+0</b></color></size> <color=#ffffff>ALTIN KAZANDIN</color>    <color=#64748b>•</color>    <color=#94a3b8>KASA:</color> <size=32><color=#ffd166><b>0</b></color></size> <color=#ffd166>ALTIN</color>";
+            goUI.goldEarnedText.text = "+<color=#f6c445><b>0</b></color> <color=#cbd5e1><b>ALTIN KAZANDIN</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>KASA:</b></color> <color=#f6c445><b>0</b></color> <color=#cbd5e1><b>ALTIN</b></color>";
             goUI.goldEarnedText.alignment = TextAnchor.MiddleLeft;
             goUI.goldEarnedText.horizontalOverflow = HorizontalWrapMode.Overflow;
             goUI.goldEarnedText.verticalOverflow = VerticalWrapMode.Overflow;
             goUI.goldEarnedText.raycastTarget = false;
 
-            Shadow txtShadow = ebTextObj.AddComponent<Shadow>();
-            txtShadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
-            txtShadow.effectDistance = new Vector2(2f, -2f);
-
-            // 5. Son 5 Skor Listesi
-            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 50f), new Color(0.40f, 0.46f, 0.56f), false);
-
             // ==========================================
-            // BUTONLAR (Standart 540x86 px, Taşmasız Rozetler)
+            // AKSİYON BUTONLARI (3 SATIR - MOCKUP'A BİREBİR)
             // ==========================================
 
-            // 6. ❤️ CAN AL & DEVAM ET Butonu (Derin Rose-Crimson #be123c)
-            GameObject reviveBtn = new GameObject("ReviveButton");
-            reviveBtn.transform.SetParent(card.transform, false);
-            RectTransform reviveRt = reviveBtn.AddComponent<RectTransform>();
-            reviveRt.anchoredPosition = new Vector2(0f, -30f);
-            reviveRt.sizeDelta = new Vector2(540f, 86f);
+            // SATIR 1: "TEKRAR OYNA" (Safir Mavi #1e7af2, 700x92 px)
+            Color primaryBlue = new Color(0.12f, 0.48f, 0.95f);
+            GameObject restartBtn = new GameObject("RestartButton");
+            restartBtn.transform.SetParent(card.transform, false);
+            RectTransform resRt = restartBtn.AddComponent<RectTransform>();
+            resRt.anchoredPosition = new Vector2(0f, -65f);
+            resRt.sizeDelta = new Vector2(700f, 92f);
 
-            Image reviveBg = reviveBtn.AddComponent<Image>();
-            reviveBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.74f, 0.07f, 0.24f),
-                Color.clear,
-                0f, 22, 128, 64
-            );
-            reviveBg.type = Image.Type.Sliced;
-            goUI.reviveButtonImage = reviveBg;
+            Image resBg = restartBtn.AddComponent<Image>();
+            resBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(primaryBlue, Color.clear, 0f, 28, 128, 64);
+            resBg.type = Image.Type.Sliced;
 
-            Button reviveBtnComp = reviveBtn.AddComponent<Button>();
-            reviveBtnComp.targetGraphic = reviveBg;
-            goUI.reviveButton = reviveBtnComp;
+            Button resBtnComp = restartBtn.AddComponent<Button>();
+            resBtnComp.targetGraphic = resBg;
+            ColorBlock resColors = resBtnComp.colors;
+            resColors.normalColor = Color.white;
+            resColors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            resColors.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            resBtnComp.colors = resColors;
+            goUI.restartButton = resBtnComp;
 
-            // Aksiyon Yazısı (Sol tarafa sabit, taşma payı bırakılmış)
-            GameObject revTitleObj = new GameObject("Title");
-            revTitleObj.transform.SetParent(reviveBtn.transform, false);
-            RectTransform revTitleRt = revTitleObj.AddComponent<RectTransform>();
-            revTitleRt.anchorMin = Vector2.zero;
-            revTitleRt.anchorMax = Vector2.one;
-            revTitleRt.offsetMin = new Vector2(28f, 0f);
-            revTitleRt.offsetMax = new Vector2(-140f, 0f);
+            GameObject resContent = new GameObject("Content");
+            resContent.transform.SetParent(restartBtn.transform, false);
+            RectTransform rescRt = resContent.AddComponent<RectTransform>();
+            rescRt.anchorMin = Vector2.zero; rescRt.anchorMax = Vector2.one;
+            rescRt.offsetMin = Vector2.zero; rescRt.offsetMax = Vector2.zero;
 
-            Text revTitleTxt = revTitleObj.AddComponent<Text>();
-            revTitleTxt.font = GetSafeDefaultFont();
-            revTitleTxt.fontSize = 25;
-            revTitleTxt.fontStyle = FontStyle.Bold;
-            revTitleTxt.color = Color.white;
-            revTitleTxt.text = "CAN AL & DEVAM ET";
-            revTitleTxt.alignment = TextAnchor.MiddleLeft;
-            revTitleTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
-            revTitleTxt.verticalOverflow = VerticalWrapMode.Overflow;
-            revTitleTxt.raycastTarget = false;
-            goUI.reviveButtonText = revTitleTxt;
+            HorizontalLayoutGroup resHlg = resContent.AddComponent<HorizontalLayoutGroup>();
+            resHlg.childAlignment = TextAnchor.MiddleCenter;
+            resHlg.spacing = 14f;
+            resHlg.childControlWidth = false; resHlg.childControlHeight = false;
+            resHlg.childForceExpandWidth = false; resHlg.childForceExpandHeight = false;
 
-            // Sağ Taraf: Sağ kenara 16px mesafeyle kilitli rozet (Kesinlikle taşmaz!)
-            GameObject revBadgeObj = new GameObject("PriceBadge");
-            revBadgeObj.transform.SetParent(reviveBtn.transform, false);
-            RectTransform revBadgeRt = revBadgeObj.AddComponent<RectTransform>();
-            revBadgeRt.anchorMin = new Vector2(1f, 0.5f);
-            revBadgeRt.anchorMax = new Vector2(1f, 0.5f);
-            revBadgeRt.pivot = new Vector2(1f, 0.5f);
-            revBadgeRt.anchoredPosition = new Vector2(-16f, 0f);
-            revBadgeRt.sizeDelta = new Vector2(116f, 42f);
+            GameObject playIconObj = new GameObject("PlayIcon");
+            playIconObj.transform.SetParent(resContent.transform, false);
+            RectTransform playRt = playIconObj.AddComponent<RectTransform>();
+            playRt.sizeDelta = new Vector2(26f, 26f);
+            Image playImg = playIconObj.AddComponent<Image>();
+            playImg.sprite = ProceduralSpriteGenerator.CreatePlayIconSprite(64);
+            playImg.preserveAspect = true;
+            playImg.raycastTarget = false;
 
-            Image revBadgeBg = revBadgeObj.AddComponent<Image>();
-            revBadgeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0f, 0f, 0f, 0.35f), Color.clear, 0f, 14, 64, 64);
-            revBadgeBg.type = Image.Type.Sliced;
-            revBadgeBg.raycastTarget = false;
+            Text resText = CreateText(resContent.transform, "Text", "TEKRAR OYNA", 30, Vector2.zero, Color.white, false, FontStyle.Bold);
+            resText.raycastTarget = false;
 
-            // Rozet içi Altın Sikkesi (24x24)
-            GameObject revCoinObj = new GameObject("CoinIcon");
-            revCoinObj.transform.SetParent(revBadgeObj.transform, false);
-            RectTransform revCoinRt = revCoinObj.AddComponent<RectTransform>();
-            revCoinRt.anchorMin = new Vector2(0f, 0.5f);
-            revCoinRt.anchorMax = new Vector2(0f, 0.5f);
-            revCoinRt.pivot = new Vector2(0.5f, 0.5f);
-            revCoinRt.anchoredPosition = new Vector2(20f, 0f);
-            revCoinRt.sizeDelta = new Vector2(24f, 24f);
-            Image revCoinImg = revCoinObj.AddComponent<Image>();
-            revCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
-            revCoinImg.preserveAspect = true;
-            revCoinImg.raycastTarget = false;
-            goUI.reviveCoinIcon = revCoinImg;
+            // SATIR 2: İKİLİ YEŞİL KAPSÜL BUTON (Zümrüt Yeşili #10b580, 700x92 px)
+            Color emeraldGreen = new Color(0.06f, 0.71f, 0.50f);
+            GameObject dualCapsule = new GameObject("DualActionCapsule");
+            dualCapsule.transform.SetParent(card.transform, false);
+            RectTransform dcRt = dualCapsule.AddComponent<RectTransform>();
+            dcRt.anchoredPosition = new Vector2(0f, -170f);
+            dcRt.sizeDelta = new Vector2(700f, 92f);
 
-            // Rozet içi Fiyat Rakamı
-            GameObject revPriceObj = new GameObject("Price");
-            revPriceObj.transform.SetParent(revBadgeObj.transform, false);
-            RectTransform revPriceRt = revPriceObj.AddComponent<RectTransform>();
-            revPriceRt.anchorMin = Vector2.zero;
-            revPriceRt.anchorMax = Vector2.one;
-            revPriceRt.offsetMin = new Vector2(34f, 0f);
-            revPriceRt.offsetMax = new Vector2(-4f, 0f);
+            Image dcBg = dualCapsule.AddComponent<Image>();
+            dcBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(emeraldGreen, Color.clear, 0f, 28, 128, 64);
+            dcBg.type = Image.Type.Sliced;
+            dcBg.raycastTarget = false;
 
-            Text revPriceTxt = revPriceObj.AddComponent<Text>();
-            revPriceTxt.font = GetSafeDefaultFont();
-            revPriceTxt.fontSize = 22;
-            revPriceTxt.fontStyle = FontStyle.Bold;
-            revPriceTxt.color = new Color(0.98f, 0.75f, 0.14f);
-            revPriceTxt.text = "500";
-            revPriceTxt.alignment = TextAnchor.MiddleCenter;
-            revPriceTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
-            revPriceTxt.verticalOverflow = VerticalWrapMode.Overflow;
-            revPriceTxt.raycastTarget = false;
-            goUI.revivePriceText = revPriceTxt;
+            // Sol Yarı: "REKLAM İZLE" Butonu
+            GameObject adHalf = new GameObject("RewardedAdButton");
+            adHalf.transform.SetParent(dualCapsule.transform, false);
+            RectTransform adRt = adHalf.AddComponent<RectTransform>();
+            adRt.anchorMin = new Vector2(0f, 0f);
+            adRt.anchorMax = new Vector2(0.5f, 1f);
+            adRt.offsetMin = Vector2.zero;
+            adRt.offsetMax = Vector2.zero;
 
-            // 7. TEKRAR OYNA Butonu (Ana Eylem - Şık Safir/İndigo #2563eb)
-            Color primaryBlue = new Color(0.14f, 0.38f, 0.92f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -130f), new Vector2(540f, 86f), primaryBlue, Color.white, 30);
-            goUI.restartButton = restartBtn.GetComponent<Button>();
-
-            // 8. REKLAM İZLE Butonu (Koyu Slate #182033 + Altın Rozeti)
-            GameObject adBtn = new GameObject("RewardedAdButton");
-            adBtn.transform.SetParent(card.transform, false);
-            RectTransform adRt = adBtn.AddComponent<RectTransform>();
-            adRt.anchoredPosition = new Vector2(0f, -230f);
-            adRt.sizeDelta = new Vector2(540f, 86f);
-
-            Color slateBtnBg = new Color(0.10f, 0.14f, 0.24f);
-            Color slateBorder = new Color(0.24f, 0.32f, 0.46f, 0.6f);
-            Image adBg = adBtn.AddComponent<Image>();
-            adBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(slateBtnBg, slateBorder, 1.5f, 22, 128, 64);
-            adBg.type = Image.Type.Sliced;
-
-            Button adBtnComp = adBtn.AddComponent<Button>();
-            adBtnComp.targetGraphic = adBg;
+            Image adHit = adHalf.AddComponent<Image>();
+            adHit.color = Color.clear;
+            Button adBtnComp = adHalf.AddComponent<Button>();
+            adBtnComp.targetGraphic = adHit;
+            ColorBlock adColors = adBtnComp.colors;
+            adColors.normalColor = Color.white;
+            adColors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            adColors.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            adBtnComp.colors = adColors;
             goUI.rewardedAdButton = adBtnComp;
 
-            GameObject adTitleObj = new GameObject("Title");
-            adTitleObj.transform.SetParent(adBtn.transform, false);
-            RectTransform adTitleRt = adTitleObj.AddComponent<RectTransform>();
-            adTitleRt.anchorMin = Vector2.zero;
-            adTitleRt.anchorMax = Vector2.one;
-            adTitleRt.offsetMin = new Vector2(28f, 0f);
-            adTitleRt.offsetMax = new Vector2(-140f, 0f);
+            GameObject adContent = new GameObject("Content");
+            adContent.transform.SetParent(adHalf.transform, false);
+            RectTransform adcRt = adContent.AddComponent<RectTransform>();
+            adcRt.anchorMin = Vector2.zero; adcRt.anchorMax = Vector2.one;
+            adcRt.offsetMin = Vector2.zero; adcRt.offsetMax = Vector2.zero;
 
-            Text adTitleTxt = adTitleObj.AddComponent<Text>();
-            adTitleTxt.font = GetSafeDefaultFont();
-            adTitleTxt.fontSize = 25;
-            adTitleTxt.fontStyle = FontStyle.Bold;
-            adTitleTxt.color = new Color(0.95f, 0.97f, 1.0f);
-            adTitleTxt.text = "REKLAM İZLE";
-            adTitleTxt.alignment = TextAnchor.MiddleLeft;
-            adTitleTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
-            adTitleTxt.verticalOverflow = VerticalWrapMode.Overflow;
-            adTitleTxt.raycastTarget = false;
-            goUI.rewardedAdButtonText = adTitleTxt;
+            HorizontalLayoutGroup adHlg = adContent.AddComponent<HorizontalLayoutGroup>();
+            adHlg.childAlignment = TextAnchor.MiddleCenter;
+            adHlg.spacing = 12f;
+            adHlg.childControlWidth = false; adHlg.childControlHeight = false;
+            adHlg.childForceExpandWidth = false; adHlg.childForceExpandHeight = false;
 
-            // Sağ Taraf: Reklam Ödül Rozeti (+100 🪙 - Sağ kenara kilitli!)
-            GameObject adBadgeObj = new GameObject("RewardBadge");
-            adBadgeObj.transform.SetParent(adBtn.transform, false);
-            RectTransform adBadgeRt = adBadgeObj.AddComponent<RectTransform>();
-            adBadgeRt.anchorMin = new Vector2(1f, 0.5f);
-            adBadgeRt.anchorMax = new Vector2(1f, 0.5f);
-            adBadgeRt.pivot = new Vector2(1f, 0.5f);
-            adBadgeRt.anchoredPosition = new Vector2(-16f, 0f);
-            adBadgeRt.sizeDelta = new Vector2(116f, 42f);
+            GameObject videoIconObj = new GameObject("VideoIcon");
+            videoIconObj.transform.SetParent(adContent.transform, false);
+            RectTransform videoRt = videoIconObj.AddComponent<RectTransform>();
+            videoRt.sizeDelta = new Vector2(32f, 24f);
+            Image videoImg = videoIconObj.AddComponent<Image>();
+            videoImg.sprite = ProceduralSpriteGenerator.CreateVideoIconSprite(64);
+            videoImg.preserveAspect = true;
+            videoImg.raycastTarget = false;
 
-            Image adBadgeBg = adBadgeObj.AddComponent<Image>();
-            adBadgeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0f, 0f, 0f, 0.35f), Color.clear, 0f, 14, 64, 64);
-            adBadgeBg.type = Image.Type.Sliced;
-            adBadgeBg.raycastTarget = false;
-            goUI.rewardedAdBadge = adBadgeObj;
+            goUI.rewardedAdButtonText = CreateText(adContent.transform, "Text", "REKLAM İZLE", 23, Vector2.zero, Color.white, false, FontStyle.Bold);
+            goUI.rewardedAdButtonText.raycastTarget = false;
 
-            GameObject adCoinObj = new GameObject("CoinIcon");
-            adCoinObj.transform.SetParent(adBadgeObj.transform, false);
-            RectTransform adCoinRt = adCoinObj.AddComponent<RectTransform>();
-            adCoinRt.anchorMin = new Vector2(0f, 0.5f);
-            adCoinRt.anchorMax = new Vector2(0f, 0.5f);
-            adCoinRt.pivot = new Vector2(0.5f, 0.5f);
-            adCoinRt.anchoredPosition = new Vector2(20f, 0f);
-            adCoinRt.sizeDelta = new Vector2(24f, 24f);
-            Image adCoinImg = adCoinObj.AddComponent<Image>();
-            adCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
-            adCoinImg.preserveAspect = true;
-            adCoinImg.raycastTarget = false;
+            // Orta Dikey Ayırıcı Çizgi
+            GameObject dividerObj = new GameObject("Divider");
+            dividerObj.transform.SetParent(dualCapsule.transform, false);
+            RectTransform divRt = dividerObj.AddComponent<RectTransform>();
+            divRt.anchorMin = new Vector2(0.5f, 0.5f);
+            divRt.anchorMax = new Vector2(0.5f, 0.5f);
+            divRt.anchoredPosition = Vector2.zero;
+            divRt.sizeDelta = new Vector2(2f, 48f);
+            Image divImg = dividerObj.AddComponent<Image>();
+            divImg.color = new Color(1f, 1f, 1f, 0.28f);
+            divImg.raycastTarget = false;
 
-            GameObject adValObj = new GameObject("Value");
-            adValObj.transform.SetParent(adBadgeObj.transform, false);
-            RectTransform adValRt = adValObj.AddComponent<RectTransform>();
-            adValRt.anchorMin = Vector2.zero;
-            adValRt.anchorMax = Vector2.one;
-            adValRt.offsetMin = new Vector2(34f, 0f);
-            adValRt.offsetMax = new Vector2(-4f, 0f);
+            // Sağ Yarı: "CAN AL DEVAM ET" Butonu
+            GameObject reviveHalf = new GameObject("ReviveButton");
+            reviveHalf.transform.SetParent(dualCapsule.transform, false);
+            RectTransform revRt = reviveHalf.AddComponent<RectTransform>();
+            revRt.anchorMin = new Vector2(0.5f, 0f);
+            revRt.anchorMax = new Vector2(1f, 1f);
+            revRt.offsetMin = Vector2.zero;
+            revRt.offsetMax = Vector2.zero;
 
-            Text adValTxt = adValObj.AddComponent<Text>();
-            adValTxt.font = GetSafeDefaultFont();
-            adValTxt.fontSize = 22;
-            adValTxt.fontStyle = FontStyle.Bold;
-            adValTxt.color = new Color(0.98f, 0.75f, 0.14f);
-            adValTxt.text = "+100";
-            adValTxt.alignment = TextAnchor.MiddleCenter;
-            adValTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
-            adValTxt.verticalOverflow = VerticalWrapMode.Overflow;
-            adValTxt.raycastTarget = false;
+            Image revHit = reviveHalf.AddComponent<Image>();
+            revHit.color = Color.clear;
+            Button revBtnComp = reviveHalf.AddComponent<Button>();
+            revBtnComp.targetGraphic = revHit;
+            ColorBlock revColors = revBtnComp.colors;
+            revColors.normalColor = Color.white;
+            revColors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            revColors.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            revBtnComp.colors = revColors;
+            goUI.reviveButton = revBtnComp;
 
-            // 9. ANA MENÜ Butonu (Minimalist Slate #0b1120)
-            Color ghostBg = new Color(0.06f, 0.09f, 0.16f);
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -330f), new Vector2(540f, 86f), ghostBg, new Color(0.65f, 0.72f, 0.82f), 28);
-            goUI.mainMenuButton = menuBtn.GetComponent<Button>();
+            GameObject revContent = new GameObject("Content");
+            revContent.transform.SetParent(reviveHalf.transform, false);
+            RectTransform revcRt = revContent.AddComponent<RectTransform>();
+            revcRt.anchorMin = Vector2.zero; revcRt.anchorMax = Vector2.one;
+            revcRt.offsetMin = Vector2.zero; revcRt.offsetMax = Vector2.zero;
+
+            HorizontalLayoutGroup revHlg = revContent.AddComponent<HorizontalLayoutGroup>();
+            revHlg.childAlignment = TextAnchor.MiddleCenter;
+            revHlg.spacing = 10f;
+            revHlg.childControlWidth = false; revHlg.childControlHeight = false;
+            revHlg.childForceExpandWidth = false; revHlg.childForceExpandHeight = false;
+
+            GameObject heartIconObj = new GameObject("HeartIcon");
+            heartIconObj.transform.SetParent(revContent.transform, false);
+            RectTransform heartRt = heartIconObj.AddComponent<RectTransform>();
+            heartRt.sizeDelta = new Vector2(28f, 28f);
+            Image heartImg = heartIconObj.AddComponent<Image>();
+            heartImg.sprite = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
+            heartImg.preserveAspect = true;
+            heartImg.raycastTarget = false;
+            goUI.reviveHeartIcon = heartImg;
+
+            goUI.reviveButtonText = CreateText(revContent.transform, "Text", "CAN AL\nDEVAM ET", 19, Vector2.zero, Color.white, false, FontStyle.Bold);
+            goUI.reviveButtonText.lineSpacing = 0.95f;
+            goUI.reviveButtonText.raycastTarget = false;
+
+            // SATIR 3: "ANA MENÜ" (Koyu Slate #263b59, 700x88 px)
+            Color slateDark = new Color(0.15f, 0.23f, 0.35f);
+            GameObject menuBtn = new GameObject("MainMenuButton");
+            menuBtn.transform.SetParent(card.transform, false);
+            RectTransform menuRt = menuBtn.AddComponent<RectTransform>();
+            menuRt.anchoredPosition = new Vector2(0f, -275f);
+            menuRt.sizeDelta = new Vector2(700f, 88f);
+
+            Image menuBg = menuBtn.AddComponent<Image>();
+            menuBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(slateDark, Color.clear, 0f, 28, 128, 64);
+            menuBg.type = Image.Type.Sliced;
+
+            Button menuBtnComp = menuBtn.AddComponent<Button>();
+            menuBtnComp.targetGraphic = menuBg;
+            ColorBlock menuColors = menuBtnComp.colors;
+            menuColors.normalColor = Color.white;
+            menuColors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            menuColors.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            menuBtnComp.colors = menuColors;
+            goUI.mainMenuButton = menuBtnComp;
+
+            GameObject menuContent = new GameObject("Content");
+            menuContent.transform.SetParent(menuBtn.transform, false);
+            RectTransform menucRt = menuContent.AddComponent<RectTransform>();
+            menucRt.anchorMin = Vector2.zero; menucRt.anchorMax = Vector2.one;
+            menucRt.offsetMin = Vector2.zero; menucRt.offsetMax = Vector2.zero;
+
+            HorizontalLayoutGroup menuHlg = menuContent.AddComponent<HorizontalLayoutGroup>();
+            menuHlg.childAlignment = TextAnchor.MiddleCenter;
+            menuHlg.spacing = 14f;
+            menuHlg.childControlWidth = false; menuHlg.childControlHeight = false;
+            menuHlg.childForceExpandWidth = false; menuHlg.childForceExpandHeight = false;
+
+            GameObject homeIconObj = new GameObject("HomeIcon");
+            homeIconObj.transform.SetParent(menuContent.transform, false);
+            RectTransform homeRt = homeIconObj.AddComponent<RectTransform>();
+            homeRt.sizeDelta = new Vector2(26f, 26f);
+            Image homeImg = homeIconObj.AddComponent<Image>();
+            homeImg.sprite = ProceduralSpriteGenerator.CreateHomeIconSprite(64);
+            homeImg.preserveAspect = true;
+            homeImg.raycastTarget = false;
+
+            Text menuText = CreateText(menuContent.transform, "Text", "ANA MENÜ", 26, Vector2.zero, Color.white, false, FontStyle.Bold);
+            menuText.raycastTarget = false;
 
             panel.SetActive(false);
             if (UIManager.Instance != null) UIManager.Instance.gameOverPanel = panel;
+        }
+
+        private static void CreateTitleAccent(Transform parent, string name, Vector2 pos, Vector2 size, float zRot, Sprite sprite)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            RectTransform rt = obj.AddComponent<RectTransform>();
+            rt.anchoredPosition = pos;
+            rt.sizeDelta = size;
+            rt.localEulerAngles = new Vector3(0f, 0f, zRot);
+            Image img = obj.AddComponent<Image>();
+            img.sprite = sprite;
+            img.type = Image.Type.Sliced;
+            img.color = new Color(0.98f, 0.80f, 0.22f);
+            img.raycastTarget = false;
         }
 
         private void CreateDailyRewardModal(Transform parent)
