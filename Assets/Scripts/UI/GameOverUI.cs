@@ -32,6 +32,7 @@ namespace ZiplaKac.UI
         public Button mainMenuButton;
         public Button rewardedAdButton;
         public Text rewardedAdButtonText;
+        public GameObject rewardedAdBadge;
 
         private void OnEnable()
         {
@@ -58,7 +59,13 @@ namespace ZiplaKac.UI
                 rewardedAdButton.interactable = true;
                 rewardedAdButton.onClick.RemoveAllListeners();
                 rewardedAdButton.onClick.AddListener(OnRewardedAdButtonClicked);
-                if (rewardedAdButtonText != null) rewardedAdButtonText.text = "REKLAM İZLE: +100 ALTIN";
+                if (rewardedAdBadge != null) rewardedAdBadge.SetActive(true);
+                if (rewardedAdButtonText != null)
+                {
+                    rewardedAdButtonText.text = "REKLAM İZLE";
+                    rewardedAdButtonText.alignment = TextAnchor.MiddleLeft;
+                    rewardedAdButtonText.rectTransform.anchorMax = new Vector2(0.70f, 1f);
+                }
             }
 
             RefreshGameOverStats();
@@ -73,7 +80,13 @@ namespace ZiplaKac.UI
                     AudioManager.Instance?.PlayNewRecordSound();
                     AudioManager.Instance?.TriggerHapticFeedback();
                     if (rewardedAdButton != null) rewardedAdButton.interactable = false;
-                    if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎉 +100 ALTIN KAZANDIN!";
+                    if (rewardedAdBadge != null) rewardedAdBadge.SetActive(false);
+                    if (rewardedAdButtonText != null)
+                    {
+                        rewardedAdButtonText.text = "🎉 +100 ALTIN KAZANDIN!";
+                        rewardedAdButtonText.alignment = TextAnchor.MiddleCenter;
+                        rewardedAdButtonText.rectTransform.anchorMax = Vector2.one;
+                    }
                 },
                 () => {
                     Debug.Log("Reklam gösterilemedi.");
@@ -175,24 +188,24 @@ namespace ZiplaKac.UI
 
                 if (reviveButtonImage != null)
                 {
-                    reviveButtonImage.color = canAfford ? new Color(0.94f, 0.28f, 0.44f, 1f) : new Color(0.32f, 0.18f, 0.24f, 0.85f);
+                    reviveButtonImage.color = canAfford ? new Color(0.88f, 0.11f, 0.28f, 1f) : new Color(0.12f, 0.16f, 0.24f, 0.85f);
                 }
 
                 if (reviveButtonText != null)
                 {
-                    reviveButtonText.text = canAfford ? "CAN AL & DEVAM ET" : "CAN AL";
-                    reviveButtonText.color = canAfford ? Color.white : new Color(0.75f, 0.75f, 0.75f);
+                    reviveButtonText.text = canAfford ? "CAN AL & DEVAM ET" : "CAN AL (YETERSİZ)";
+                    reviveButtonText.color = canAfford ? Color.white : new Color(0.55f, 0.60f, 0.70f);
                 }
 
                 if (revivePriceText != null)
                 {
-                    revivePriceText.text = canAfford ? "500" : "500 GEREKİR";
-                    revivePriceText.color = canAfford ? new Color(1f, 0.90f, 0.2f) : new Color(0.9f, 0.4f, 0.4f);
+                    revivePriceText.text = "500";
+                    revivePriceText.color = canAfford ? new Color(0.98f, 0.75f, 0.14f) : new Color(0.8f, 0.35f, 0.35f);
                 }
 
                 if (reviveCoinIcon != null)
                 {
-                    reviveCoinIcon.gameObject.SetActive(true);
+                    reviveCoinIcon.color = canAfford ? Color.white : new Color(0.55f, 0.55f, 0.55f, 0.65f);
                 }
             }
         }
