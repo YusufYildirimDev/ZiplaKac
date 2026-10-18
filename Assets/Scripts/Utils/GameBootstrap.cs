@@ -576,7 +576,7 @@ namespace ZiplaKac.Utils
             uiMod.AssignDefaultActions();
         }
 
-        private static GameObject CreateCardContainer(Transform parent, string name, Vector2 size)
+        private static GameObject CreateCardContainer(Transform parent, string name, Vector2 size, Color? accentColor = null)
         {
             GameObject card = new GameObject(name);
             card.transform.SetParent(parent, false);
@@ -585,13 +585,29 @@ namespace ZiplaKac.Utils
             rt.anchoredPosition = Vector2.zero;
 
             Image img = card.AddComponent<Image>();
-            // #141a30 (%88 alpha) + subtle border (%14 alpha)
+            // Ultra-şık derin Midnight Obsidian gövde (#070913 %97 opaklık) + İnce Slate Kenarlık (#233250 %75 opaklık) + 32px yuvarlatılmış köşeler
             img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.10f, 0.19f, 0.88f),
-                new Color(1f, 1f, 1f, 0.14f),
-                2f, 24, 128, 128);
+                new Color(0.045f, 0.06f, 0.12f, 0.97f),
+                new Color(0.20f, 0.28f, 0.46f, 0.75f),
+                2.5f, 32, 128, 128);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
+
+            // Kart Üstü Zarif Vurgu Çizgisi (Top Header Glow / Accent Line)
+            Color accent = accentColor ?? new Color(0.24f, 0.45f, 0.85f, 0.85f);
+            GameObject accentObj = new GameObject("CardTopAccent");
+            accentObj.transform.SetParent(card.transform, false);
+            RectTransform accentRt = accentObj.AddComponent<RectTransform>();
+            accentRt.anchorMin = new Vector2(0.5f, 1f);
+            accentRt.anchorMax = new Vector2(0.5f, 1f);
+            accentRt.pivot = new Vector2(0.5f, 1f);
+            accentRt.anchoredPosition = new Vector2(0f, -4f);
+            accentRt.sizeDelta = new Vector2(size.x - 140f, 4.5f);
+
+            Image accentImg = accentObj.AddComponent<Image>();
+            accentImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(accent, Color.clear, 0f, 2, 64, 16);
+            accentImg.type = Image.Type.Sliced;
+            accentImg.raycastTarget = false;
 
             return card;
         }
@@ -703,7 +719,7 @@ namespace ZiplaKac.Utils
             bg.color = new Color(0f, 0f, 0f, 0.45f);
 
             // Centered Glassmorphic Card (920x1260, Y: +90 so player is clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f), new Color(0.20f, 0.55f, 0.95f, 0.90f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
 
             // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin, Şık Sıcak Altın)
@@ -907,73 +923,73 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = panel.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.78f);
+            bg.color = new Color(0.02f, 0.03f, 0.07f, 0.88f);
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Kompakt & Şık Obsidian Glass Kart (860x1080, Y: +40)
-            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(860f, 1080f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 40f);
+            // Ferahlatılmış & Modern Obsidian Kart (880x1220, Y: +20)
+            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(880f, 1220f), new Color(0.88f, 0.12f, 0.28f, 0.90f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 20f);
 
-            // 1. Başlık "OYUN BİTTİ" (Şık Beyaz #f8fafc)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 48, new Vector2(0f, 450f), new Color(0.97f, 0.98f, 0.99f), false, FontStyle.Bold);
+            // 1. Başlık "OYUN BİTTİ" (52pt Bold - Saf Beyaz)
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 52, new Vector2(0f, 520f), Color.white, false, FontStyle.Bold);
 
-            // Alt Bilgi "Bir engele çarptın" (Muted Slate #94a3b8)
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 22, new Vector2(0f, 402f), new Color(0.58f, 0.64f, 0.72f), false);
+            // Alt Bilgi "Bir engele çarptın" (22pt - Muted Slate)
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 22, new Vector2(0f, 470f), new Color(0.58f, 0.65f, 0.78f), false);
 
-            // 2. Özel Vurgulu Skor Kutusu (Glassmorphic Score Box)
+            // 2. Özel Vurgulu Skor Kutusu (Glassmorphic Score Box - 800x205)
             GameObject scoreBox = new GameObject("ScoreBox");
             scoreBox.transform.SetParent(card.transform, false);
             RectTransform sbRt = scoreBox.AddComponent<RectTransform>();
-            sbRt.anchoredPosition = new Vector2(0f, 275f);
-            sbRt.sizeDelta = new Vector2(780f, 190f);
+            sbRt.anchoredPosition = new Vector2(0f, 325f);
+            sbRt.sizeDelta = new Vector2(800f, 205f);
 
             Image sbBg = scoreBox.AddComponent<Image>();
             sbBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.11f, 0.20f, 0.92f),
-                new Color(0.20f, 0.27f, 0.38f, 0.75f),
-                1.5f, 20, 128, 128
+                new Color(0.08f, 0.11f, 0.20f, 0.95f),
+                new Color(0.24f, 0.34f, 0.54f, 0.85f),
+                2.0f, 24, 128, 128
             );
             sbBg.type = Image.Type.Sliced;
             sbBg.raycastTarget = false;
 
             // Skor Kutusu İçi - Başlık
-            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 20, new Vector2(0f, 56f), new Color(0.58f, 0.64f, 0.72f), false, FontStyle.Bold);
+            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 22, new Vector2(0f, 62f), new Color(0.60f, 0.70f, 0.85f), false, FontStyle.Bold);
 
-            // Skor Kutusu İçi - Büyük Net Rakam (78pt Bold - Bembeyaz & Kırpılmaz)
-            goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 78, new Vector2(0f, 2f), Color.white, false, FontStyle.Bold);
+            // Skor Kutusu İçi - Büyük Net Rakam (84pt Bold - Bembeyaz & Kırpılmaz)
+            goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 84, new Vector2(0f, 2f), Color.white, false, FontStyle.Bold);
 
-            // Skor Kutusu İçi - En İyi Skor
-            goUI.highScoreText = CreateText(scoreBox.transform, "HighScoreText", "🏆 En İyi Skor: 0", 22, new Vector2(0f, -56f), new Color(0.96f, 0.62f, 0.04f), false, FontStyle.Bold);
+            // Skor Kutusu İçi - En İyi Skor (24pt - Parlak Altın)
+            goUI.highScoreText = CreateText(scoreBox.transform, "HighScoreText", "🏆 En İyi Skor: 0", 24, new Vector2(0f, -62f), new Color(0.98f, 0.75f, 0.15f), false, FontStyle.Bold);
 
             // 3. Yeni Rekor Rozeti
             GameObject recBadge = new GameObject("NewRecordBadge");
             recBadge.transform.SetParent(card.transform, false);
             RectTransform recRt = recBadge.AddComponent<RectTransform>();
-            recRt.anchoredPosition = new Vector2(0f, 155f);
-            recRt.sizeDelta = new Vector2(340f, 36f);
+            recRt.anchoredPosition = new Vector2(0f, 195f);
+            recRt.sizeDelta = new Vector2(360f, 40f);
             Image recBg = recBadge.AddComponent<Image>();
-            recBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.96f, 0.62f, 0.04f), Color.white, 1f, 18, 128, 64);
+            recBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.96f, 0.62f, 0.04f), Color.white, 1.5f, 20, 128, 64);
             recBg.type = Image.Type.Sliced;
             recBg.raycastTarget = false;
 
-            Text recTxt = CreateText(recBadge.transform, "RecText", "★ YENİ REKOR! ★", 20, Vector2.zero, new Color(0.06f, 0.09f, 0.16f), false, FontStyle.Bold);
-            recTxt.rectTransform.sizeDelta = new Vector2(340f, 36f);
+            Text recTxt = CreateText(recBadge.transform, "RecText", "★ YENİ REKOR! ★", 22, Vector2.zero, new Color(0.06f, 0.09f, 0.16f), false, FontStyle.Bold);
+            recTxt.rectTransform.sizeDelta = new Vector2(360f, 40f);
             goUI.newRecordBadge = recBadge;
             goUI.newRecordBadge.SetActive(false);
 
-            // 4. Altın & Kasa Bilgi Şeridi (Büyük ve Belirgin!)
+            // 4. Altın & Kasa Bilgi Şeridi (800x72 - Ferah ve Belirgin!)
             GameObject earnBanner = new GameObject("EarningsBanner");
             earnBanner.transform.SetParent(card.transform, false);
             RectTransform ebRt = earnBanner.AddComponent<RectTransform>();
-            ebRt.anchoredPosition = new Vector2(0f, 100f);
-            ebRt.sizeDelta = new Vector2(780f, 66f);
+            ebRt.anchoredPosition = new Vector2(0f, 130f);
+            ebRt.sizeDelta = new Vector2(800f, 72f);
 
             Image ebBg = earnBanner.AddComponent<Image>();
             ebBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.11f, 0.20f, 0.90f),
-                new Color(0.96f, 0.70f, 0.18f, 0.40f),
-                1.5f, 18, 128, 64
+                new Color(0.09f, 0.12f, 0.22f, 0.95f),
+                new Color(0.96f, 0.75f, 0.20f, 0.50f),
+                1.5f, 20, 128, 64
             );
             ebBg.type = Image.Type.Sliced;
             ebBg.raycastTarget = false;
@@ -986,7 +1002,7 @@ namespace ZiplaKac.Utils
 
             HorizontalLayoutGroup ebHlg = ebContent.AddComponent<HorizontalLayoutGroup>();
             ebHlg.childAlignment = TextAnchor.MiddleCenter;
-            ebHlg.spacing = 12f;
+            ebHlg.spacing = 14f;
             ebHlg.childControlWidth = true;
             ebHlg.childControlHeight = false;
             ebHlg.childForceExpandWidth = false;
@@ -995,12 +1011,12 @@ namespace ZiplaKac.Utils
             GameObject ebCoin = new GameObject("CoinIcon");
             ebCoin.transform.SetParent(ebContent.transform, false);
             RectTransform ebCoinRt = ebCoin.AddComponent<RectTransform>();
-            ebCoinRt.sizeDelta = new Vector2(32f, 32f);
+            ebCoinRt.sizeDelta = new Vector2(34f, 34f);
             LayoutElement coinLe = ebCoin.AddComponent<LayoutElement>();
-            coinLe.preferredWidth = 32f;
-            coinLe.preferredHeight = 32f;
-            coinLe.minWidth = 32f;
-            coinLe.minHeight = 32f;
+            coinLe.preferredWidth = 34f;
+            coinLe.preferredHeight = 34f;
+            coinLe.minWidth = 34f;
+            coinLe.minHeight = 34f;
             coinLe.flexibleWidth = 0f;
 
             Image ebCoinImg = ebCoin.AddComponent<Image>();
@@ -1027,18 +1043,18 @@ namespace ZiplaKac.Utils
             txtShadow.effectDistance = new Vector2(2f, -2f);
 
             // 5. Son 5 Skor Listesi
-            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 50f), new Color(0.40f, 0.46f, 0.56f), false);
+            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 70f), new Color(0.45f, 0.52f, 0.65f), false);
 
             // ==========================================
-            // BUTONLAR (Standart 540x86 px, Taşmasız Rozetler)
+            // BUTONLAR (Standart 540x84 px, Taşmasız Rozetler)
             // ==========================================
 
             // 6. ❤️ CAN AL & DEVAM ET Butonu (Derin Rose-Crimson #be123c)
             GameObject reviveBtn = new GameObject("ReviveButton");
             reviveBtn.transform.SetParent(card.transform, false);
             RectTransform reviveRt = reviveBtn.AddComponent<RectTransform>();
-            reviveRt.anchoredPosition = new Vector2(0f, -30f);
-            reviveRt.sizeDelta = new Vector2(540f, 86f);
+            reviveRt.anchoredPosition = new Vector2(0f, -12f);
+            reviveRt.sizeDelta = new Vector2(540f, 84f);
 
             Image reviveBg = reviveBtn.AddComponent<Image>();
             reviveBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -1053,7 +1069,6 @@ namespace ZiplaKac.Utils
             reviveBtnComp.targetGraphic = reviveBg;
             goUI.reviveButton = reviveBtnComp;
 
-            // Aksiyon Yazısı (Sol tarafa sabit, taşma payı bırakılmış)
             GameObject revTitleObj = new GameObject("Title");
             revTitleObj.transform.SetParent(reviveBtn.transform, false);
             RectTransform revTitleRt = revTitleObj.AddComponent<RectTransform>();
@@ -1074,7 +1089,6 @@ namespace ZiplaKac.Utils
             revTitleTxt.raycastTarget = false;
             goUI.reviveButtonText = revTitleTxt;
 
-            // Sağ Taraf: Sağ kenara 16px mesafeyle kilitli rozet (Kesinlikle taşmaz!)
             GameObject revBadgeObj = new GameObject("PriceBadge");
             revBadgeObj.transform.SetParent(reviveBtn.transform, false);
             RectTransform revBadgeRt = revBadgeObj.AddComponent<RectTransform>();
@@ -1089,7 +1103,6 @@ namespace ZiplaKac.Utils
             revBadgeBg.type = Image.Type.Sliced;
             revBadgeBg.raycastTarget = false;
 
-            // Rozet içi Altın Sikkesi (24x24)
             GameObject revCoinObj = new GameObject("CoinIcon");
             revCoinObj.transform.SetParent(revBadgeObj.transform, false);
             RectTransform revCoinRt = revCoinObj.AddComponent<RectTransform>();
@@ -1104,7 +1117,6 @@ namespace ZiplaKac.Utils
             revCoinImg.raycastTarget = false;
             goUI.reviveCoinIcon = revCoinImg;
 
-            // Rozet içi Fiyat Rakamı
             GameObject revPriceObj = new GameObject("Price");
             revPriceObj.transform.SetParent(revBadgeObj.transform, false);
             RectTransform revPriceRt = revPriceObj.AddComponent<RectTransform>();
@@ -1125,17 +1137,17 @@ namespace ZiplaKac.Utils
             revPriceTxt.raycastTarget = false;
             goUI.revivePriceText = revPriceTxt;
 
-            // 7. TEKRAR OYNA Butonu (Ana Eylem - Şık Safir/İndigo #2563eb)
+            // 7. TEKRAR OYNA Butonu (Canlı Safir İndigo - Ana Aksiyon)
             Color primaryBlue = new Color(0.14f, 0.38f, 0.92f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -130f), new Vector2(540f, 86f), primaryBlue, Color.white, 30);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -108f), new Vector2(540f, 84f), primaryBlue, Color.white, 30);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
-            // 8. REKLAM İZLE Butonu (Koyu Slate #182033 + Altın Rozeti)
+            // 8. REKLAM İZLE Butonu (Koyu Slate #121827 + İnce Kenarlık)
             GameObject adBtn = new GameObject("RewardedAdButton");
             adBtn.transform.SetParent(card.transform, false);
             RectTransform adRt = adBtn.AddComponent<RectTransform>();
-            adRt.anchoredPosition = new Vector2(0f, -230f);
-            adRt.sizeDelta = new Vector2(540f, 86f);
+            adRt.anchoredPosition = new Vector2(0f, -204f);
+            adRt.sizeDelta = new Vector2(540f, 84f);
 
             Color slateBtnBg = new Color(0.10f, 0.14f, 0.24f);
             Color slateBorder = new Color(0.24f, 0.32f, 0.46f, 0.6f);
@@ -1167,7 +1179,6 @@ namespace ZiplaKac.Utils
             adTitleTxt.raycastTarget = false;
             goUI.rewardedAdButtonText = adTitleTxt;
 
-            // Sağ Taraf: Reklam Ödül Rozeti (+100 🪙 - Sağ kenara kilitli!)
             GameObject adBadgeObj = new GameObject("RewardBadge");
             adBadgeObj.transform.SetParent(adBtn.transform, false);
             RectTransform adBadgeRt = adBadgeObj.AddComponent<RectTransform>();
@@ -1217,7 +1228,7 @@ namespace ZiplaKac.Utils
 
             // 9. ANA MENÜ Butonu (Minimalist Slate #0b1120)
             Color ghostBg = new Color(0.06f, 0.09f, 0.16f);
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -330f), new Vector2(540f, 86f), ghostBg, new Color(0.65f, 0.72f, 0.82f), 28);
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -300f), new Vector2(540f, 84f), ghostBg, new Color(0.65f, 0.72f, 0.82f), 28);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);
@@ -1232,23 +1243,34 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = modal.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.75f);
+            bg.color = new Color(0.02f, 0.03f, 0.07f, 0.88f);
 
             UI.DailyRewardModalUI modalUI = modal.AddComponent<UI.DailyRewardModalUI>();
 
-            // Modal Card (920x1360) - Ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(920f, 1360f));
+            // Modal Card (900x1340) - Ferah ve şık altın vurgulu kart
+            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(900f, 1340f), new Color(1.0f, 0.80f, 0.15f, 0.90f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
             // Başlık (Büyük ve Belirgin)
-            modalUI.titleText = CreateText(card.transform, "Title", "GÜNLÜK ÖDÜL SANDIĞI", 52, new Vector2(0f, 540f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            modalUI.titleText = CreateText(card.transform, "Title", "GÜNLÜK ÖDÜL SANDIĞI", 50, new Vector2(0f, 540f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
 
-            // Sandık Görseli (420x420)
+            // Sandık Arkası Parlama / Aura (Radial Glow)
+            GameObject haloObj = new GameObject("ChestHalo");
+            haloObj.transform.SetParent(card.transform, false);
+            RectTransform haloRt = haloObj.AddComponent<RectTransform>();
+            haloRt.anchoredPosition = new Vector2(0f, 210f);
+            haloRt.sizeDelta = new Vector2(460f, 460f);
+            Image haloImg = haloObj.AddComponent<Image>();
+            haloImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(1f, 0.82f, 0.2f, 0.09f), new Color(1f, 0.82f, 0.2f, 0.20f), 2f, 230, 128, 128);
+            haloImg.type = Image.Type.Sliced;
+            haloImg.raycastTarget = false;
+
+            // Sandık Görseli (400x400)
             GameObject chestObj = new GameObject("ChestImage");
             chestObj.transform.SetParent(card.transform, false);
             RectTransform chestRt = chestObj.AddComponent<RectTransform>();
             chestRt.anchoredPosition = new Vector2(0f, 210f);
-            chestRt.sizeDelta = new Vector2(420f, 420f);
+            chestRt.sizeDelta = new Vector2(400f, 400f);
             Image chestImg = chestObj.AddComponent<Image>();
             modalUI.closedChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
             modalUI.openChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest_open", () => modalUI.closedChestSprite);
@@ -1258,21 +1280,21 @@ namespace ZiplaKac.Utils
             modalUI.chestImage = chestImg;
 
             // Açıklama (Büyük ve Okunaklı)
-            modalUI.descriptionText = CreateText(card.transform, "Desc", "Her gün oyuna gir, sandığını aç ve bonus altınları topla!", 32, new Vector2(0f, -80f), new Color(0.75f, 0.85f, 0.98f), false);
+            modalUI.descriptionText = CreateText(card.transform, "Desc", "Her gün oyuna gir, sandığını aç ve bonus altınları topla!", 30, new Vector2(0f, -80f), new Color(0.75f, 0.85f, 0.98f), false);
 
             // Durum Mesajı
-            modalUI.statusText = CreateText(card.transform, "Status", "🎁 Bugünün sandığı açılmaya hazır!", 36, new Vector2(0f, -190f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            modalUI.statusText = CreateText(card.transform, "Status", "🎁 Bugünün sandığı açılmaya hazır!", 36, new Vector2(0f, -180f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
 
             // Sandığı Aç Butonu (Standart 540x96)
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject claimBtnObj = CreatePillButton(card.transform, "ClaimButton", "SANDIĞI AÇ", new Vector2(0f, -320f), new Vector2(540f, 96f), mintColor, darkNavy, 34);
+            GameObject claimBtnObj = CreatePillButton(card.transform, "ClaimButton", "SANDIĞI AÇ", new Vector2(0f, -300f), new Vector2(540f, 96f), mintColor, darkNavy, 34);
             modalUI.claimButton = claimBtnObj.GetComponent<Button>();
             modalUI.claimButtonText = claimBtnObj.GetComponentInChildren<Text>();
             modalUI.claimButton.onClick.AddListener(modalUI.OnClaimButtonClicked);
 
             // Kapat Butonu (Standart 540x96)
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -440f), new Vector2(540f, 96f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 32);
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -420f), new Vector2(540f, 96f), new Color(0.12f, 0.16f, 0.28f, 0.95f), Color.white, 32);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
@@ -1287,40 +1309,49 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = modal.AddComponent<Image>();
-            bg.color = new Color(0.02f, 0.03f, 0.06f, 0.95f); // Karartma ve odak
+            bg.color = new Color(0.02f, 0.03f, 0.07f, 0.88f);
             bg.raycastTarget = true;
 
             UI.WardrobeModalUI modalUI = modal.AddComponent<UI.WardrobeModalUI>();
 
-            // Modal Card (940x1520) - Geniş, ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(940f, 1520f));
+            // Modal Card (940x1540) - Royal Mor Vurgulu Modern Kart
+            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(940f, 1540f), new Color(0.65f, 0.38f, 0.92f, 0.90f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-            Image cardImg = card.GetComponent<Image>();
-            cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.07f, 0.09f, 0.17f, 0.98f),
-                new Color(1f, 1f, 1f, 0.15f),
-                2f, 28, 128, 128);
 
             // Başlık (Üstte - Büyük ve Belirgin)
-            modalUI.titleText = CreateText(card.transform, "Title", "⚡ GÜÇLER & YÜKSELTMELER", 48, new Vector2(0f, 660f), new Color(0.65f, 0.40f, 0.95f), false, FontStyle.Bold);
+            modalUI.titleText = CreateText(card.transform, "Title", "⚡ GÜÇLER & YÜKSELTMELER", 48, new Vector2(0f, 665f), new Color(0.75f, 0.50f, 1.0f), false, FontStyle.Bold);
 
             // Toplam Altın Göstergesi (Büyük)
-            modalUI.totalGoldText = CreateText(card.transform, "TotalGold", "🪙 Toplam Altın: 150", 38, new Vector2(0f, 595f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            modalUI.totalGoldText = CreateText(card.transform, "TotalGold", "🪙 Toplam Altın: 150", 38, new Vector2(0f, 600f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
 
             // Durum / Hata Mesajı
-            modalUI.statusMessageText = CreateText(card.transform, "StatusMsg", "", 28, new Vector2(0f, 545f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            modalUI.statusMessageText = CreateText(card.transform, "StatusMsg", "", 28, new Vector2(0f, 550f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
 
-            // Sekmeler Çubuğu (Tabs Bar - Genişletilmiş ve Büyük Butonlar)
+            // Sekmeler Çubuğu Kapsülü (Segmented Control Bar - 880x86)
+            GameObject tabsBar = new GameObject("TabsBar");
+            tabsBar.transform.SetParent(card.transform, false);
+            RectTransform tbRt = tabsBar.AddComponent<RectTransform>();
+            tbRt.anchoredPosition = new Vector2(0f, 475f);
+            tbRt.sizeDelta = new Vector2(880f, 86f);
+
+            Image tbBg = tabsBar.AddComponent<Image>();
+            tbBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.05f, 0.07f, 0.13f, 0.95f),
+                new Color(0.18f, 0.24f, 0.38f, 0.70f),
+                1.5f, 22, 128, 64);
+            tbBg.type = Image.Type.Sliced;
+            tbBg.raycastTarget = false;
+
             Color tabActive = new Color(0.61f, 0.36f, 0.90f);
-            Color tabInactive = new Color(0.12f, 0.15f, 0.28f, 0.9f);
+            Color tabInactive = new Color(0.09f, 0.12f, 0.22f, 0.9f);
 
-            GameObject tabUpgradesObj = CreatePillButton(card.transform, "TabUpgradesBtn", "⚡ YÜKSELTMELER", new Vector2(-225f, 470f), new Vector2(430f, 82f), tabActive, Color.white, 30);
+            GameObject tabUpgradesObj = CreatePillButton(tabsBar.transform, "TabUpgradesBtn", "⚡ YÜKSELTMELER", new Vector2(-215f, 0f), new Vector2(430f, 74f), tabActive, Color.white, 28);
             modalUI.tabUpgradesButton = tabUpgradesObj.GetComponent<Button>();
             modalUI.tabUpgradesBg = tabUpgradesObj.GetComponent<Image>();
             modalUI.tabUpgradesText = tabUpgradesObj.GetComponentInChildren<Text>();
             modalUI.tabUpgradesButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.Upgrades));
 
-            GameObject tabOutfitsObj = CreatePillButton(card.transform, "TabOutfitsBtn", "👔 GARDIROP", new Vector2(225f, 470f), new Vector2(430f, 82f), tabInactive, new Color(0.7f, 0.8f, 0.9f), 30);
+            GameObject tabOutfitsObj = CreatePillButton(tabsBar.transform, "TabOutfitsBtn", "👔 GARDIROP", new Vector2(215f, 0f), new Vector2(430f, 74f), tabInactive, new Color(0.7f, 0.8f, 0.9f), 28);
             modalUI.tabOutfitsButton = tabOutfitsObj.GetComponent<Button>();
             modalUI.tabOutfitsBg = tabOutfitsObj.GetComponent<Image>();
             modalUI.tabOutfitsText = tabOutfitsObj.GetComponentInChildren<Text>();
@@ -1362,7 +1393,7 @@ namespace ZiplaKac.Utils
             modalUI.itemsScrollRect = scrollRect;
 
             // Kapat Butonu (Standart 540x96)
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -670f), new Vector2(540f, 96f), new Color(0.15f, 0.20f, 0.35f, 0.95f), Color.white, 32);
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -680f), new Vector2(540f, 96f), new Color(0.12f, 0.16f, 0.28f, 0.95f), Color.white, 32);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
@@ -1377,13 +1408,13 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = modal.AddComponent<Image>();
-            bg.color = new Color(0.02f, 0.03f, 0.07f, 0.96f);
+            bg.color = new Color(0.02f, 0.03f, 0.07f, 0.88f);
             bg.raycastTarget = true;
 
             UI.OnboardingModalUI modalUI = modal.AddComponent<UI.OnboardingModalUI>();
 
-            // Onboarding Card (940x1520)
-            GameObject card = CreateCardContainer(modal.transform, "OnboardingCard", new Vector2(940f, 1520f));
+            // Onboarding Card (940x1540) - Mint Yeşili Vurgulu Modern Kart
+            GameObject card = CreateCardContainer(modal.transform, "OnboardingCard", new Vector2(940f, 1540f), new Color(0.024f, 0.839f, 0.627f, 0.90f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             modalUI.modalCard = card;
 
