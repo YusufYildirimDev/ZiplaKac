@@ -175,7 +175,7 @@ namespace ZiplaKac.UI
                     borderRt.offsetMin = new Vector2(-5f, -5f); borderRt.offsetMax = new Vector2(5f, 5f);
                     Image borderImg = borderObj.AddComponent<Image>();
                     borderImg.type = Image.Type.Sliced;
-                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.02f, 0.84f, 0.63f), 4.5f, 32);
+                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.24f, 0.58f, 0.98f), 4.5f, 32);
                     borderImg.raycastTarget = false;
                     card.borderHighlight = borderImg;
 
@@ -341,7 +341,7 @@ namespace ZiplaKac.UI
                         }
                         else
                         {
-                            bg.color = isSelected ? new Color(0.024f, 0.839f, 0.627f, 0.22f) : new Color(1f, 1f, 1f, 0.04f);
+                            bg.color = isSelected ? new Color(0.14f, 0.38f, 0.92f, 0.25f) : new Color(1f, 1f, 1f, 0.04f);
                         }
                     }
                 }
@@ -354,7 +354,7 @@ namespace ZiplaKac.UI
                     }
                     else
                     {
-                        card.nameText.color = isSelected ? new Color(0.024f, 0.839f, 0.627f) : new Color(0.96f, 0.96f, 0.98f, 0.85f);
+                        card.nameText.color = isSelected ? new Color(0.35f, 0.70f, 1.0f) : new Color(0.96f, 0.96f, 0.98f, 0.85f);
                     }
                 }
             }

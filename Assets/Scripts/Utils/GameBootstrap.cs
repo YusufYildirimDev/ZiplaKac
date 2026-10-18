@@ -596,7 +596,7 @@ namespace ZiplaKac.Utils
             return card;
         }
 
-        private static GameObject CreatePillButton(Transform parent, string name, string label, Vector2 position, Vector2 size, Color bgColor, Color textColor, int fontSize = 32)
+        private static GameObject CreatePillButton(Transform parent, string name, string label, Vector2 position, Vector2 size, Color bgColor, Color textColor, int fontSize = 32, Color? borderColor = null, float borderWidth = 0f)
         {
             GameObject obj = new GameObject(name);
             obj.transform.SetParent(parent, false);
@@ -605,7 +605,8 @@ namespace ZiplaKac.Utils
             rt.sizeDelta = size;
 
             Image img = obj.AddComponent<Image>();
-            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, Color.clear, 0f, 24, 128, 64);
+            Color border = borderColor ?? Color.clear;
+            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, border, borderWidth, 22, 128, 64);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
 
@@ -621,8 +622,8 @@ namespace ZiplaKac.Utils
             RectTransform labelRt = labelTxt.GetComponent<RectTransform>();
             labelRt.anchorMin = Vector2.zero;
             labelRt.anchorMax = Vector2.one;
-            labelRt.offsetMin = new Vector2(12f, 0f);
-            labelRt.offsetMax = new Vector2(-12f, 0f);
+            labelRt.offsetMin = new Vector2(16f, 0f);
+            labelRt.offsetMax = new Vector2(-16f, 0f);
             labelTxt.resizeTextForBestFit = true;
             labelTxt.resizeTextMinSize = 18;
             labelTxt.resizeTextMaxSize = fontSize;
@@ -705,14 +706,14 @@ namespace ZiplaKac.Utils
             GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
 
-            // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin)
-            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 72, new Vector2(0f, 510f), new Color(1.0f, 0.82f, 0.4f), false, FontStyle.Bold); // #ffd166
+            // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin, Şık Sıcak Altın)
+            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 72, new Vector2(0f, 510f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
 
             // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 30, new Vector2(0f, 435f), new Color(0.6f, 0.7f, 0.85f), false);
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 435f), new Color(0.62f, 0.70f, 0.82f), false);
 
             // "KARAKTER SEÇ" etiketi
-            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 28, new Vector2(0f, 320f), new Color(0.75f, 0.82f, 0.95f), false, FontStyle.Bold);
+            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 26, new Vector2(0f, 320f), new Color(0.72f, 0.80f, 0.92f), false, FontStyle.Bold);
 
             // Karakter Galerisi UI (Swatches - Genişletilmiş Alan)
             GameObject galleryObj = new GameObject("CharacterGallery");
@@ -723,18 +724,19 @@ namespace ZiplaKac.Utils
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // Neon Mint "BAŞLA" Butonu (#06d6a0 - Standart 540x96)
-            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
-            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -70f), new Vector2(540f, 96f), mintColor, darkNavy, 36);
+            // 1. "BAŞLA" Butonu (Hero Action - Şık Safir Mavi #2563eb - Standart 540x86)
+            Color primaryBlue = new Color(0.14f, 0.38f, 0.92f);
+            Color primaryBorder = new Color(0.35f, 0.58f, 1.0f, 0.80f);
+            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -60f), new Vector2(540f, 86f), primaryBlue, Color.white, 32, primaryBorder, 1.5f);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // 🛒 Mağaza & Gardırop (Yükseltmeler, Güçler, Kıyafetler) Butonu (#9b5de5 - Standart 540x96)
-            Color purpleColor = new Color(0.61f, 0.36f, 0.90f);
-            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -180f), new Vector2(540f, 96f), purpleColor, Color.white, 32);
+            // 2. 🛒 Mağaza & Gardırop Butonu (Koyu Slate #101424 + Safir İndigo Bordür - Standart 540x86)
+            Color slateBg = new Color(0.10f, 0.14f, 0.24f);
+            Color slateBorder = new Color(0.30f, 0.38f, 0.56f, 0.75f);
+            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -165f), new Vector2(540f, 86f), slateBg, new Color(0.94f, 0.96f, 1.0f), 28, slateBorder, 1.5f);
             Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
             wardrobeBtn.onClick.AddListener(() => {
                 if (UI.WardrobeModalUI.Instance != null)
@@ -743,9 +745,9 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // 🎁 Günlük Ödül Sandığı Butonu (#ffd166 - Standart 540x96)
-            Color goldColor = new Color(1.0f, 0.82f, 0.40f);
-            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -290f), new Vector2(540f, 96f), goldColor, darkNavy, 32);
+            // 3. 🎁 Günlük Ödül Sandığı Butonu (Koyu Slate #101424 + Altın Bordür - Standart 540x86)
+            Color goldBorder = new Color(0.92f, 0.70f, 0.18f, 0.80f);
+            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -270f), new Vector2(540f, 86f), slateBg, new Color(1.0f, 0.88f, 0.50f), 28, goldBorder, 1.5f);
             Button rewardBtn = rewardBtnObj.GetComponent<Button>();
             rewardBtn.onClick.AddListener(() => {
                 if (DailyRewardModalUI.Instance != null)
@@ -754,9 +756,10 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // 📖 Nasıl Oynanır & Rehber Butonu (#4cc9f0 - Standart 540x96)
-            Color cyanColor = new Color(0.30f, 0.79f, 0.94f);
-            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -400f), new Vector2(540f, 96f), cyanColor, darkNavy, 32);
+            // 4. 📖 Nasıl Oynanır & Rehber Butonu (Minimalist Koyu Slate - Standart 540x86)
+            Color ghostBg = new Color(0.08f, 0.11f, 0.19f);
+            Color ghostBorder = new Color(0.20f, 0.26f, 0.38f, 0.55f);
+            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -375f), new Vector2(540f, 86f), ghostBg, new Color(0.72f, 0.80f, 0.90f), 28, ghostBorder, 1.2f);
             Button rulesBtn = rulesBtnObj.GetComponent<Button>();
             rulesBtn.onClick.AddListener(() => {
                 Debug.Log("[RulesButton] Clicked! Opening onboarding modal...");
@@ -780,7 +783,7 @@ namespace ZiplaKac.Utils
             });
 
             // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -495f), new Color(0.55f, 0.65f, 0.8f), false);
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -470f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
