@@ -990,13 +990,22 @@ namespace ZiplaKac.Utils
             HorizontalLayoutGroup ebHlg = ebContent.AddComponent<HorizontalLayoutGroup>();
             ebHlg.childAlignment = TextAnchor.MiddleCenter;
             ebHlg.spacing = 10f;
-            ebHlg.childControlWidth = false; ebHlg.childControlHeight = false;
-            ebHlg.childForceExpandWidth = false; ebHlg.childForceExpandHeight = false;
+            ebHlg.childControlWidth = true;
+            ebHlg.childControlHeight = false;
+            ebHlg.childForceExpandWidth = false;
+            ebHlg.childForceExpandHeight = false;
 
             GameObject ebCoin = new GameObject("CoinIcon");
             ebCoin.transform.SetParent(ebContent.transform, false);
             RectTransform ebCoinRt = ebCoin.AddComponent<RectTransform>();
             ebCoinRt.sizeDelta = new Vector2(26f, 26f);
+            LayoutElement coinLe = ebCoin.AddComponent<LayoutElement>();
+            coinLe.preferredWidth = 26f;
+            coinLe.preferredHeight = 26f;
+            coinLe.minWidth = 26f;
+            coinLe.minHeight = 26f;
+            coinLe.flexibleWidth = 0f;
+
             Image ebCoinImg = ebCoin.AddComponent<Image>();
             ebCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
             ebCoinImg.preserveAspect = true;
@@ -1010,11 +1019,10 @@ namespace ZiplaKac.Utils
             goUI.goldEarnedText.fontStyle = FontStyle.Bold;
             goUI.goldEarnedText.color = new Color(0.85f, 0.89f, 0.95f);
             goUI.goldEarnedText.text = "+0 Altın Kazanıldı   •   Toplam Kasa: 0 Altın";
-            goUI.goldEarnedText.alignment = TextAnchor.MiddleCenter;
+            goUI.goldEarnedText.alignment = TextAnchor.MiddleLeft;
             goUI.goldEarnedText.horizontalOverflow = HorizontalWrapMode.Overflow;
             goUI.goldEarnedText.verticalOverflow = VerticalWrapMode.Overflow;
             goUI.goldEarnedText.raycastTarget = false;
-            ebTextObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             // 5. Son 5 Skor Listesi
             goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 50f), new Color(0.40f, 0.46f, 0.56f), false);

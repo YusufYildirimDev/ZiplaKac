@@ -134,6 +134,10 @@ namespace ZiplaKac.UI
                 int runGold = GameManager.Instance.CurrentRunGold;
                 int totalGold = SaveSystem.GetTotalGold();
                 goldEarnedText.text = $"+{runGold} ALTIN KAZANDIN   •   KASA: {totalGold} ALTIN";
+                if (goldEarnedText.transform.parent != null)
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(goldEarnedText.transform.parent.GetComponent<RectTransform>());
+                }
             }
 
             // Yeni Rekor Rozeti Kontrolü
