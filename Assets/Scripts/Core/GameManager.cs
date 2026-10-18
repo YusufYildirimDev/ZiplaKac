@@ -231,6 +231,44 @@ namespace ZiplaKac.Core
             invulnerabilityTimer = duration;
         }
 
+        public bool ReviveWithGold(int cost = 500)
+        {
+            if (State != GameState.GameOver) return false;
+
+            if (SaveSystem.SpendGold(cost))
+            {
+                // Önceki GameOver aşamasında eklenen tur içi altını sıfırla ki sonraki ölümde tekrar toplanmasın
+                CurrentRunGold = 0;
+                RunObstacleGold = 0;
+                RunComboGold = 0;
+                RunScoreGold = 0;
+                RunRecordGold = 0;
+
+                // Sahadaki engelleri temizle
+                Obstacles.Obstacle.ClearAllActiveObstacles();
+
+                // 2.5 saniye geçici dokunulmazlık sağla
+                TriggerTemporaryInvulnerability(2.5f);
+
+                // Karakteri zemine al ve fizik simülasyonunu aç
+                if (Player.PlayerController.Instance != null)
+                {
+                    Player.PlayerController.Instance.ResetToGround();
+                }
+
+                // Oynanış durumuna devam et (skor korunur)
+                State = GameState.Playing;
+                Time.timeScale = 1.0f;
+                OnGameStateChanged?.Invoke(State);
+
+                AudioManager.Instance?.PlayPowerUpSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                return true;
+            }
+
+            return false;
+        }
+
         public void GameOver()
         {
             if (isTemporaryInvulnerable) return;

@@ -118,6 +118,22 @@ namespace ZiplaKac.Player
                 transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, Time.deltaTime * 10f);
             }
 
+            // Geçici dokunulmazlık (Can alma sonrası) görsel yanıp sönme efekti
+            if (GameManager.Instance != null && GameManager.Instance.isTemporaryInvulnerable)
+            {
+                float alpha = Mathf.PingPong(Time.time * 8f, 1f) > 0.4f ? 1.0f : 0.35f;
+                if (bodySpriteRenderer != null)
+                {
+                    Color c = bodySpriteRenderer.color;
+                    bodySpriteRenderer.color = new Color(c.r, c.g, c.b, alpha);
+                }
+            }
+            else if (bodySpriteRenderer != null && bodySpriteRenderer.color.a < 0.99f)
+            {
+                Color c = bodySpriteRenderer.color;
+                bodySpriteRenderer.color = new Color(c.r, c.g, c.b, 1.0f);
+            }
+
             // Dokunma (Mobile) veya Boşluk Tuşu (Keyboard) girişi
             if (IsJumpInputTriggered())
             {
@@ -534,6 +550,23 @@ namespace ZiplaKac.Player
             {
                 rb.simulated = false;
             }
+        }
+
+        public void ResetToGround()
+        {
+            transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.simulated = true;
+            }
+            jumpsUsed = 0;
+            isGrounded = true;
+            lastJumpTime = -1f;
+            lastJumpFrame = -1;
+            transform.localScale = Vector3.one;
+            UpdateCharacterAppearance();
+            UpdateShieldVisual();
         }
 
         private void OnDrawGizmosSelected()

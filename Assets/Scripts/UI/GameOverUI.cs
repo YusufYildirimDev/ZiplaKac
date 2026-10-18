@@ -22,6 +22,8 @@ namespace ZiplaKac.UI
         public Text scoreHistoryListText;
 
         [Header("Butonlar")]
+        public Button reviveButton;
+        public Text reviveButtonText;
         public Button restartButton;
         public Button mainMenuButton;
         public Button rewardedAdButton;
@@ -29,6 +31,12 @@ namespace ZiplaKac.UI
 
         private void OnEnable()
         {
+            if (reviveButton != null)
+            {
+                reviveButton.onClick.RemoveAllListeners();
+                reviveButton.onClick.AddListener(OnReviveButtonClicked);
+            }
+
             if (restartButton != null)
             {
                 restartButton.onClick.RemoveAllListeners();
@@ -46,7 +54,7 @@ namespace ZiplaKac.UI
                 rewardedAdButton.interactable = true;
                 rewardedAdButton.onClick.RemoveAllListeners();
                 rewardedAdButton.onClick.AddListener(OnRewardedAdButtonClicked);
-                if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎁 REKLAM İZLE: +50 PUAN";
+                if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎁 REKLAM İZLE: +100 ALTIN";
             }
 
             RefreshGameOverStats();
@@ -56,16 +64,12 @@ namespace ZiplaKac.UI
         {
             MonetizationManager.Instance?.ShowRewardedAd(
                 () => {
-                    if (GameManager.Instance != null)
-                    {
-                        GameManager.Instance.AddBonusScore(50f);
-                        SaveSystem.SaveScore(Mathf.FloorToInt(GameManager.Instance.CurrentScore));
-                    }
+                    SaveSystem.AddGold(100);
                     RefreshGameOverStats();
                     AudioManager.Instance?.PlayNewRecordSound();
                     AudioManager.Instance?.TriggerHapticFeedback();
                     if (rewardedAdButton != null) rewardedAdButton.interactable = false;
-                    if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎉 +50 PUAN EKLENDİ!";
+                    if (rewardedAdButtonText != null) rewardedAdButtonText.text = "🎉 +100 ALTIN KAZANDIN!";
                 },
                 () => {
                     Debug.Log("Reklam gösterilemedi.");
@@ -165,6 +169,18 @@ namespace ZiplaKac.UI
                     scoreHistoryListText.text = "Son skorlar: " + string.Join(", ", history);
                 }
             }
+
+            // Can Alma (Revive) Butonu Durumu
+            int currentGold = SaveSystem.GetTotalGold();
+            if (reviveButton != null)
+            {
+                bool canAfford = currentGold >= 500;
+                reviveButton.interactable = canAfford;
+                if (reviveButtonText != null)
+                {
+                    reviveButtonText.text = canAfford ? "❤️ CAN AL & DEVAM ET (500 🪙)" : "❤️ CAN AL (500 🪙 GEREKİR)";
+                }
+            }
         }
 
         private GameObject newCharacterUnlockedBadge;
@@ -212,6 +228,19 @@ namespace ZiplaKac.UI
             newCharacterUnlockedText.alignment = TextAnchor.MiddleCenter;
             newCharacterUnlockedText.color = new Color(0.024f, 0.839f, 0.627f);
             newCharacterUnlockedText.raycastTarget = false;
+        }
+
+        private void OnReviveButtonClicked()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.ReviveWithGold(500))
+            {
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                AudioManager.Instance?.PlayGameOverSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+            }
         }
 
         private void OnRestartButtonClicked()
