@@ -82,15 +82,15 @@ namespace ZiplaKac.UI
         private readonly List<ConsumableItemConfig> consumableConfigs = new List<ConsumableItemConfig>
         {
             new ConsumableItemConfig { id = "shield",        displayName = "Başlangıç Kalkanı",    description = "Oyuna 1 kalkanla başla", price = 90 },
-            new ConsumableItemConfig { id = "slow_start",    displayName = "Yavaş Başlangıç",      description = "İlk 5sn engel hızı %30 yavaş", price = 60 },
-            new ConsumableItemConfig { id = "lucky_pu",      displayName = "Şanslı Güçlendirme",   description = "İlk küre garantili 3. saniyede", price = 45 },
-            new ConsumableItemConfig { id = "second_chance", displayName = "İkinci Şans Bileti",   description = "Çarpışınca 1 kez ücretsiz devam et", price = 120 }
+            new ConsumableItemConfig { id = "slow_start",    displayName = "Yavaş Başlangıç",      description = "İlk 5 saniye engel hızı %30 yavaşlar", price = 60 },
+            new ConsumableItemConfig { id = "lucky_pu",      displayName = "Şanslı Güçlendirme",   description = "İlk güçlendirme 3. saniyede gelir", price = 45 },
+            new ConsumableItemConfig { id = "second_chance", displayName = "İkinci Şans Bileti",   description = "Yandığında baştan başlamak yerine devam et", price = 120 }
         };
 
         private readonly List<UpgradeItemConfig> upgradeConfigs = new List<UpgradeItemConfig>
         {
-            new UpgradeItemConfig { id = "pu_duration",   displayName = "Güçlendirme Süresi",   description = "Kalkan/yavaş/x2 süreleri +%20 uzar", price = 450, maxLevel = 3 },
-            new UpgradeItemConfig { id = "double_jump",   displayName = "Çift Zıplama Ustası",  description = "2. zıplama yüksekliği +%15 artar",  price = 600, maxLevel = 1 },
+            new UpgradeItemConfig { id = "pu_duration",   displayName = "Güçlendirme Süresi",   description = "Güçlendirme süreleri +%20 uzar", price = 450, maxLevel = 3 },
+            new UpgradeItemConfig { id = "double_jump",   displayName = "Çift Zıplama Ustası",  description = "İkinci zıplama yüksekliği +%15 artar",  price = 600, maxLevel = 1 },
             new UpgradeItemConfig { id = "combo_memory",  displayName = "Kombo Hafızası",       description = "Çarpışmada kombonun yarısı korunur", price = 750, maxLevel = 1 },
             new UpgradeItemConfig { id = "signature",     displayName = "İmza Yeteneği +1",     description = "Karakterin özel yeteneği güçlenir",  price = 900, maxLevel = 1 }
         };
@@ -206,7 +206,8 @@ namespace ZiplaKac.UI
                 rowIndex++;
 
                 int count = SaveSystem.GetConsumableCount(cfg.id);
-                string subtitle = $"{cfg.description} · <color=#06d6a0>Envanter: {count}</color>";
+                string countBadge = count > 0 ? $"<color=#4ade80><b>[Mevcut: {count}]</b></color>" : "<color=#94a3b8>[Mevcut: 0]</color>";
+                string subtitle = $"{cfg.description} · {countBadge}";
 
                 string emoji = "⚡";
                 if (cfg.id == "shield") emoji = "🛡️";
@@ -241,9 +242,11 @@ namespace ZiplaKac.UI
                 int currentLvl = SaveSystem.GetUpgradeLevel(charKey, cfg.id);
                 bool isMax = currentLvl >= cfg.maxLevel;
 
-                string subtitle = cfg.maxLevel > 1
-                    ? $"{cfg.description} · <color=#ffd166>Seviye {currentLvl}/{cfg.maxLevel}</color>"
-                    : (isMax ? $"{cfg.description} · <color=#06d6a0>Açık</color>" : cfg.description);
+                string lvlBadge = isMax
+                    ? "<color=#4ade80><b>[MAKSİMUM SEVİYE]</b></color>"
+                    : (cfg.maxLevel > 1 ? $"<color=#ffd166><b>[Seviye {currentLvl}/{cfg.maxLevel}]</b></color>" : "<color=#94a3b8>[Pasif Kilitli]</color>");
+
+                string subtitle = $"{cfg.description} · {lvlBadge}";
 
                 string btnLabel = isMax ? "MAX" : (cfg.maxLevel > 1 ? "YÜKSELT" : "AÇ");
                 Color btnColor = isMax ? new Color(0.3f, 0.35f, 0.45f) : new Color(0.024f, 0.839f, 0.627f);
@@ -300,7 +303,10 @@ namespace ZiplaKac.UI
                 bool isPurchased = SaveSystem.IsOutfitPurchased(charKey, cfg.outfitType);
                 bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, cfg.outfitType);
 
-                string subtitle = isPurchased ? "<color=#06d6a0>Sahipsin</color>" : $"Fiyat: {cfg.price} Altın";
+                string subtitle = !isPurchased 
+                    ? "<color=#ffd166><b>[Henüz Alınmadı]</b></color>" 
+                    : (isEquipped ? "<color=#4ade80><b>[Şu An Giyili ✓]</b></color>" : "<color=#60a5fa><b>[Gardırobunda]</b></color>");
+
                 string btnLabel = !isPurchased ? "SATIN AL" : (isEquipped ? "ÇIKAR" : "GİY");
                 Color btnColor = !isPurchased ? new Color(1.0f, 0.82f, 0.40f) : (isEquipped ? new Color(0.85f, 0.22f, 0.30f) : new Color(0.024f, 0.839f, 0.627f));
 
@@ -457,7 +463,7 @@ namespace ZiplaKac.UI
             labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelText.verticalOverflow = VerticalWrapMode.Truncate;
             labelText.color = Color.white;
-            labelText.text = $"{title}\n<size=26><color=#b8c8dc>{subtitle}</color></size>";
+            labelText.text = $"{title}\n<size=26><color=#cbd5e1>{subtitle}</color></size>";
 
             // 3. Buton Alanı (Genişletilmiş ve büyük: 240x86)
             GameObject btnObj = new GameObject("ActionBtn");

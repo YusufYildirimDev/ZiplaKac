@@ -1410,10 +1410,10 @@ namespace ZiplaKac.Utils
 
             CreateText(slide0.transform, "Sub0", "Zıpla, engellerden kaç ve rekorunu kır!", 32, new Vector2(0f, 520f), new Color(0.70f, 0.80f, 0.95f), false, FontStyle.Bold);
 
-            CreateOnboardingRow(slide0.transform, "Row0_1", 345f, 165f, "👆", "Tek Dokunuşla Zıpla", "Ekrana dokunarak veya Space tuşuna basarak yaklaşan sivri dikenlerin, kaktüs ve kayaların üzerinden atla.", new Color(0.024f, 0.839f, 0.627f));
-            CreateOnboardingRow(slide0.transform, "Row0_2", 165f, 165f, "🚀", "Çift Zıplama (Double Jump)", "Havada bir kez daha dokunarak ikinci kez zıpla! Yüksek ve arka arkaya gelen engelleri aşmak için en önemli yeteneğin.", new Color(0.30f, 0.79f, 0.94f));
-            CreateOnboardingRow(slide0.transform, "Row0_3", -15f, 165f, "🔥", "Kombo Serisi & Bonus Altın", "Engelleri çarpmadan art arda geç. Her 5 engelde ekstra kombo puanı ve çarpanlı altın ödülleri kazanırsın!", new Color(1.0f, 0.82f, 0.40f));
-            CreateOnboardingRow(slide0.transform, "Row0_4", -195f, 165f, "🌅", "3 Zorluk Aşaması (Gündüz, Akşam, Gece)", "Puanın arttıkça dünya değişir, oyun hızlanır ve reflekslerini sonuna kadar zorlar!", new Color(1.0f, 0.42f, 0.21f));
+            CreateOnboardingRow(slide0.transform, "Row0_1", 345f, 165f, "👆", "Tek Dokunuşla Zıpla", "Ekrana dokunarak sivri kaktüs ve engellerin üzerinden atla.", new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingRow(slide0.transform, "Row0_2", 165f, 165f, "🚀", "Çift Zıplama", "Havada bir kez daha dokun, 2 kat yükseğe zıpla!", new Color(0.30f, 0.79f, 0.94f));
+            CreateOnboardingRow(slide0.transform, "Row0_3", -15f, 165f, "🔥", "Kombo & Bonus Altın", "Engelleri art arda geç, bonus skor ve altın kazan!", new Color(1.0f, 0.82f, 0.40f));
+            CreateOnboardingRow(slide0.transform, "Row0_4", -195f, 165f, "🌅", "3 Zorluk Kademesi", "Puanın arttıkça dünya hızlanır ve geceye döner!", new Color(1.0f, 0.42f, 0.21f));
 
             // -------------------------------------------------------------
             // SLIDE 1: 5 KARAKTER & SIRALI 2500 SKOR KİLİT SİSTEMİ
@@ -1425,13 +1425,13 @@ namespace ZiplaKac.Utils
             s1Rt.offsetMin = Vector2.zero; s1Rt.offsetMax = Vector2.zero;
             modalUI.slides[1] = slide1;
 
-            CreateText(slide1.transform, "Sub1", "İlk başta sadece Klasik açıktır! Sırayla 2500 skor yaparak kilidi aç:", 30, new Vector2(0f, 520f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+            CreateText(slide1.transform, "Sub1", "Sırayla 2500 skor yaparak karakterlerin kilidini aç:", 30, new Vector2(0f, 520f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
 
-            CreateOnboardingCharacterRow(slide1.transform, "Char_classic", 360f, "classic", "Klasik", "🔓 BAŞLANGIÇTA AÇIK", "Çayır Diyarı • Kalıcı +%15 ekstra skor yeteneği!", new Color(1.0f, 0.82f, 0.40f), new Color(0.024f, 0.839f, 0.627f));
-            CreateOnboardingCharacterRow(slide1.transform, "Char_fire", 200f, "fire", "Ateş", "🔒 Klasik ile 2500 Skor Yap", "Volkan & Lav Diyarı • Ateş topu ve kor alev dünyası!", new Color(1.0f, 0.42f, 0.21f), new Color(1.0f, 0.65f, 0.20f));
-            CreateOnboardingCharacterRow(slide1.transform, "Char_ice", 40f, "ice", "Buz", "🔒 Ateş ile 2500 Skor Yap", "Buzul & Kar Dağları • Dondurucu soğuk ve kutup gecesi!", new Color(0.30f, 0.79f, 0.94f), new Color(0.30f, 0.79f, 0.94f));
-            CreateOnboardingCharacterRow(slide1.transform, "Char_toxic", -120f, "toxic", "Zehir", "🔒 Buz ile 2500 Skor Yap", "Toksik Sis Ormanı • Kombo ödüllerini x1.25 katına çıkarır!", new Color(0.49f, 0.95f, 0.61f), new Color(0.49f, 0.95f, 0.61f));
-            CreateOnboardingCharacterRow(slide1.transform, "Char_shadow", -280f, "shadow", "Gece", "🔒 Zehir ile 2500 Skor Yap", "Derin Uzay & Nebula • Engellerden %28 otomatik sıyrılma!", new Color(0.61f, 0.36f, 0.90f), new Color(0.61f, 0.36f, 0.90f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_classic", 360f, "classic", "Klasik", "🔓 BAŞLANGIÇTA AÇIK", "Çayır Diyarı • Kalıcı +%15 ekstra skor yeteneği", new Color(1.0f, 0.82f, 0.40f), new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_fire", 200f, "fire", "Ateş", "🔒 KLASİK İLE 2500 SKOR", "Volkan Diyarı • Hızlı sıçrama ve kor alev dünyası", new Color(1.0f, 0.42f, 0.21f), new Color(1.0f, 0.65f, 0.20f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_ice", 40f, "ice", "Buz", "🔒 ATEŞ İLE 2500 SKOR", "Buzul Dağları • Net görüş ve buz diyarı atmosferi", new Color(0.30f, 0.79f, 0.94f), new Color(0.30f, 0.79f, 0.94f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_toxic", -120f, "toxic", "Zehir", "🔒 BUZ İLE 2500 SKOR", "Toksik Orman • x1.25 ekstra kombo altın bonusu", new Color(0.49f, 0.95f, 0.61f), new Color(0.49f, 0.95f, 0.61f));
+            CreateOnboardingCharacterRow(slide1.transform, "Char_shadow", -280f, "shadow", "Gece", "🔒 ZEHİR İLE 2500 SKOR", "Nebula Uzayı • %28 engellerden otomatik sıyrılma", new Color(0.61f, 0.36f, 0.90f), new Color(0.61f, 0.36f, 0.90f));
 
             // -------------------------------------------------------------
             // SLIDE 2: GÜÇLER, YÜKSELTMELER VE BİLETLER
@@ -1443,12 +1443,12 @@ namespace ZiplaKac.Utils
             s2Rt.offsetMin = Vector2.zero; s2Rt.offsetMax = Vector2.zero;
             modalUI.slides[2] = slide2;
 
-            CreateText(slide2.transform, "Sub2", "Güçlendirmeleri topla ve mağazadan kalıcı yetenekler edin!", 32, new Vector2(0f, 520f), new Color(0.70f, 0.80f, 0.95f), false, FontStyle.Bold);
+            CreateText(slide2.transform, "Sub2", "Güçlendirmeleri topla ve mağazadan yetenekler edin!", 32, new Vector2(0f, 520f), new Color(0.70f, 0.80f, 0.95f), false, FontStyle.Bold);
 
-            CreateOnboardingPowerRow(slide2.transform, "Power_Shield", 345f, "shield", "🛡️", "Koruyucu Kalkan (Shield)", "Bir engele çarpışmayı tamamen emer, engelleri temizler ve koşunu kurtarır.", new Color(0.30f, 0.79f, 0.94f));
-            CreateOnboardingPowerRow(slide2.transform, "Power_Slow", 165f, "slow", "⏱️", "Zamanı Yavaşlatma (Slow-Mo)", "5 saniye boyunca dünya hızını %40 düşürerek karmaşık engellerden kolayca sıyrılmanı sağlar.", new Color(0.024f, 0.839f, 0.627f));
-            CreateOnboardingPowerRow(slide2.transform, "Power_Multi", -15f, "multi", "✖️2️⃣", "x2 Çift Skor & Altın Çarpanı", "Aktif olduğu sürece kazanılan tüm koşu puanlarını ve engellerden gelen altınları 2 katına çıkarır!", new Color(1.0f, 0.82f, 0.40f));
-            CreateOnboardingPowerRow(slide2.transform, "Power_SecondChance", -195f, "second_chance", "🎫", "İkinci Şans Bileti & Kalıcı Güçler", "Mağaza'dan İkinci Şans Bileti alıp yandığın yerden devam edebilir, zıplama ve kombo süreni geliştirebilirsin.", new Color(0.61f, 0.36f, 0.90f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_Shield", 345f, "shield", "🛡️", "Koruyucu Kalkan", "Engellere çarpmayı önler, koşunu güvenle devam ettirir.", new Color(0.30f, 0.79f, 0.94f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_Slow", 165f, "slow", "⏱️", "Ağır Çekim (Slow-Mo)", "5 saniye oyunu yavaşlatır, kolayca sıyrılmanı sağlar.", new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_Multi", -15f, "multi", "✖️2️⃣", "x2 Skor & Altın Çarpanı", "Tüm skor ve engellerden gelen altınları 2 katına çıkarır!", new Color(1.0f, 0.82f, 0.40f));
+            CreateOnboardingPowerRow(slide2.transform, "Power_SecondChance", -195f, "second_chance", "🎫", "İkinci Şans Bileti", "Yandığında baştan başlamak yerine kaldığın yerden devam et!", new Color(0.61f, 0.36f, 0.90f));
 
             // -------------------------------------------------------------
             // SLIDE 3: GÜNLÜK SANDIK, ALTIN EKONOMİSİ & GARDIROP
@@ -1462,9 +1462,9 @@ namespace ZiplaKac.Utils
 
             CreateText(slide3.transform, "Sub3", "Her gün giriş yap, sandığını aç ve altınlarınla tarzını yarat!", 32, new Vector2(0f, 520f), new Color(0.70f, 0.80f, 0.95f), false, FontStyle.Bold);
 
-            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Chest", 310f, 220f, "Sprites/treasure_chest", "🎁 Günlük Ödül Sandığı", "Her gün oyuna girerek sandığını aç! Günlük seri yaptıkça (Streak) kazandığın altın miktarı 20'den 50'ye kadar katlanır.", new Color(1.0f, 0.82f, 0.40f));
-            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Gold", 65f, 220f, null, "🪙 Altın Toplama & Yeni Rekorlar", "Engelleri aştıkça, kombo yaptıkça ve rekor kırdıkça altın topla. Her koşu sonunda kasan zenginleşir!", new Color(0.024f, 0.839f, 0.627f));
-            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Wardrobe", -180f, 220f, null, "👔 Gardırop & Kostümler", "Topladığın altınlarla kahramanlarına süper kahraman pelerini, havalı güneş gözlükleri ve maskeler satın al!", new Color(0.61f, 0.36f, 0.90f));
+            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Chest", 310f, 220f, "Sprites/treasure_chest", "🎁 Günlük Ödül Sandığı", "Her gün oyuna girerek sandığını aç! Seri yaptıkça altın ödülü katlanır.", new Color(1.0f, 0.82f, 0.40f));
+            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Gold", 65f, 220f, null, "🪙 Altın Topla & Kasanı Büyüt", "Engelleri aştıkça altın topla, kasanı zenginleştir ve yeni eşyalar al!", new Color(0.024f, 0.839f, 0.627f));
+            CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Wardrobe", -180f, 220f, null, "👔 Gardırop & Havalı Kostümler", "Topladığın altınlarla kahramanlarına pelerin, gözlük ve şapkalar giydir!", new Color(0.61f, 0.36f, 0.90f));
 
             // -------------------------------------------------------------
             // ALT NAVİGASYON (Dots + Önceki + Sonraki Butonları)
@@ -1547,7 +1547,10 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(40f, 32f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(170f, 28f);
             titleRt.sizeDelta = new Vector2(680f, 44f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
@@ -1562,14 +1565,17 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(40f, -26f);
-            descRt.sizeDelta = new Vector2(680f, 75f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(170f, -24f);
+            descRt.sizeDelta = new Vector2(680f, 65f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
-            descTxt.fontSize = 26;
+            descTxt.fontSize = 28;
             descTxt.alignment = TextAnchor.MiddleLeft;
-            descTxt.color = new Color(0.85f, 0.92f, 1f);
+            descTxt.color = new Color(0.88f, 0.94f, 1f);
             descTxt.raycastTarget = false;
         }
 
@@ -1601,8 +1607,11 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(40f, 26f);
-            titleRt.sizeDelta = new Vector2(280f, 40f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(170f, 26f);
+            titleRt.sizeDelta = new Vector2(230f, 44f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
             titleTxt.text = charName;
@@ -1616,8 +1625,11 @@ namespace ZiplaKac.Utils
             GameObject reqObj = new GameObject("Req");
             reqObj.transform.SetParent(row.transform, false);
             RectTransform reqRt = reqObj.AddComponent<RectTransform>();
-            reqRt.anchoredPosition = new Vector2(170f, 26f);
-            reqRt.sizeDelta = new Vector2(430f, 40f);
+            reqRt.anchorMin = new Vector2(1f, 0.5f);
+            reqRt.anchorMax = new Vector2(1f, 0.5f);
+            reqRt.pivot = new Vector2(1f, 0.5f);
+            reqRt.anchoredPosition = new Vector2(-30f, 26f);
+            reqRt.sizeDelta = new Vector2(450f, 44f);
             Text reqTxt = reqObj.AddComponent<Text>();
             reqTxt.font = GetSafeDefaultFont();
             reqTxt.text = reqText;
@@ -1631,12 +1643,15 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(40f, -24f);
-            descRt.sizeDelta = new Vector2(680f, 50f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(170f, -24f);
+            descRt.sizeDelta = new Vector2(670f, 50f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
-            descTxt.fontSize = 25;
+            descTxt.fontSize = 27;
             descTxt.alignment = TextAnchor.MiddleLeft;
             descTxt.color = new Color(0.85f, 0.92f, 1f);
             descTxt.raycastTarget = false;
@@ -1692,7 +1707,10 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(40f, 32f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(170f, 28f);
             titleRt.sizeDelta = new Vector2(680f, 44f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
@@ -1707,14 +1725,17 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(40f, -26f);
-            descRt.sizeDelta = new Vector2(680f, 75f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(170f, -24f);
+            descRt.sizeDelta = new Vector2(680f, 65f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
-            descTxt.fontSize = 26;
+            descTxt.fontSize = 28;
             descTxt.alignment = TextAnchor.MiddleLeft;
-            descTxt.color = new Color(0.85f, 0.92f, 1f);
+            descTxt.color = new Color(0.88f, 0.94f, 1f);
             descTxt.raycastTarget = false;
         }
 
@@ -1753,8 +1774,11 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(40f, 42f);
-            titleRt.sizeDelta = new Vector2(670f, 48f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(190f, 36f);
+            titleRt.sizeDelta = new Vector2(660f, 48f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
             titleTxt.text = title;
@@ -1768,14 +1792,17 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(40f, -24f);
-            descRt.sizeDelta = new Vector2(670f, 90f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(190f, -24f);
+            descRt.sizeDelta = new Vector2(660f, 85f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
-            descTxt.fontSize = 27;
+            descTxt.fontSize = 28;
             descTxt.alignment = TextAnchor.MiddleLeft;
-            descTxt.color = new Color(0.85f, 0.92f, 1f);
+            descTxt.color = new Color(0.88f, 0.94f, 1f);
             descTxt.raycastTarget = false;
         }
 
