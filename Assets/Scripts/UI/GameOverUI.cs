@@ -64,7 +64,8 @@ namespace ZiplaKac.UI
                 {
                     rewardedAdButtonText.text = "REKLAM İZLE";
                     rewardedAdButtonText.alignment = TextAnchor.MiddleLeft;
-                    rewardedAdButtonText.rectTransform.anchorMax = new Vector2(0.70f, 1f);
+                    rewardedAdButtonText.rectTransform.offsetMin = new Vector2(30f, 0f);
+                    rewardedAdButtonText.rectTransform.offsetMax = new Vector2(-140f, 0f);
                 }
             }
 
@@ -85,7 +86,8 @@ namespace ZiplaKac.UI
                     {
                         rewardedAdButtonText.text = "🎉 +100 ALTIN KAZANDIN!";
                         rewardedAdButtonText.alignment = TextAnchor.MiddleCenter;
-                        rewardedAdButtonText.rectTransform.anchorMax = Vector2.one;
+                        rewardedAdButtonText.rectTransform.offsetMin = new Vector2(20f, 0f);
+                        rewardedAdButtonText.rectTransform.offsetMax = new Vector2(-20f, 0f);
                     }
                 },
                 () => {

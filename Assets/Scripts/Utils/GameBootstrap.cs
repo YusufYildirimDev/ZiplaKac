@@ -911,22 +911,22 @@ namespace ZiplaKac.Utils
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            // Ana Obsidian Glass Kart (880x1260, Y: +20)
-            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(880f, 1260f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 20f);
+            // Kompakt & Şık Obsidian Glass Kart (860x1080, Y: +40)
+            GameObject card = CreateCardContainer(panel.transform, "GameOverCard", new Vector2(860f, 1080f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 40f);
 
-            // 1. Başlık "OYUN BİTTİ" (Şık Beyaz/Slate #f8fafc)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 50, new Vector2(0f, 495f), new Color(0.97f, 0.98f, 0.99f), false, FontStyle.Bold);
+            // 1. Başlık "OYUN BİTTİ" (Şık Beyaz #f8fafc)
+            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 48, new Vector2(0f, 450f), new Color(0.97f, 0.98f, 0.99f), false, FontStyle.Bold);
 
             // Alt Bilgi "Bir engele çarptın" (Muted Slate #94a3b8)
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 24, new Vector2(0f, 445f), new Color(0.58f, 0.64f, 0.72f), false);
+            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 22, new Vector2(0f, 402f), new Color(0.58f, 0.64f, 0.72f), false);
 
             // 2. Özel Vurgulu Skor Kutusu (Glassmorphic Score Box)
             GameObject scoreBox = new GameObject("ScoreBox");
             scoreBox.transform.SetParent(card.transform, false);
             RectTransform sbRt = scoreBox.AddComponent<RectTransform>();
-            sbRt.anchoredPosition = new Vector2(0f, 315f);
-            sbRt.sizeDelta = new Vector2(800f, 210f);
+            sbRt.anchoredPosition = new Vector2(0f, 275f);
+            sbRt.sizeDelta = new Vector2(780f, 190f);
 
             Image sbBg = scoreBox.AddComponent<Image>();
             sbBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -938,36 +938,36 @@ namespace ZiplaKac.Utils
             sbBg.raycastTarget = false;
 
             // Skor Kutusu İçi - Başlık
-            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 20, new Vector2(0f, 62f), new Color(0.58f, 0.64f, 0.72f), false, FontStyle.Bold);
+            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 20, new Vector2(0f, 56f), new Color(0.58f, 0.64f, 0.72f), false, FontStyle.Bold);
 
-            // Skor Kutusu İçi - Büyük Net Rakam (82pt Bold - Bembeyaz & Kırpılmaz)
-            goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 82, new Vector2(0f, 4f), Color.white, false, FontStyle.Bold);
+            // Skor Kutusu İçi - Büyük Net Rakam (78pt Bold - Bembeyaz & Kırpılmaz)
+            goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 78, new Vector2(0f, 2f), Color.white, false, FontStyle.Bold);
 
             // Skor Kutusu İçi - En İyi Skor
-            goUI.highScoreText = CreateText(scoreBox.transform, "HighScoreText", "🏆 En İyi Skor: 0", 24, new Vector2(0f, -62f), new Color(0.96f, 0.62f, 0.04f), false, FontStyle.Bold);
+            goUI.highScoreText = CreateText(scoreBox.transform, "HighScoreText", "🏆 En İyi Skor: 0", 22, new Vector2(0f, -56f), new Color(0.96f, 0.62f, 0.04f), false, FontStyle.Bold);
 
             // 3. Yeni Rekor Rozeti
             GameObject recBadge = new GameObject("NewRecordBadge");
             recBadge.transform.SetParent(card.transform, false);
             RectTransform recRt = recBadge.AddComponent<RectTransform>();
-            recRt.anchoredPosition = new Vector2(0f, 180f);
-            recRt.sizeDelta = new Vector2(360f, 38f);
+            recRt.anchoredPosition = new Vector2(0f, 155f);
+            recRt.sizeDelta = new Vector2(340f, 36f);
             Image recBg = recBadge.AddComponent<Image>();
-            recBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.96f, 0.62f, 0.04f), Color.white, 1f, 19, 128, 64);
+            recBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0.96f, 0.62f, 0.04f), Color.white, 1f, 18, 128, 64);
             recBg.type = Image.Type.Sliced;
             recBg.raycastTarget = false;
 
-            Text recTxt = CreateText(recBadge.transform, "RecText", "★ YENİ REKOR! ★", 22, Vector2.zero, new Color(0.06f, 0.09f, 0.16f), false, FontStyle.Bold);
-            recTxt.rectTransform.sizeDelta = new Vector2(360f, 38f);
+            Text recTxt = CreateText(recBadge.transform, "RecText", "★ YENİ REKOR! ★", 20, Vector2.zero, new Color(0.06f, 0.09f, 0.16f), false, FontStyle.Bold);
+            recTxt.rectTransform.sizeDelta = new Vector2(340f, 36f);
             goUI.newRecordBadge = recBadge;
             goUI.newRecordBadge.SetActive(false);
 
-            // 4. Altın & Kasa Bilgi Şeridi
+            // 4. Altın & Kasa Bilgi Şeridi (İçerik Tam Ortada!)
             GameObject earnBanner = new GameObject("EarningsBanner");
             earnBanner.transform.SetParent(card.transform, false);
             RectTransform ebRt = earnBanner.AddComponent<RectTransform>();
-            ebRt.anchoredPosition = new Vector2(0f, 125f);
-            ebRt.sizeDelta = new Vector2(800f, 60f);
+            ebRt.anchoredPosition = new Vector2(0f, 100f);
+            ebRt.sizeDelta = new Vector2(780f, 54f);
 
             Image ebBg = earnBanner.AddComponent<Image>();
             ebBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -993,28 +993,39 @@ namespace ZiplaKac.Utils
             GameObject ebCoin = new GameObject("CoinIcon");
             ebCoin.transform.SetParent(ebContent.transform, false);
             RectTransform ebCoinRt = ebCoin.AddComponent<RectTransform>();
-            ebCoinRt.sizeDelta = new Vector2(28f, 28f);
+            ebCoinRt.sizeDelta = new Vector2(26f, 26f);
             Image ebCoinImg = ebCoin.AddComponent<Image>();
             ebCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
             ebCoinImg.preserveAspect = true;
             ebCoinImg.raycastTarget = false;
 
-            goUI.goldEarnedText = CreateText(ebContent.transform, "GoldEarnedText", "+0 Altın Kazanıldı   •   Toplam Kasa: 0 Altın", 22, Vector2.zero, new Color(0.80f, 0.84f, 0.90f), false, FontStyle.Bold);
-            goUI.goldEarnedText.rectTransform.sizeDelta = new Vector2(650f, 50f);
+            GameObject ebTextObj = new GameObject("GoldEarnedText");
+            ebTextObj.transform.SetParent(ebContent.transform, false);
+            goUI.goldEarnedText = ebTextObj.AddComponent<Text>();
+            goUI.goldEarnedText.font = GetSafeDefaultFont();
+            goUI.goldEarnedText.fontSize = 22;
+            goUI.goldEarnedText.fontStyle = FontStyle.Bold;
+            goUI.goldEarnedText.color = new Color(0.85f, 0.89f, 0.95f);
+            goUI.goldEarnedText.text = "+0 Altın Kazanıldı   •   Toplam Kasa: 0 Altın";
+            goUI.goldEarnedText.alignment = TextAnchor.MiddleCenter;
+            goUI.goldEarnedText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            goUI.goldEarnedText.verticalOverflow = VerticalWrapMode.Overflow;
+            goUI.goldEarnedText.raycastTarget = false;
+            ebTextObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             // 5. Son 5 Skor Listesi
-            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 68f), new Color(0.40f, 0.46f, 0.56f), false);
+            goUI.scoreHistoryListText = CreateText(card.transform, "HistoryListText", "", 20, new Vector2(0f, 50f), new Color(0.40f, 0.46f, 0.56f), false);
 
             // ==========================================
-            // BUTONLAR (Standart 540x88 px, Olgun & Düzenli)
+            // BUTONLAR (Standart 540x86 px, Taşmasız Rozetler)
             // ==========================================
 
             // 6. ❤️ CAN AL & DEVAM ET Butonu (Derin Rose-Crimson #be123c)
             GameObject reviveBtn = new GameObject("ReviveButton");
             reviveBtn.transform.SetParent(card.transform, false);
             RectTransform reviveRt = reviveBtn.AddComponent<RectTransform>();
-            reviveRt.anchoredPosition = new Vector2(0f, -20f);
-            reviveRt.sizeDelta = new Vector2(540f, 88f);
+            reviveRt.anchoredPosition = new Vector2(0f, -30f);
+            reviveRt.sizeDelta = new Vector2(540f, 86f);
 
             Image reviveBg = reviveBtn.AddComponent<Image>();
             reviveBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -1029,13 +1040,14 @@ namespace ZiplaKac.Utils
             reviveBtnComp.targetGraphic = reviveBg;
             goUI.reviveButton = reviveBtnComp;
 
-            // Aksiyon Yazısı (Sol tarafa sabit, %5 -> %68 arası)
+            // Aksiyon Yazısı (Sol tarafa sabit, taşma payı bırakılmış)
             GameObject revTitleObj = new GameObject("Title");
             revTitleObj.transform.SetParent(reviveBtn.transform, false);
             RectTransform revTitleRt = revTitleObj.AddComponent<RectTransform>();
-            revTitleRt.anchorMin = new Vector2(0.05f, 0f);
-            revTitleRt.anchorMax = new Vector2(0.68f, 1f);
-            revTitleRt.offsetMin = Vector2.zero; revTitleRt.offsetMax = Vector2.zero;
+            revTitleRt.anchorMin = Vector2.zero;
+            revTitleRt.anchorMax = Vector2.one;
+            revTitleRt.offsetMin = new Vector2(28f, 0f);
+            revTitleRt.offsetMax = new Vector2(-140f, 0f);
 
             Text revTitleTxt = revTitleObj.AddComponent<Text>();
             revTitleTxt.font = GetSafeDefaultFont();
@@ -1049,27 +1061,30 @@ namespace ZiplaKac.Utils
             revTitleTxt.raycastTarget = false;
             goUI.reviveButtonText = revTitleTxt;
 
-            // Sağ Taraf: Bağımsız Fiyat Rozeti (%70 -> %96 arası, asla çakışmaz!)
+            // Sağ Taraf: Sağ kenara 16px mesafeyle kilitli rozet (Kesinlikle taşmaz!)
             GameObject revBadgeObj = new GameObject("PriceBadge");
             revBadgeObj.transform.SetParent(reviveBtn.transform, false);
             RectTransform revBadgeRt = revBadgeObj.AddComponent<RectTransform>();
-            revBadgeRt.anchorMin = new Vector2(0.70f, 0.5f);
-            revBadgeRt.anchorMax = new Vector2(0.96f, 0.5f);
-            revBadgeRt.sizeDelta = new Vector2(130f, 42f);
-            revBadgeRt.anchoredPosition = Vector2.zero;
+            revBadgeRt.anchorMin = new Vector2(1f, 0.5f);
+            revBadgeRt.anchorMax = new Vector2(1f, 0.5f);
+            revBadgeRt.pivot = new Vector2(1f, 0.5f);
+            revBadgeRt.anchoredPosition = new Vector2(-16f, 0f);
+            revBadgeRt.sizeDelta = new Vector2(116f, 42f);
 
             Image revBadgeBg = revBadgeObj.AddComponent<Image>();
             revBadgeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0f, 0f, 0f, 0.35f), Color.clear, 0f, 14, 64, 64);
             revBadgeBg.type = Image.Type.Sliced;
             revBadgeBg.raycastTarget = false;
 
-            // Rozet içi Altın Sikkesi (26x26)
+            // Rozet içi Altın Sikkesi (24x24)
             GameObject revCoinObj = new GameObject("CoinIcon");
             revCoinObj.transform.SetParent(revBadgeObj.transform, false);
             RectTransform revCoinRt = revCoinObj.AddComponent<RectTransform>();
-            revCoinRt.anchorMin = new Vector2(0f, 0.5f); revCoinRt.anchorMax = new Vector2(0f, 0.5f);
-            revCoinRt.anchoredPosition = new Vector2(22f, 0f);
-            revCoinRt.sizeDelta = new Vector2(26f, 26f);
+            revCoinRt.anchorMin = new Vector2(0f, 0.5f);
+            revCoinRt.anchorMax = new Vector2(0f, 0.5f);
+            revCoinRt.pivot = new Vector2(0.5f, 0.5f);
+            revCoinRt.anchoredPosition = new Vector2(20f, 0f);
+            revCoinRt.sizeDelta = new Vector2(24f, 24f);
             Image revCoinImg = revCoinObj.AddComponent<Image>();
             revCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
             revCoinImg.preserveAspect = true;
@@ -1080,12 +1095,14 @@ namespace ZiplaKac.Utils
             GameObject revPriceObj = new GameObject("Price");
             revPriceObj.transform.SetParent(revBadgeObj.transform, false);
             RectTransform revPriceRt = revPriceObj.AddComponent<RectTransform>();
-            revPriceRt.anchorMin = Vector2.zero; revPriceRt.anchorMax = Vector2.one;
-            revPriceRt.offsetMin = new Vector2(38f, 0f); revPriceRt.offsetMax = new Vector2(-4f, 0f);
+            revPriceRt.anchorMin = Vector2.zero;
+            revPriceRt.anchorMax = Vector2.one;
+            revPriceRt.offsetMin = new Vector2(34f, 0f);
+            revPriceRt.offsetMax = new Vector2(-4f, 0f);
 
             Text revPriceTxt = revPriceObj.AddComponent<Text>();
             revPriceTxt.font = GetSafeDefaultFont();
-            revPriceTxt.fontSize = 24;
+            revPriceTxt.fontSize = 22;
             revPriceTxt.fontStyle = FontStyle.Bold;
             revPriceTxt.color = new Color(0.98f, 0.75f, 0.14f);
             revPriceTxt.text = "500";
@@ -1097,7 +1114,7 @@ namespace ZiplaKac.Utils
 
             // 7. TEKRAR OYNA Butonu (Ana Eylem - Şık Safir/İndigo #2563eb)
             Color primaryBlue = new Color(0.14f, 0.38f, 0.92f);
-            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -125f), new Vector2(540f, 88f), primaryBlue, Color.white, 30);
+            GameObject restartBtn = CreatePillButton(card.transform, "RestartButton", "TEKRAR OYNA", new Vector2(0f, -130f), new Vector2(540f, 86f), primaryBlue, Color.white, 30);
             goUI.restartButton = restartBtn.GetComponent<Button>();
 
             // 8. REKLAM İZLE Butonu (Koyu Slate #182033 + Altın Rozeti)
@@ -1105,7 +1122,7 @@ namespace ZiplaKac.Utils
             adBtn.transform.SetParent(card.transform, false);
             RectTransform adRt = adBtn.AddComponent<RectTransform>();
             adRt.anchoredPosition = new Vector2(0f, -230f);
-            adRt.sizeDelta = new Vector2(540f, 88f);
+            adRt.sizeDelta = new Vector2(540f, 86f);
 
             Color slateBtnBg = new Color(0.10f, 0.14f, 0.24f);
             Color slateBorder = new Color(0.24f, 0.32f, 0.46f, 0.6f);
@@ -1120,9 +1137,10 @@ namespace ZiplaKac.Utils
             GameObject adTitleObj = new GameObject("Title");
             adTitleObj.transform.SetParent(adBtn.transform, false);
             RectTransform adTitleRt = adTitleObj.AddComponent<RectTransform>();
-            adTitleRt.anchorMin = new Vector2(0.05f, 0f);
-            adTitleRt.anchorMax = new Vector2(0.68f, 1f);
-            adTitleRt.offsetMin = Vector2.zero; adTitleRt.offsetMax = Vector2.zero;
+            adTitleRt.anchorMin = Vector2.zero;
+            adTitleRt.anchorMax = Vector2.one;
+            adTitleRt.offsetMin = new Vector2(28f, 0f);
+            adTitleRt.offsetMax = new Vector2(-140f, 0f);
 
             Text adTitleTxt = adTitleObj.AddComponent<Text>();
             adTitleTxt.font = GetSafeDefaultFont();
@@ -1136,14 +1154,15 @@ namespace ZiplaKac.Utils
             adTitleTxt.raycastTarget = false;
             goUI.rewardedAdButtonText = adTitleTxt;
 
-            // Reklam Ödül Rozeti (+100 🪙)
+            // Sağ Taraf: Reklam Ödül Rozeti (+100 🪙 - Sağ kenara kilitli!)
             GameObject adBadgeObj = new GameObject("RewardBadge");
             adBadgeObj.transform.SetParent(adBtn.transform, false);
             RectTransform adBadgeRt = adBadgeObj.AddComponent<RectTransform>();
-            adBadgeRt.anchorMin = new Vector2(0.70f, 0.5f);
-            adBadgeRt.anchorMax = new Vector2(0.96f, 0.5f);
-            adBadgeRt.sizeDelta = new Vector2(130f, 42f);
-            adBadgeRt.anchoredPosition = Vector2.zero;
+            adBadgeRt.anchorMin = new Vector2(1f, 0.5f);
+            adBadgeRt.anchorMax = new Vector2(1f, 0.5f);
+            adBadgeRt.pivot = new Vector2(1f, 0.5f);
+            adBadgeRt.anchoredPosition = new Vector2(-16f, 0f);
+            adBadgeRt.sizeDelta = new Vector2(116f, 42f);
 
             Image adBadgeBg = adBadgeObj.AddComponent<Image>();
             adBadgeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(0f, 0f, 0f, 0.35f), Color.clear, 0f, 14, 64, 64);
@@ -1154,9 +1173,11 @@ namespace ZiplaKac.Utils
             GameObject adCoinObj = new GameObject("CoinIcon");
             adCoinObj.transform.SetParent(adBadgeObj.transform, false);
             RectTransform adCoinRt = adCoinObj.AddComponent<RectTransform>();
-            adCoinRt.anchorMin = new Vector2(0f, 0.5f); adCoinRt.anchorMax = new Vector2(0f, 0.5f);
-            adCoinRt.anchoredPosition = new Vector2(22f, 0f);
-            adCoinRt.sizeDelta = new Vector2(26f, 26f);
+            adCoinRt.anchorMin = new Vector2(0f, 0.5f);
+            adCoinRt.anchorMax = new Vector2(0f, 0.5f);
+            adCoinRt.pivot = new Vector2(0.5f, 0.5f);
+            adCoinRt.anchoredPosition = new Vector2(20f, 0f);
+            adCoinRt.sizeDelta = new Vector2(24f, 24f);
             Image adCoinImg = adCoinObj.AddComponent<Image>();
             adCoinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
             adCoinImg.preserveAspect = true;
@@ -1165,12 +1186,14 @@ namespace ZiplaKac.Utils
             GameObject adValObj = new GameObject("Value");
             adValObj.transform.SetParent(adBadgeObj.transform, false);
             RectTransform adValRt = adValObj.AddComponent<RectTransform>();
-            adValRt.anchorMin = Vector2.zero; adValRt.anchorMax = Vector2.one;
-            adValRt.offsetMin = new Vector2(38f, 0f); adValRt.offsetMax = new Vector2(-4f, 0f);
+            adValRt.anchorMin = Vector2.zero;
+            adValRt.anchorMax = Vector2.one;
+            adValRt.offsetMin = new Vector2(34f, 0f);
+            adValRt.offsetMax = new Vector2(-4f, 0f);
 
             Text adValTxt = adValObj.AddComponent<Text>();
             adValTxt.font = GetSafeDefaultFont();
-            adValTxt.fontSize = 24;
+            adValTxt.fontSize = 22;
             adValTxt.fontStyle = FontStyle.Bold;
             adValTxt.color = new Color(0.98f, 0.75f, 0.14f);
             adValTxt.text = "+100";
@@ -1181,7 +1204,7 @@ namespace ZiplaKac.Utils
 
             // 9. ANA MENÜ Butonu (Minimalist Slate #0b1120)
             Color ghostBg = new Color(0.06f, 0.09f, 0.16f);
-            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -335f), new Vector2(540f, 88f), ghostBg, new Color(0.65f, 0.72f, 0.82f), 28);
+            GameObject menuBtn = CreatePillButton(card.transform, "MainMenuButton", "ANA MENÜ", new Vector2(0f, -330f), new Vector2(540f, 86f), ghostBg, new Color(0.65f, 0.72f, 0.82f), 28);
             goUI.mainMenuButton = menuBtn.GetComponent<Button>();
 
             panel.SetActive(false);
