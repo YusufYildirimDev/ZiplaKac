@@ -1026,10 +1026,10 @@ namespace ZiplaKac.Utils
             GameObject ebTextObj = new GameObject("GoldEarnedText");
             ebTextObj.transform.SetParent(ebContent.transform, false);
             RectTransform ebTxtRt = ebTextObj.AddComponent<RectTransform>();
-            ebTxtRt.sizeDelta = new Vector2(750f, 52f);
+            ebTxtRt.sizeDelta = new Vector2(900f, 60f);
             goUI.goldEarnedText = ebTextObj.AddComponent<Text>();
             goUI.goldEarnedText.font = GetSafeDefaultFont();
-            goUI.goldEarnedText.fontSize = 28;
+            goUI.goldEarnedText.fontSize = 40;
             goUI.goldEarnedText.fontStyle = FontStyle.Bold;
             goUI.goldEarnedText.color = Color.white;
             goUI.goldEarnedText.supportRichText = true;
@@ -1169,12 +1169,12 @@ namespace ZiplaKac.Utils
             adTxtRt.anchorMax = new Vector2(0f, 0.5f);
             adTxtRt.pivot = new Vector2(0f, 0.5f);
             adTxtRt.anchoredPosition = new Vector2(52f, 0f);
-            adTxtRt.sizeDelta = new Vector2(220f, 48f);
+            adTxtRt.sizeDelta = new Vector2(280f, 48f);
 
             Text adText = adTxtObj.AddComponent<Text>();
             adText.font = GetSafeDefaultFont();
             adText.text = "REKLAM İZLE";
-            adText.fontSize = 30;
+            adText.fontSize = 40;
             adText.fontStyle = FontStyle.Bold;
             adText.color = Color.white;
             adText.alignment = TextAnchor.MiddleLeft;
@@ -1245,12 +1245,12 @@ namespace ZiplaKac.Utils
             revTxtRt.anchorMax = new Vector2(0f, 0.5f);
             revTxtRt.pivot = new Vector2(0f, 0.5f);
             revTxtRt.anchoredPosition = new Vector2(48f, 0f);
-            revTxtRt.sizeDelta = new Vector2(195f, 58f);
+            revTxtRt.sizeDelta = new Vector2(240f, 70f);
 
             Text revText = revTxtObj.AddComponent<Text>();
             revText.font = GetSafeDefaultFont();
             revText.text = "CAN AL\nDEVAM ET";
-            revText.fontSize = 25;
+            revText.fontSize = 40;
             revText.fontStyle = FontStyle.Bold;
             revText.color = Color.white;
             revText.lineSpacing = 0.92f;
@@ -1310,12 +1310,12 @@ namespace ZiplaKac.Utils
             menuTxtRt.anchorMax = new Vector2(0f, 0.5f);
             menuTxtRt.pivot = new Vector2(0f, 0.5f);
             menuTxtRt.anchoredPosition = new Vector2(48f, 0f);
-            menuTxtRt.sizeDelta = new Vector2(225f, 48f);
+            menuTxtRt.sizeDelta = new Vector2(280f, 55f);
 
             Text menuText = menuTxtObj.AddComponent<Text>();
             menuText.font = GetSafeDefaultFont();
             menuText.text = "ANA MENÜ";
-            menuText.fontSize = 34;
+            menuText.fontSize = 40;
             menuText.fontStyle = FontStyle.Bold;
             menuText.color = Color.white;
             menuText.alignment = TextAnchor.MiddleLeft;
