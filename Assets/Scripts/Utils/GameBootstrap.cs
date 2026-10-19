@@ -90,11 +90,6 @@ namespace ZiplaKac.Utils
             {
                 camData.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.FastApproximateAntialiasing;
             }
-
-            if (mainCam.GetComponent<ResponsiveCamera>() == null)
-            {
-                mainCam.gameObject.AddComponent<ResponsiveCamera>();
-            }
         }
 
         private void SetupManagers()
@@ -590,11 +585,6 @@ namespace ZiplaKac.Utils
             rt.sizeDelta = size;
             rt.anchoredPosition = Vector2.zero;
 
-            var responsive = card.AddComponent<UI.CardResponsiveScaler>();
-            responsive.targetWidth = size.x;
-            responsive.targetHeight = size.y;
-            responsive.padding = 30f;
-
             Image img = card.AddComponent<Image>();
             // #141a30 (%88 alpha) + subtle border (%14 alpha)
             img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -718,11 +708,9 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.45f);
 
-            GameObject safeArea = UI.SafeAreaFitter.Create(panel.transform, "Menu_SafeArea");
-
-            // Centered Glassmorphic Card (920x1260, Y: +40 so player is clearly visible below)
-            GameObject card = CreateCardContainer(safeArea.transform, "MenuCard", new Vector2(920f, 1260f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 40f);
+            // Centered Glassmorphic Card (920x1260, Y: +90 so player is clearly visible below)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
 
             // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin, Şık Sıcak Altın)
             CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 72, new Vector2(0f, 510f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
@@ -818,21 +806,21 @@ namespace ZiplaKac.Utils
             // Top Header Bar — Premium Arcade Glassmorphic Badges
             // 1. Anlık Skor (Sol Üst Neon Mint Badge - Güvenli Alan Köşesine Sabitli)
             Sprite scoreIcon = ProceduralSpriteGenerator.CreateScoreStarSprite();
-            CreateHUDBadge(safeArea.transform, "ScorePill", new Vector2(340f, 96f), new Vector2(28f, -24f),
+            CreateHUDBadge(safeArea.transform, "ScorePill", new Vector2(340f, 96f), new Vector2(30f, -28f),
                 new Color(0.06f, 0.09f, 0.18f, 0.94f), new Color(0.024f, 0.839f, 0.627f, 0.95f), 3.0f,
                 scoreIcon, "<size=20><color=#8da4c4>SKOR</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
                 Color.white, 24, out hud.currentScoreText, new Vector2(0f, 1f), new Vector2(0f, 1f));
 
             // 2. Altın Rozeti (Sol Üst Skorun altında — Parlak Altın Sikke Rozeti)
             Sprite coinIcon = ProceduralSpriteGenerator.CreateGoldCoinSprite();
-            CreateHUDBadge(safeArea.transform, "GoldPill", new Vector2(280f, 86f), new Vector2(28f, -132f),
+            CreateHUDBadge(safeArea.transform, "GoldPill", new Vector2(280f, 86f), new Vector2(30f, -136f),
                 new Color(0.09f, 0.08f, 0.14f, 0.94f), new Color(1.0f, 0.82f, 0.25f, 0.95f), 3.0f,
                 coinIcon, "<size=18><color=#ffd166>ALTIN</color></size>\n<size=38><color=#ffea79><b>0</b></color></size>",
                 new Color(1.0f, 0.92f, 0.45f), 22, out hud.goldText, new Vector2(0f, 1f), new Vector2(0f, 1f));
 
             // 3. En İyi Skor (Sağ Üst — Parlak Altın Kupa / Rekor Rozeti)
             Sprite trophyIcon = ProceduralSpriteGenerator.CreateTrophyIconSprite();
-            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(340f, 96f), new Vector2(-28f, -24f),
+            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(340f, 96f), new Vector2(-30f, -28f),
                 new Color(0.08f, 0.07f, 0.16f, 0.94f), new Color(0.98f, 0.75f, 0.18f, 0.95f), 3.0f,
                 trophyIcon, "<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
                 Color.white, 24, out hud.highScoreText, new Vector2(1f, 1f), new Vector2(1f, 1f));
@@ -844,7 +832,7 @@ namespace ZiplaKac.Utils
             barRt.anchorMin = new Vector2(0.5f, 1f);
             barRt.anchorMax = new Vector2(0.5f, 1f);
             barRt.pivot = new Vector2(0.5f, 1f);
-            barRt.anchoredPosition = new Vector2(0f, -24f);
+            barRt.anchoredPosition = new Vector2(0f, -28f);
             barRt.sizeDelta = new Vector2(300f, 80f);
 
             hud.shieldBadgeText = CreateText(badgeBar.transform, "ShieldBadge", "Kalkan", 26, new Vector2(-95f, -40f), new Color(0.30f, 0.79f, 0.94f), false, FontStyle.Bold);
@@ -895,7 +883,7 @@ namespace ZiplaKac.Utils
             tipRt.anchorMin = new Vector2(0.5f, 0f);
             tipRt.anchorMax = new Vector2(0.5f, 0f);
             tipRt.pivot = new Vector2(0.5f, 0f);
-            tipRt.anchoredPosition = new Vector2(0f, 25f);
+            tipRt.anchoredPosition = new Vector2(0f, 28f);
 
             // Kombo Bildirim Kartı (Ekranın Üst-Orta Kısmı, Y: -135)
             GameObject comboCard = CreateCardContainer(safeArea.transform, "ComboNotificationCard", new Vector2(460f, 84f));
@@ -946,22 +934,15 @@ namespace ZiplaKac.Utils
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
-            GameObject safeArea = UI.SafeAreaFitter.Create(panel.transform, "GameOver_SafeArea");
-
             // Ana Kart (920x1340 px, #18263b - Ekran Orantısı Tam Dengeli)
             GameObject card = new GameObject("GameOverCard");
-            card.transform.SetParent(safeArea.transform, false);
+            card.transform.SetParent(panel.transform, false);
             RectTransform cardRt = card.AddComponent<RectTransform>();
             cardRt.anchorMin = new Vector2(0.5f, 0.5f);
             cardRt.anchorMax = new Vector2(0.5f, 0.5f);
             cardRt.pivot = new Vector2(0.5f, 0.5f);
             cardRt.sizeDelta = new Vector2(920f, 1340f);
             cardRt.anchoredPosition = Vector2.zero;
-
-            var cardScaler = card.AddComponent<UI.CardResponsiveScaler>();
-            cardScaler.targetWidth = 920f;
-            cardScaler.targetHeight = 1340f;
-            cardScaler.padding = 30f;
 
             Color cardBg = new Color(0.094f, 0.149f, 0.231f, 0.98f);
             Color cardBorder = new Color(0.18f, 0.28f, 0.40f, 0.55f);
@@ -1384,10 +1365,8 @@ namespace ZiplaKac.Utils
 
             UI.DailyRewardModalUI modalUI = modal.AddComponent<UI.DailyRewardModalUI>();
 
-            GameObject safeArea = UI.SafeAreaFitter.Create(modal.transform, "Reward_SafeArea");
-
             // Modal Card (920x1360) - Ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(safeArea.transform, "RewardCard", new Vector2(920f, 1360f));
+            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(920f, 1360f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
             // Başlık (Büyük ve Belirgin)
@@ -1442,10 +1421,8 @@ namespace ZiplaKac.Utils
 
             UI.WardrobeModalUI modalUI = modal.AddComponent<UI.WardrobeModalUI>();
 
-            GameObject safeArea = UI.SafeAreaFitter.Create(modal.transform, "Wardrobe_SafeArea");
-
             // Modal Card (940x1520) - Geniş, ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(safeArea.transform, "WardrobeCard", new Vector2(940f, 1520f));
+            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(940f, 1520f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             Image cardImg = card.GetComponent<Image>();
             cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -1534,10 +1511,8 @@ namespace ZiplaKac.Utils
 
             UI.OnboardingModalUI modalUI = modal.AddComponent<UI.OnboardingModalUI>();
 
-            GameObject safeArea = UI.SafeAreaFitter.Create(modal.transform, "Onboarding_SafeArea");
-
             // Onboarding Card (940x1520)
-            GameObject card = CreateCardContainer(safeArea.transform, "OnboardingCard", new Vector2(940f, 1520f));
+            GameObject card = CreateCardContainer(modal.transform, "OnboardingCard", new Vector2(940f, 1520f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             modalUI.modalCard = card;
 
