@@ -110,6 +110,11 @@ namespace ZiplaKac.UI
             lockNoticeText.fontSize = 22;
             lockNoticeText.fontStyle = FontStyle.Bold;
             lockNoticeText.alignment = TextAnchor.MiddleCenter;
+            lockNoticeText.resizeTextForBestFit = true;
+            lockNoticeText.resizeTextMinSize = 14;
+            lockNoticeText.resizeTextMaxSize = 22;
+            lockNoticeText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            lockNoticeText.verticalOverflow = VerticalWrapMode.Truncate;
             lockNoticeText.color = new Color(1.0f, 0.85f, 0.35f);
             lockNoticeText.raycastTarget = false;
 
@@ -218,6 +223,11 @@ namespace ZiplaKac.UI
                     lockTxt.fontSize = 17;
                     lockTxt.fontStyle = FontStyle.Bold;
                     lockTxt.alignment = TextAnchor.MiddleCenter;
+                    lockTxt.resizeTextForBestFit = true;
+                    lockTxt.resizeTextMinSize = 12;
+                    lockTxt.resizeTextMaxSize = 17;
+                    lockTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+                    lockTxt.verticalOverflow = VerticalWrapMode.Truncate;
                     lockTxt.color = new Color(1f, 0.85f, 0.35f, 0.95f);
                     lockTxt.raycastTarget = false;
 
@@ -235,6 +245,11 @@ namespace ZiplaKac.UI
                     nameTxt.fontSize = 26;
                     nameTxt.fontStyle = FontStyle.Bold;
                     nameTxt.alignment = TextAnchor.MiddleCenter;
+                    nameTxt.resizeTextForBestFit = true;
+                    nameTxt.resizeTextMinSize = 16;
+                    nameTxt.resizeTextMaxSize = 26;
+                    nameTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+                    nameTxt.verticalOverflow = VerticalWrapMode.Truncate;
                     nameTxt.color = new Color(0.96f, 0.96f, 0.98f, 0.85f);
                     nameTxt.raycastTarget = false;
                     card.nameText = nameTxt;

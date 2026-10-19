@@ -438,7 +438,7 @@ namespace ZiplaKac.UI
 
             // 2. Metin Alanı (Daha büyük ve okunaklı: 36pt başlık / 26pt alt yazı)
             float textLeft = hasVisual ? 172f : 24f;
-            float textWidth = hasVisual ? 425f : 570f;
+            float textWidth = hasVisual ? 385f : 530f;
 
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(rowObj.transform, false);
@@ -451,15 +451,18 @@ namespace ZiplaKac.UI
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;
-            labelText.fontSize = 36;
+            labelText.fontSize = 34;
             labelText.fontStyle = FontStyle.Bold;
             labelText.alignment = TextAnchor.MiddleLeft;
             labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelText.verticalOverflow = VerticalWrapMode.Truncate;
+            labelText.resizeTextForBestFit = true;
+            labelText.resizeTextMinSize = 22;
+            labelText.resizeTextMaxSize = 34;
             labelText.color = Color.white;
             labelText.text = $"{title}\n<size=26><color=#b8c8dc>{subtitle}</color></size>";
 
-            // 3. Buton Alanı (Genişletilmiş ve büyük: 240x86)
+            // 3. Buton Alanı (Genişletilmiş ve dengeli: 260x82)
             GameObject btnObj = new GameObject("ActionBtn");
             btnObj.transform.SetParent(rowObj.transform, false);
             RectTransform btnRt = btnObj.AddComponent<RectTransform>();
@@ -467,7 +470,7 @@ namespace ZiplaKac.UI
             btnRt.anchorMax = new Vector2(1f, 0.5f);
             btnRt.pivot = new Vector2(1f, 0.5f);
             btnRt.anchoredPosition = new Vector2(-16f, 0f);
-            btnRt.sizeDelta = new Vector2(240f, 86f);
+            btnRt.sizeDelta = new Vector2(260f, 82f);
 
             Image btnBg = btnObj.AddComponent<Image>();
             Color finalBtnColor = btnColor ?? new Color(1.0f, 0.82f, 0.40f);
@@ -495,7 +498,7 @@ namespace ZiplaKac.UI
 
                 HorizontalLayoutGroup hlg = contentObj.AddComponent<HorizontalLayoutGroup>();
                 hlg.childAlignment = TextAnchor.MiddleCenter;
-                hlg.spacing = 8f;
+                hlg.spacing = 6f;
                 hlg.childControlWidth = false;
                 hlg.childControlHeight = false;
                 hlg.childForceExpandWidth = false;
@@ -506,18 +509,21 @@ namespace ZiplaKac.UI
                 actObj.transform.SetParent(contentObj.transform, false);
                 Text actTxt = actObj.AddComponent<Text>();
                 actTxt.font = font;
-                actTxt.fontSize = 26;
+                actTxt.fontSize = 22;
                 actTxt.fontStyle = FontStyle.Bold;
                 actTxt.color = textCol;
                 actTxt.text = btnText;
                 actTxt.alignment = TextAnchor.MiddleCenter;
+                actTxt.resizeTextForBestFit = true;
+                actTxt.resizeTextMinSize = 16;
+                actTxt.resizeTextMaxSize = 24;
                 actObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-                // 2. Altın Sikke Görseli (32x32)
+                // 2. Altın Sikke Görseli (28x28)
                 GameObject coinObj = new GameObject("CoinIcon");
                 coinObj.transform.SetParent(contentObj.transform, false);
                 RectTransform coinRt = coinObj.AddComponent<RectTransform>();
-                coinRt.sizeDelta = new Vector2(32f, 32f);
+                coinRt.sizeDelta = new Vector2(28f, 28f);
                 Image coinImg = coinObj.AddComponent<Image>();
                 coinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
                 coinImg.preserveAspect = true;
@@ -528,11 +534,14 @@ namespace ZiplaKac.UI
                 priceObj.transform.SetParent(contentObj.transform, false);
                 Text priceTxt = priceObj.AddComponent<Text>();
                 priceTxt.font = font;
-                priceTxt.fontSize = 26;
+                priceTxt.fontSize = 22;
                 priceTxt.fontStyle = FontStyle.Bold;
                 priceTxt.color = textCol;
                 priceTxt.text = price.ToString();
                 priceTxt.alignment = TextAnchor.MiddleCenter;
+                priceTxt.resizeTextForBestFit = true;
+                priceTxt.resizeTextMinSize = 16;
+                priceTxt.resizeTextMaxSize = 24;
                 priceObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             }
             else
@@ -543,14 +552,17 @@ namespace ZiplaKac.UI
                 RectTransform btnTxtRt = btnTxtObj.AddComponent<RectTransform>();
                 btnTxtRt.anchorMin = Vector2.zero;
                 btnTxtRt.anchorMax = Vector2.one;
-                btnTxtRt.offsetMin = Vector2.zero;
-                btnTxtRt.offsetMax = Vector2.zero;
+                btnTxtRt.offsetMin = new Vector2(8f, 0f);
+                btnTxtRt.offsetMax = new Vector2(-8f, 0f);
 
                 Text bTxt = btnTxtObj.AddComponent<Text>();
                 bTxt.font = font;
-                bTxt.fontSize = 28;
+                bTxt.fontSize = 26;
                 bTxt.fontStyle = FontStyle.Bold;
                 bTxt.alignment = TextAnchor.MiddleCenter;
+                bTxt.resizeTextForBestFit = true;
+                bTxt.resizeTextMinSize = 18;
+                bTxt.resizeTextMaxSize = 28;
                 bTxt.color = textCol;
                 bTxt.text = btnText;
             }
