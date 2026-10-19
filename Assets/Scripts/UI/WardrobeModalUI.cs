@@ -122,14 +122,6 @@ namespace ZiplaKac.UI
             }
         }
 
-        public void OpenWithTab(ShopTab tab)
-        {
-            currentTab = tab;
-            gameObject.SetActive(true);
-            RefreshUI();
-            if (itemsScrollRect != null) itemsScrollRect.verticalNormalizedPosition = 1f;
-        }
-
         public void SwitchTab(ShopTab tab)
         {
             currentTab = tab;
