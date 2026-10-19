@@ -21,6 +21,8 @@ namespace ZiplaKac.Editor
             PlayerSettings.iOS.appleDeveloperTeamID = "5A4A2VUMDM";
             PlayerSettings.iOS.appleEnableAutomaticSigning = true;
 
+            ConfigureAppIcons();
+
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
             {
                 scenes = scenes,
@@ -37,12 +39,79 @@ namespace ZiplaKac.Editor
             if (summary.result == BuildResult.Succeeded)
             {
                 Debug.Log("[BuildPipelineScript] iOS Build succeeded!");
+                SyncAppIconToXcodeBuild(buildPath);
                 EditorApplication.Exit(0);
             }
             else
             {
                 Debug.LogError($"[BuildPipelineScript] iOS Build failed with {summary.totalErrors} errors!");
                 EditorApplication.Exit(1);
+            }
+        }
+
+        private static void ConfigureAppIcons()
+        {
+            string masterIconPath = "Assets/Art/AppIcon/app_icon_1024.png";
+            TextureImporter ti = AssetImporter.GetAtPath(masterIconPath) as TextureImporter;
+            if (ti != null)
+            {
+                bool changed = false;
+                if (!ti.isReadable) { ti.isReadable = true; changed = true; }
+                if (ti.maxTextureSize < 1024) { ti.maxTextureSize = 1024; changed = true; }
+                if (ti.textureCompression != TextureImporterCompression.Uncompressed)
+                {
+                    ti.textureCompression = TextureImporterCompression.Uncompressed;
+                    changed = true;
+                }
+                if (changed)
+                {
+                    ti.SaveAndReimport();
+                    AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                }
+            }
+
+            Texture2D iconTex = AssetDatabase.LoadAssetAtPath<Texture2D>(masterIconPath);
+            if (iconTex != null)
+            {
+                PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.iOS, new Texture2D[] { iconTex });
+                PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown, new Texture2D[] { iconTex });
+                Debug.Log("[BuildPipelineScript] Assigned app icon to iOS and Unknown target groups.");
+            }
+            else
+            {
+                Debug.LogWarning($"[BuildPipelineScript] Could not load master icon from {masterIconPath}");
+            }
+        }
+
+        private static void SyncAppIconToXcodeBuild(string buildPath)
+        {
+            try
+            {
+                string sourceDir = "Assets/Art/AppIcon/AppIcon.appiconset";
+                string targetDir = System.IO.Path.Combine(buildPath, "Unity-iPhone/Images.xcassets/AppIcon.appiconset");
+
+                if (!System.IO.Directory.Exists(sourceDir))
+                {
+                    Debug.LogWarning($"[BuildPipelineScript] Source icon set not found at {sourceDir}");
+                    return;
+                }
+
+                if (!System.IO.Directory.Exists(targetDir))
+                {
+                    System.IO.Directory.CreateDirectory(targetDir);
+                }
+
+                foreach (string srcFile in System.IO.Directory.GetFiles(sourceDir))
+                {
+                    if (srcFile.EndsWith(".meta")) continue;
+                    string destFile = System.IO.Path.Combine(targetDir, System.IO.Path.GetFileName(srcFile));
+                    System.IO.File.Copy(srcFile, destFile, true);
+                }
+                Debug.Log($"[BuildPipelineScript] Successfully synced AppIcon.appiconset to {targetDir}");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[BuildPipelineScript] Failed syncing AppIcon.appiconset: {ex.Message}");
             }
         }
 
