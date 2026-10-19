@@ -589,11 +589,11 @@ namespace ZiplaKac.Utils
             rt.anchoredPosition = Vector2.zero;
 
             Image img = card.AddComponent<Image>();
-            // Solid Deep Navy (#151e36, %98 alpha) + yumuşak 36px köşe kavisleri
+            // Solid Deep Navy (#151e36, %98 alpha) + yumuşak 48px köşe kavisleri (HD Retina 256x256)
             img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 new Color(0.082f, 0.118f, 0.212f, 0.98f),
                 new Color(1f, 1f, 1f, 0.08f),
-                1.5f, 36, 128, 128);
+                2.0f, 48, 256, 256);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
 

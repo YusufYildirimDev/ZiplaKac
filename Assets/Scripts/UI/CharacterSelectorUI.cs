@@ -351,12 +351,12 @@ namespace ZiplaKac.UI
 
                     card.lockOverlay = lockObj;
 
-                    // Karakter İsmi ve Seçili Pill Rozeti (Mockup 94x32 px)
+                    // Karakter İsmi ve Seçili Pill Rozeti (HD 104x34 px)
                     GameObject nameObj = new GameObject("NamePill");
                     nameObj.transform.SetParent(cardObj.transform, false);
                     RectTransform nameRt = nameObj.AddComponent<RectTransform>();
                     nameRt.anchoredPosition = new Vector2(0f, -56f);
-                    nameRt.sizeDelta = new Vector2(94f, 32f);
+                    nameRt.sizeDelta = new Vector2(104f, 34f);
 
                     Image namePillBg = nameObj.AddComponent<Image>();
                     Sprite badgeSp = LoadUISprite("badge_selected_name");
