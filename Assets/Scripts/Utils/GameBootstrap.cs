@@ -589,18 +589,18 @@ namespace ZiplaKac.Utils
             rt.anchoredPosition = Vector2.zero;
 
             Image img = card.AddComponent<Image>();
-            // #141a30 (%88 alpha) + subtle border (%14 alpha)
+            // Solid Deep Navy (#151e36, %98 alpha) + yumuşak 36px köşe kavisleri
             img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.10f, 0.19f, 0.88f),
-                new Color(1f, 1f, 1f, 0.14f),
-                2f, 24, 128, 128);
+                new Color(0.082f, 0.118f, 0.212f, 0.98f),
+                new Color(1f, 1f, 1f, 0.08f),
+                1.5f, 36, 128, 128);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
 
             return card;
         }
 
-        private static GameObject CreatePillButton(Transform parent, string name, string label, Vector2 position, Vector2 size, Color bgColor, Color textColor, int fontSize = 32, Color? borderColor = null, float borderWidth = 0f)
+        private static GameObject CreatePillButton(Transform parent, string name, string label, Vector2 position, Vector2 size, Color bgColor, Color textColor, int fontSize = 32, Color? borderColor = null, float borderWidth = 0f, int cornerRadius = 24)
         {
             GameObject obj = new GameObject(name);
             obj.transform.SetParent(parent, false);
@@ -610,7 +610,7 @@ namespace ZiplaKac.Utils
 
             Image img = obj.AddComponent<Image>();
             Color border = borderColor ?? Color.clear;
-            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, border, borderWidth, 22, 128, 64);
+            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, border, borderWidth, cornerRadius, 128, 64);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
 
@@ -701,7 +701,51 @@ namespace ZiplaKac.Utils
             return card;
         }
 
-        private static GameObject CreateSquareIconButton(Transform parent, string name, string iconText, string labelText, Vector2 position, Vector2 size, Color bgColor, Color borderColor, float borderWidth = 2f)
+        private static void CreateSectionDivider(Transform parent, string title, float yPos)
+        {
+            GameObject dividerObj = new GameObject("SectionDivider");
+            dividerObj.transform.SetParent(parent, false);
+            RectTransform rt = dividerObj.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0f, yPos);
+            rt.sizeDelta = new Vector2(780f, 30f);
+
+            // Sol Çizgi
+            GameObject leftLine = new GameObject("LeftLine");
+            leftLine.transform.SetParent(dividerObj.transform, false);
+            RectTransform leftRt = leftLine.AddComponent<RectTransform>();
+            leftRt.anchoredPosition = new Vector2(-160f, 0f);
+            leftRt.sizeDelta = new Vector2(110f, 2f);
+            Image leftImg = leftLine.AddComponent<Image>();
+            leftImg.color = new Color(0.24f, 0.35f, 0.52f, 0.65f);
+            leftImg.raycastTarget = false;
+
+            // Başlık
+            GameObject textObj = new GameObject("Title");
+            textObj.transform.SetParent(dividerObj.transform, false);
+            RectTransform textRt = textObj.AddComponent<RectTransform>();
+            textRt.anchoredPosition = Vector2.zero;
+            textRt.sizeDelta = new Vector2(210f, 30f);
+            Text txt = textObj.AddComponent<Text>();
+            txt.font = GetSafeDefaultFont();
+            txt.text = title;
+            txt.fontSize = 22;
+            txt.fontStyle = FontStyle.Bold;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = new Color(0.42f, 0.56f, 0.74f);
+            txt.raycastTarget = false;
+
+            // Sağ Çizgi
+            GameObject rightLine = new GameObject("RightLine");
+            rightLine.transform.SetParent(dividerObj.transform, false);
+            RectTransform rightRt = rightLine.AddComponent<RectTransform>();
+            rightRt.anchoredPosition = new Vector2(160f, 0f);
+            rightRt.sizeDelta = new Vector2(110f, 2f);
+            Image rightImg = rightLine.AddComponent<Image>();
+            rightImg.color = new Color(0.24f, 0.35f, 0.52f, 0.65f);
+            rightImg.raycastTarget = false;
+        }
+
+        private static GameObject CreateMenuGridButton(Transform parent, string name, string iconEmoji, string line1, string line2, Vector2 position, Vector2 size, Color bgColor, Color highlightColor)
         {
             GameObject obj = new GameObject(name);
             obj.transform.SetParent(parent, false);
@@ -710,7 +754,7 @@ namespace ZiplaKac.Utils
             rt.sizeDelta = size;
 
             Image img = obj.AddComponent<Image>();
-            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, borderColor, borderWidth, 24, 128, 128);
+            img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(bgColor, highlightColor, 1.5f, 26, 128, 128);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
 
@@ -722,44 +766,67 @@ namespace ZiplaKac.Utils
             colors.pressedColor = new Color(0.85f, 0.85f, 0.85f);
             btn.colors = colors;
 
-            // Üst İkon / Emoji
+            // Sol İkon (Emoji / Simge)
             GameObject iconObj = new GameObject("Icon");
             iconObj.transform.SetParent(obj.transform, false);
             RectTransform iconRt = iconObj.AddComponent<RectTransform>();
-            iconRt.anchoredPosition = new Vector2(0f, 32f);
-            iconRt.sizeDelta = new Vector2(size.x - 20f, 64f);
+            iconRt.anchorMin = new Vector2(0f, 0.5f);
+            iconRt.anchorMax = new Vector2(0f, 0.5f);
+            iconRt.pivot = new Vector2(0.5f, 0.5f);
+            iconRt.anchoredPosition = new Vector2(48f, 0f);
+            iconRt.sizeDelta = new Vector2(56f, 56f);
             Text iconTxt = iconObj.AddComponent<Text>();
             iconTxt.font = GetSafeDefaultFont();
-            iconTxt.text = iconText;
-            iconTxt.fontSize = 48;
+            iconTxt.text = iconEmoji;
+            iconTxt.fontSize = 42;
             iconTxt.alignment = TextAnchor.MiddleCenter;
             iconTxt.color = Color.white;
             iconTxt.raycastTarget = false;
 
-            // Alt Metin
+            // Metin Alanı (2 satır kalın beyaz yazı)
             GameObject textObj = new GameObject("Label");
             textObj.transform.SetParent(obj.transform, false);
             RectTransform textRt = textObj.AddComponent<RectTransform>();
-            textRt.anchoredPosition = new Vector2(0f, -40f);
-            textRt.sizeDelta = new Vector2(size.x - 16f, 62f);
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(88f, 4f);
+            textRt.offsetMax = new Vector2(-46f, -4f);
             Text labelComp = textObj.AddComponent<Text>();
             labelComp.font = GetSafeDefaultFont();
-            labelComp.text = labelText;
-            labelComp.fontSize = 20;
+            labelComp.text = $"{line1}\n{line2}";
+            labelComp.fontSize = 21;
             labelComp.fontStyle = FontStyle.Bold;
-            labelComp.alignment = TextAnchor.MiddleCenter;
+            labelComp.alignment = TextAnchor.MiddleLeft;
             labelComp.color = Color.white;
             labelComp.lineSpacing = 1.05f;
             labelComp.resizeTextForBestFit = true;
-            labelComp.resizeTextMinSize = 13;
-            labelComp.resizeTextMaxSize = 20;
+            labelComp.resizeTextMinSize = 15;
+            labelComp.resizeTextMaxSize = 22;
             labelComp.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelComp.verticalOverflow = VerticalWrapMode.Truncate;
             labelComp.raycastTarget = false;
 
             Shadow shadow = textObj.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            shadow.effectColor = new Color(0f, 0f, 0f, 0.55f);
             shadow.effectDistance = new Vector2(1.5f, -1.5f);
+
+            // Sağ Chevron Ok (>)
+            GameObject chevObj = new GameObject("Chevron");
+            chevObj.transform.SetParent(obj.transform, false);
+            RectTransform chevRt = chevObj.AddComponent<RectTransform>();
+            chevRt.anchorMin = new Vector2(1f, 0.5f);
+            chevRt.anchorMax = new Vector2(1f, 0.5f);
+            chevRt.pivot = new Vector2(1f, 0.5f);
+            chevRt.anchoredPosition = new Vector2(-20f, 0f);
+            chevRt.sizeDelta = new Vector2(30f, 40f);
+            Text chevTxt = chevObj.AddComponent<Text>();
+            chevTxt.font = GetSafeDefaultFont();
+            chevTxt.text = ">";
+            chevTxt.fontSize = 32;
+            chevTxt.fontStyle = FontStyle.Bold;
+            chevTxt.alignment = TextAnchor.MiddleCenter;
+            chevTxt.color = new Color(1f, 1f, 1f, 0.85f);
+            chevTxt.raycastTarget = false;
 
             return obj;
         }
@@ -830,49 +897,53 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = panel.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.45f);
+            bg.color = new Color(0f, 0f, 0f, 0.40f);
 
-            // Centered Glassmorphic Card (920x1200, Y: +75 so player is clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1200f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 75f);
+            // Centered Glassmorphic Card (880x1000, Y: +120 so character & obstacles are clearly visible below)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(880f, 1000f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 120f);
 
-            // Başlık "HOPPZY" (Büyük ve Belirgin, Şık Sıcak Altın)
-            CreateText(card.transform, "TitleText", "HOPPZY", 72, new Vector2(0f, 490f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+            // Başlık "= HOPPZY =" (Büyük ve Belirgin, Şık Sıcak Altın Sarı)
+            CreateText(card.transform, "TitleText", "= HOPPZY =", 74, new Vector2(0f, 422f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
 
             // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 420f), new Color(0.62f, 0.70f, 0.82f), false);
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 362f), new Color(0.48f, 0.62f, 0.80f), false);
 
-            // "KARAKTER SEÇ" etiketi
-            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 26, new Vector2(0f, 310f), new Color(0.72f, 0.80f, 0.92f), false, FontStyle.Bold);
+            // "─── KARAKTER SEÇ ───" Bölücü Başlık
+            CreateSectionDivider(card.transform, "KARAKTER SEÇ", 295f);
 
-            // Karakter Galerisi UI (Swatches - Orijinal zengin avatarlar ve kilit sistemi)
+            // Karakter Galerisi UI (Swatches - 5 Karakter, Seçili olan Açık Mavi Rozetli)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
             galleryRt.anchoredPosition = new Vector2(0f, 165f);
-            galleryRt.sizeDelta = new Vector2(880f, 210f);
+            galleryRt.sizeDelta = new Vector2(820f, 185f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 1. "OYNA" Butonu (Hero Action - Şık Safir Mavi #2563eb - 620x96, Belirgin Vurgulu Çerçeve)
-            Color primaryBlue = new Color(0.14f, 0.40f, 0.92f);
-            Color blueBorder = new Color(0.40f, 0.65f, 1.0f, 0.55f);
-            GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶  OYNA", new Vector2(0f, -30f), new Vector2(620f, 96f), primaryBlue, Color.white, 36, blueBorder, 2.5f);
+            // 1. "▶  OYNA" Butonu (Hero Action - Parlak Elektrik Mavisi #1E6FFF - 780x116, Capsule/Pill)
+            Color primaryBlue = new Color(0.12f, 0.48f, 0.98f);
+            Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
+            GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, -15f), new Vector2(780f, 116f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
             Button btn = btnObj.GetComponent<Button>();
             btn.onClick.AddListener(() => {
                 AudioManager.Instance?.PlayJumpSound();
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // 2. 4 Tane Kare Yan Yana Buton:
-            // [MAĞAZA & GARDIROP] [GÜNLÜK ÖDÜL] [NASIL OYNANIR] [REKLAM İZLE]
-            float sqY = -195f;
-            Vector2 sqSize = new Vector2(195f, 195f);
+            // 2. 2x2 Grid Butonlar (Geniş Dikdörtgen Kartlar, 382x118):
+            // Row 1 (y = -150f): [MAĞAZA & GARDIROP]   [GÜNLÜK ÖDÜL]
+            // Row 2 (y = -282f): [NASIL OYNANIR?]       [REKLAM İZLE CAN AL ❤️]
+            Vector2 gridSize = new Vector2(382f, 118f);
+            float row1Y = -150f;
+            float row2Y = -282f;
+            float colLeftX = -198f;
+            float colRightX = 198f;
 
-            // Buton 1: 🛒 Mağaza & Gardırop (Asil Mor #6D28D9)
-            Color purpleBg = new Color(0.42f, 0.22f, 0.78f);
-            Color purpleBorder = new Color(0.68f, 0.45f, 1.0f, 0.50f);
-            GameObject wardrobeBtnObj = CreateSquareIconButton(card.transform, "WardrobeSquareButton", "🛒", "MAĞAZA &\nGARDIROP", new Vector2(-316.5f, sqY), sqSize, purpleBg, purpleBorder, 2.5f);
+            // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Asil Mor #6D28D9)
+            Color purpleBg = new Color(0.45f, 0.22f, 0.88f);
+            Color purpleHighlight = new Color(0.70f, 0.45f, 1.0f, 0.35f);
+            GameObject wardrobeBtnObj = CreateMenuGridButton(card.transform, "WardrobeGridButton", "🛍️", "MAĞAZA &", "GARDIROP", new Vector2(colLeftX, row1Y), gridSize, purpleBg, purpleHighlight);
             Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
             wardrobeBtn.onClick.AddListener(() => {
                 AudioManager.Instance?.PlayJumpSound();
@@ -882,10 +953,10 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // Buton 2: 🎁 Günlük Ödül Sandığı (Hazine Altını #D97706)
-            Color goldBg = new Color(0.85f, 0.50f, 0.08f);
-            Color goldBorder = new Color(1.0f, 0.78f, 0.30f, 0.50f);
-            GameObject rewardBtnObj = CreateSquareIconButton(card.transform, "DailyRewardSquareButton", "🎁", "GÜNLÜK\nÖDÜL", new Vector2(-105.5f, sqY), sqSize, goldBg, goldBorder, 2.5f);
+            // Buton 2 (Sağ Üst): 🎁 Günlük Ödül (Hazine Kehribarı #EA8800)
+            Color goldBg = new Color(0.92f, 0.56f, 0.10f);
+            Color goldHighlight = new Color(1.0f, 0.80f, 0.40f, 0.35f);
+            GameObject rewardBtnObj = CreateMenuGridButton(card.transform, "DailyRewardGridButton", "🎁", "GÜNLÜK", "ÖDÜL", new Vector2(colRightX, row1Y), gridSize, goldBg, goldHighlight);
             Button rewardBtn = rewardBtnObj.GetComponent<Button>();
             rewardBtn.onClick.AddListener(() => {
                 AudioManager.Instance?.PlayJumpSound();
@@ -895,10 +966,10 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // Buton 3: 📖 Nasıl Oynanır (Okyanus Mavisi #0284C7)
-            Color tealBg = new Color(0.08f, 0.50f, 0.75f);
-            Color tealBorder = new Color(0.35f, 0.78f, 1.0f, 0.50f);
-            GameObject rulesBtnObj = CreateSquareIconButton(card.transform, "RulesSquareButton", "📖", "NASIL\nOYNANIR?", new Vector2(105.5f, sqY), sqSize, tealBg, tealBorder, 2.5f);
+            // Buton 3 (Sol Alt): 📖 Nasıl Oynanır? (Okyanus Mavisi #0284C7)
+            Color tealBg = new Color(0.08f, 0.62f, 0.82f);
+            Color tealHighlight = new Color(0.40f, 0.85f, 1.0f, 0.35f);
+            GameObject rulesBtnObj = CreateMenuGridButton(card.transform, "RulesGridButton", "📖", "NASIL", "OYNANIR?", new Vector2(colLeftX, row2Y), gridSize, tealBg, tealHighlight);
             Button rulesBtn = rulesBtnObj.GetComponent<Button>();
             rulesBtn.onClick.AddListener(() => {
                 AudioManager.Instance?.PlayJumpSound();
@@ -913,10 +984,10 @@ namespace ZiplaKac.Utils
                 }
             });
 
-            // Buton 4: 🎬 Reklam İzle (Zümrüt Yeşili #059669 - +35 Altın Ödülü)
-            Color greenBg = new Color(0.05f, 0.60f, 0.40f);
-            Color greenBorder = new Color(0.25f, 0.88f, 0.55f, 0.50f);
-            GameObject adBtnObj = CreateSquareIconButton(card.transform, "RewardedAdSquareButton", "🎬", "REKLAM\nİZLE", new Vector2(316.5f, sqY), sqSize, greenBg, greenBorder, 2.5f);
+            // Buton 4 (Sağ Alt): 🎬 Reklam İzle Can Al ❤️ (Zümrüt Yeşili #059669 - Can ve Altın Ödülü)
+            Color greenBg = new Color(0.08f, 0.72f, 0.45f);
+            Color greenHighlight = new Color(0.45f, 0.95f, 0.65f, 0.35f);
+            GameObject adBtnObj = CreateMenuGridButton(card.transform, "AdGridButton", "🎬", "REKLAM İZLE", "CAN AL  ❤️", new Vector2(colRightX, row2Y), gridSize, greenBg, greenHighlight);
             Button adBtn = adBtnObj.GetComponent<Button>();
             adBtn.onClick.AddListener(() => {
                 AudioManager.Instance?.PlayJumpSound();
@@ -924,12 +995,13 @@ namespace ZiplaKac.Utils
                 {
                     MonetizationManager.Instance.ShowRewardedAd(
                         () => {
-                            SaveSystem.AddGold(35);
+                            SaveSystem.AddConsumable("second_chance", 1);
+                            SaveSystem.AddGold(25);
                             AudioManager.Instance?.PlayNewRecordSound();
                             AudioManager.Instance?.TriggerHapticFeedback();
                             if (Instance != null)
                             {
-                                Instance.ShowRewardToast(card.transform, "🎉 +35 ALTIN KAZANDIN!");
+                                Instance.ShowRewardToast(card.transform, "❤️ +1 CAN & +25 ALTIN KAZANDIN!");
                             }
                             if (UI.WardrobeModalUI.Instance != null && UI.WardrobeModalUI.Instance.gameObject.activeInHierarchy)
                             {
@@ -946,17 +1018,15 @@ namespace ZiplaKac.Utils
                 }
                 else
                 {
-                    SaveSystem.AddGold(35);
+                    SaveSystem.AddConsumable("second_chance", 1);
+                    SaveSystem.AddGold(25);
                     AudioManager.Instance?.PlayNewRecordSound();
                     if (Instance != null)
                     {
-                        Instance.ShowRewardToast(card.transform, "🎉 +35 ALTIN KAZANDIN!");
+                        Instance.ShowRewardToast(card.transform, "❤️ +1 CAN & +25 ALTIN KAZANDIN!");
                     }
                 }
             });
-
-            // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -340f), new Color(0.55f, 0.65f, 0.8f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }

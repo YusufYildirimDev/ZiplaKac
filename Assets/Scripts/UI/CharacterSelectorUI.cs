@@ -16,6 +16,7 @@ namespace ZiplaKac.UI
         public Image borderHighlight;
         public Image iconImage;
         public Text nameText;
+        public Image namePillBg;
         public GameObject lockOverlay;
     }
 
@@ -128,7 +129,7 @@ namespace ZiplaKac.UI
                 CreateDefaultCardsData();
             }
 
-            float cardSpacing = 168f;
+            float cardSpacing = 152f;
             float startX = -((characterCards.Count - 1) * cardSpacing) * 0.5f;
 
             for (int i = 0; i < characterCards.Count; i++)
@@ -141,12 +142,11 @@ namespace ZiplaKac.UI
                     cardObj.transform.SetParent(transform, false);
                     RectTransform rt = cardObj.AddComponent<RectTransform>();
                     rt.anchoredPosition = new Vector2(startX + i * cardSpacing, 0f);
-                    rt.sizeDelta = new Vector2(150f, 195f);
+                    rt.sizeDelta = new Vector2(136f, 185f);
 
                     // Tıklanabilir zemin kartı (raycastTarget = true)
                     Image cardBg = cardObj.AddComponent<Image>();
-                    cardBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(new Color(1f, 1f, 1f, 0.04f), new Color(1f, 1f, 1f, 0.08f), 1f, 22);
-                    cardBg.type = Image.Type.Sliced;
+                    cardBg.color = Color.clear;
                     cardBg.raycastTarget = true;
 
                     Button btn = cardObj.AddComponent<Button>();
@@ -154,37 +154,53 @@ namespace ZiplaKac.UI
                     btn.transition = Selectable.Transition.ColorTint;
                     ColorBlock cb = btn.colors;
                     cb.normalColor = Color.white;
-                    cb.highlightedColor = new Color(1.2f, 1.2f, 1.2f);
+                    cb.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
                     cb.pressedColor = new Color(0.85f, 0.85f, 0.85f);
                     btn.colors = cb;
                     card.selectButton = btn;
 
-                    // Swatch (Yuvarlatılmış Renk Kutusu - 115x115 Büyük Görsel)
+                    // Swatch Konteyneri (120x120 Koyu Navy Squircle Zemin)
                     GameObject swatchObj = new GameObject("Swatch");
                     swatchObj.transform.SetParent(cardObj.transform, false);
                     RectTransform swatchRt = swatchObj.AddComponent<RectTransform>();
-                    swatchRt.anchoredPosition = new Vector2(0f, 28f);
-                    swatchRt.sizeDelta = new Vector2(115f, 115f);
-                    Image swatchImg = swatchObj.AddComponent<Image>();
-                    swatchImg.type = Image.Type.Simple;
-                    swatchImg.preserveAspect = true;
-                    swatchImg.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/{card.characterId}_hero", () => Utils.ProceduralSpriteGenerator.CreateMiniCharacterIcon(card.bodyColor, 128));
-                    swatchImg.raycastTarget = false;
-                    card.iconImage = swatchImg;
+                    swatchRt.anchoredPosition = new Vector2(0f, 26f);
+                    swatchRt.sizeDelta = new Vector2(120f, 120f);
 
-                    // Dış Vurgu Çerçevesi (Border)
+                    Image swatchBg = swatchObj.AddComponent<Image>();
+                    swatchBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                        new Color(0.09f, 0.13f, 0.22f, 0.95f),
+                        new Color(1f, 1f, 1f, 0.06f),
+                        1f, 24, 128, 128
+                    );
+                    swatchBg.type = Image.Type.Sliced;
+                    swatchBg.raycastTarget = false;
+
+                    // Karakter Avatar İkonu (96x96 Orantılı)
+                    GameObject avatarObj = new GameObject("Avatar");
+                    avatarObj.transform.SetParent(swatchObj.transform, false);
+                    RectTransform avatarRt = avatarObj.AddComponent<RectTransform>();
+                    avatarRt.anchoredPosition = Vector2.zero;
+                    avatarRt.sizeDelta = new Vector2(96f, 96f);
+                    Image avatarImg = avatarObj.AddComponent<Image>();
+                    avatarImg.type = Image.Type.Simple;
+                    avatarImg.preserveAspect = true;
+                    avatarImg.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/{card.characterId}_hero", () => Utils.ProceduralSpriteGenerator.CreateMiniCharacterIcon(card.bodyColor, 128));
+                    avatarImg.raycastTarget = false;
+                    card.iconImage = avatarImg;
+
+                    // Dış Vurgu Çerçevesi (Border - Parlak Camgöbeği #00C2FF)
                     GameObject borderObj = new GameObject("Border");
                     borderObj.transform.SetParent(swatchObj.transform, false);
                     RectTransform borderRt = borderObj.AddComponent<RectTransform>();
                     borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
-                    borderRt.offsetMin = new Vector2(-5f, -5f); borderRt.offsetMax = new Vector2(5f, 5f);
+                    borderRt.offsetMin = new Vector2(-3f, -3f); borderRt.offsetMax = new Vector2(3f, 3f);
                     Image borderImg = borderObj.AddComponent<Image>();
                     borderImg.type = Image.Type.Sliced;
-                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.24f, 0.58f, 0.98f), 4.5f, 32);
+                    borderImg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(Color.clear, new Color(0.0f, 0.76f, 1.0f), 4.0f, 26);
                     borderImg.raycastTarget = false;
                     card.borderHighlight = borderImg;
 
-                    // Kilit Katmanı (Lock Overlay - Swatch üzerine tam oturan katman)
+                    // Kilit Katmanı (Lock Overlay)
                     GameObject lockObj = new GameObject("LockOverlay");
                     lockObj.transform.SetParent(swatchObj.transform, false);
                     RectTransform lockRt = lockObj.AddComponent<RectTransform>();
@@ -192,29 +208,28 @@ namespace ZiplaKac.UI
                     lockRt.offsetMin = Vector2.zero; lockRt.offsetMax = Vector2.zero;
 
                     Image lockBg = lockObj.AddComponent<Image>();
-                    lockBg.color = new Color(0.02f, 0.04f, 0.08f, 0.25f); // Hafif şeffaf derinlik, avatarı örtmez
+                    lockBg.color = new Color(0.02f, 0.04f, 0.08f, 0.20f);
                     lockBg.raycastTarget = false;
 
-                    // 1. Köşedeki Kilit Rozeti (Sağ Üst Köşe - 38x38 px)
+                    // 1. Köşedeki Kilit Rozeti (Sağ Üst Köşe - 34x34 px)
                     GameObject cornerBadge = new GameObject("CornerLockBadge");
                     cornerBadge.transform.SetParent(lockObj.transform, false);
                     RectTransform badgeRt = cornerBadge.AddComponent<RectTransform>();
                     badgeRt.anchorMin = new Vector2(1f, 1f);
                     badgeRt.anchorMax = new Vector2(1f, 1f);
                     badgeRt.pivot = new Vector2(1f, 1f);
-                    badgeRt.anchoredPosition = new Vector2(-6f, -6f);
-                    badgeRt.sizeDelta = new Vector2(38f, 38f);
+                    badgeRt.anchoredPosition = new Vector2(-4f, -4f);
+                    badgeRt.sizeDelta = new Vector2(34f, 34f);
 
                     Image badgeBg = cornerBadge.AddComponent<Image>();
                     badgeBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
                         new Color(0.06f, 0.08f, 0.16f, 0.95f),
                         new Color(1.0f, 0.82f, 0.35f, 0.95f),
-                        1.5f, 19, 64, 64
+                        1.5f, 17, 64, 64
                     );
                     badgeBg.type = Image.Type.Sliced;
                     badgeBg.raycastTarget = false;
 
-                    // Asma Kilit İkonu (Altın Sarısı Kilit)
                     GameObject lockIconObj = new GameObject("LockIcon");
                     lockIconObj.transform.SetParent(cornerBadge.transform, false);
                     RectTransform lockIconRt = lockIconObj.AddComponent<RectTransform>();
@@ -222,14 +237,14 @@ namespace ZiplaKac.UI
                     lockIconRt.anchorMax = new Vector2(0.5f, 0.5f);
                     lockIconRt.pivot = new Vector2(0.5f, 0.5f);
                     lockIconRt.anchoredPosition = Vector2.zero;
-                    lockIconRt.sizeDelta = new Vector2(22f, 22f);
+                    lockIconRt.sizeDelta = new Vector2(20f, 20f);
                     Image lockIconImg = lockIconObj.AddComponent<Image>();
                     lockIconImg.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/icon_lock", () => Utils.ProceduralSpriteGenerator.CreateLockIconSprite(128));
                     lockIconImg.color = new Color(1.0f, 0.85f, 0.35f);
                     lockIconImg.preserveAspect = true;
                     lockIconImg.raycastTarget = false;
 
-                    // 2. Kilit Gereksinim Şeridi (Alt Kenarda Zarif Bant - Avatar yüzünü kapatmaz)
+                    // 2. Kilit Gereksinim Şeridi (Alt Kenarda "2500 Skor")
                     GameObject lockPillObj = new GameObject("LockPill");
                     lockPillObj.transform.SetParent(lockObj.transform, false);
                     RectTransform lockPillRt = lockPillObj.AddComponent<RectTransform>();
@@ -237,7 +252,7 @@ namespace ZiplaKac.UI
                     lockPillRt.anchorMax = new Vector2(0.5f, 0f);
                     lockPillRt.pivot = new Vector2(0.5f, 0f);
                     lockPillRt.anchoredPosition = new Vector2(0f, 6f);
-                    lockPillRt.sizeDelta = new Vector2(100f, 24f);
+                    lockPillRt.sizeDelta = new Vector2(88f, 22f);
 
                     Image pillBg = lockPillObj.AddComponent<Image>();
                     pillBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -253,18 +268,18 @@ namespace ZiplaKac.UI
                     RectTransform lockTextRt = lockTextObj.AddComponent<RectTransform>();
                     lockTextRt.anchorMin = Vector2.zero;
                     lockTextRt.anchorMax = Vector2.one;
-                    lockTextRt.offsetMin = new Vector2(4f, 0f);
-                    lockTextRt.offsetMax = new Vector2(-4f, 0f);
+                    lockTextRt.offsetMin = new Vector2(2f, 0f);
+                    lockTextRt.offsetMax = new Vector2(-2f, 0f);
 
                     Text lockTxt = lockTextObj.AddComponent<Text>();
                     lockTxt.font = GetSafeFont();
                     lockTxt.text = "2500 Skor";
-                    lockTxt.fontSize = 16;
+                    lockTxt.fontSize = 15;
                     lockTxt.fontStyle = FontStyle.Bold;
                     lockTxt.alignment = TextAnchor.MiddleCenter;
                     lockTxt.resizeTextForBestFit = true;
-                    lockTxt.resizeTextMinSize = 11;
-                    lockTxt.resizeTextMaxSize = 16;
+                    lockTxt.resizeTextMinSize = 10;
+                    lockTxt.resizeTextMaxSize = 15;
                     lockTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
                     lockTxt.verticalOverflow = VerticalWrapMode.Truncate;
                     lockTxt.color = new Color(1f, 0.85f, 0.35f, 0.95f);
@@ -272,21 +287,41 @@ namespace ZiplaKac.UI
 
                     card.lockOverlay = lockObj;
 
-                    // Karakter İsmi (Büyük ve Kalın Yazı)
-                    GameObject nameObj = new GameObject("Name");
+                    // Karakter İsmi ve Seçili Pill Rozeti (94x32 px)
+                    GameObject nameObj = new GameObject("NamePill");
                     nameObj.transform.SetParent(cardObj.transform, false);
                     RectTransform nameRt = nameObj.AddComponent<RectTransform>();
-                    nameRt.anchoredPosition = new Vector2(0f, -58f);
-                    nameRt.sizeDelta = new Vector2(140f, 40f);
-                    Text nameTxt = nameObj.AddComponent<Text>();
+                    nameRt.anchoredPosition = new Vector2(0f, -56f);
+                    nameRt.sizeDelta = new Vector2(94f, 32f);
+
+                    Image namePillBg = nameObj.AddComponent<Image>();
+                    namePillBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                        new Color(0.0f, 0.62f, 0.98f),
+                        Color.clear,
+                        0f, 16, 64, 32
+                    );
+                    namePillBg.type = Image.Type.Sliced;
+                    namePillBg.raycastTarget = false;
+                    namePillBg.enabled = false;
+                    card.namePillBg = namePillBg;
+
+                    GameObject nameTextObj = new GameObject("NameText");
+                    nameTextObj.transform.SetParent(nameObj.transform, false);
+                    RectTransform nameTextRt = nameTextObj.AddComponent<RectTransform>();
+                    nameTextRt.anchorMin = Vector2.zero;
+                    nameTextRt.anchorMax = Vector2.one;
+                    nameTextRt.offsetMin = Vector2.zero;
+                    nameTextRt.offsetMax = Vector2.zero;
+
+                    Text nameTxt = nameTextObj.AddComponent<Text>();
                     nameTxt.font = GetSafeFont();
                     nameTxt.text = card.characterName;
-                    nameTxt.fontSize = 26;
+                    nameTxt.fontSize = 20;
                     nameTxt.fontStyle = FontStyle.Bold;
                     nameTxt.alignment = TextAnchor.MiddleCenter;
                     nameTxt.resizeTextForBestFit = true;
-                    nameTxt.resizeTextMinSize = 16;
-                    nameTxt.resizeTextMaxSize = 26;
+                    nameTxt.resizeTextMinSize = 14;
+                    nameTxt.resizeTextMaxSize = 20;
                     nameTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
                     nameTxt.verticalOverflow = VerticalWrapMode.Truncate;
                     nameTxt.color = new Color(0.96f, 0.96f, 0.98f, 0.85f);
@@ -381,34 +416,24 @@ namespace ZiplaKac.UI
                     card.borderHighlight.gameObject.SetActive(isSelected);
                 }
 
-                if (card.selectButton != null)
+                if (card.namePillBg != null)
                 {
-                    Vector3 targetScale = isSelected ? new Vector3(1.10f, 1.10f, 1.0f) : Vector3.one;
-                    card.selectButton.transform.localScale = targetScale;
-
-                    Image bg = card.selectButton.GetComponent<Image>();
-                    if (bg != null)
-                    {
-                        if (!isUnlocked)
-                        {
-                            bg.color = new Color(0f, 0f, 0f, 0.20f);
-                        }
-                        else
-                        {
-                            bg.color = isSelected ? new Color(0.14f, 0.38f, 0.92f, 0.25f) : new Color(1f, 1f, 1f, 0.04f);
-                        }
-                    }
+                    card.namePillBg.enabled = isSelected;
                 }
 
                 if (card.nameText != null)
                 {
-                    if (!isUnlocked)
+                    if (isSelected)
                     {
-                        card.nameText.color = new Color(0.55f, 0.55f, 0.60f, 0.65f);
+                        card.nameText.color = Color.white;
+                    }
+                    else if (isUnlocked)
+                    {
+                        card.nameText.color = new Color(0.92f, 0.95f, 1.0f);
                     }
                     else
                     {
-                        card.nameText.color = isSelected ? new Color(0.35f, 0.70f, 1.0f) : new Color(0.96f, 0.96f, 0.98f, 0.85f);
+                        card.nameText.color = new Color(0.55f, 0.62f, 0.74f);
                     }
                 }
             }
