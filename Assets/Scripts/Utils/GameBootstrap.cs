@@ -889,6 +889,64 @@ namespace ZiplaKac.Utils
             Destroy(toastObj);
         }
 
+        public static Sprite LoadMainMenuSprite(string spriteName)
+        {
+            Sprite sp = Resources.Load<Sprite>("Sprites/UI_MainMenu/" + spriteName);
+            if (sp == null)
+            {
+                Texture2D tex = Resources.Load<Texture2D>("Sprites/UI_MainMenu/" + spriteName);
+                if (tex != null)
+                {
+                    sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                }
+            }
+            return sp;
+        }
+
+        private static GameObject CreateSpriteImage(Transform parent, string name, Sprite sprite, Vector2 position, Vector2 size)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            RectTransform rt = obj.AddComponent<RectTransform>();
+            rt.anchoredPosition = position;
+            rt.sizeDelta = size;
+
+            Image img = obj.AddComponent<Image>();
+            img.sprite = sprite;
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+            return obj;
+        }
+
+        private static GameObject CreateSpriteButton(Transform parent, string name, Sprite sprite, Vector2 position, Vector2 size, UnityEngine.Events.UnityAction onClick)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            RectTransform rt = obj.AddComponent<RectTransform>();
+            rt.anchoredPosition = position;
+            rt.sizeDelta = size;
+
+            Image img = obj.AddComponent<Image>();
+            img.sprite = sprite;
+            img.preserveAspect = true;
+            img.raycastTarget = true;
+
+            Button btn = obj.AddComponent<Button>();
+            btn.targetGraphic = img;
+            ColorBlock cb = btn.colors;
+            cb.normalColor = Color.white;
+            cb.highlightedColor = new Color(1.12f, 1.12f, 1.12f);
+            cb.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            btn.colors = cb;
+
+            if (onClick != null)
+            {
+                btn.onClick.AddListener(onClick);
+            }
+
+            return obj;
+        }
+
         private void CreateMainMenuPanel(Transform parent)
         {
             GameObject panel = new GameObject("MainMenuPanel");
@@ -899,97 +957,159 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.40f);
 
-            // Centered Glassmorphic Card (880x1000, Y: +120 so character & obstacles are clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(880f, 1000f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 120f);
+            // Mockup ile 1:1 Kart Konteyneri (880x1050, Y: +110 altındaki karakter ve kaktüs engelleri tam görünür)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(880f, 1050f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
 
-            // Başlık "= HOPPZY =" (Büyük ve Belirgin, Şık Sıcak Altın Sarı)
-            CreateText(card.transform, "TitleText", "= HOPPZY =", 74, new Vector2(0f, 422f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
+            // 1. Mockup Başlık "= HOPPZY =" (3D Şişkin Bubble Sarı Tipografi)
+            Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
+            if (titleSp != null)
+            {
+                CreateSpriteImage(card.transform, "TitleImage", titleSp, new Vector2(0f, 440f), new Vector2(540f, 94f));
+            }
+            else
+            {
+                CreateText(card.transform, "TitleText", "= HOPPZY =", 74, new Vector2(0f, 440f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
+            }
 
-            // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 362f), new Color(0.48f, 0.62f, 0.80f), false);
+            // 2. Mockup Alt Başlık "tek dokunuş, sonsuz kaçış"
+            Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
+            if (subSp != null)
+            {
+                CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 380f), new Vector2(330f, 34f));
+            }
+            else
+            {
+                CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 380f), new Color(0.48f, 0.62f, 0.80f), false);
+            }
 
-            // "─── KARAKTER SEÇ ───" Bölücü Başlık
-            CreateSectionDivider(card.transform, "KARAKTER SEÇ", 295f);
+            // 3. Mockup "─── KARAKTER SEÇ ───" Bölücü Başlık
+            Sprite divSp = LoadMainMenuSprite("divider_karakter_sec");
+            if (divSp != null)
+            {
+                CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 320f), new Vector2(415f, 31f));
+            }
+            else
+            {
+                CreateSectionDivider(card.transform, "KARAKTER SEÇ", 320f);
+            }
 
-            // Karakter Galerisi UI (Swatches - 5 Karakter, Seçili olan Açık Mavi Rozetli)
+            // 4. Karakter Galerisi UI (5 Karakter Kartı - Seçili olan Açık Mavi Rozetli)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 165f);
+            galleryRt.anchoredPosition = new Vector2(0f, 180f);
             galleryRt.sizeDelta = new Vector2(820f, 185f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 1. "▶  OYNA" Butonu (Hero Action - Parlak Elektrik Mavisi #1E6FFF - 780x116, Capsule/Pill)
-            Color primaryBlue = new Color(0.12f, 0.48f, 0.98f);
-            Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-            GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, -15f), new Vector2(780f, 116f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
-            Button btn = btnObj.GetComponent<Button>();
-            btn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
-                if (GameManager.Instance != null) GameManager.Instance.StartGame();
-            });
+            // 5. Mockup "▶ OYNA" Butonu (Elektrik Mavisi Kapsül Buton - 790x132)
+            Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
+            if (oynaSp != null)
+            {
+                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(790f, 132f), () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (GameManager.Instance != null) GameManager.Instance.StartGame();
+                });
+            }
+            else
+            {
+                Color primaryBlue = new Color(0.12f, 0.48f, 0.98f);
+                Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(790f, 132f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                Button btn = btnObj.GetComponent<Button>();
+                btn.onClick.AddListener(() => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (GameManager.Instance != null) GameManager.Instance.StartGame();
+                });
+            }
 
-            // 2. 2x2 Grid Butonlar (Geniş Dikdörtgen Kartlar, 382x118):
-            // Row 1 (y = -150f): [MAĞAZA & GARDIROP]   [GÜNLÜK ÖDÜL]
+            // 6. Mockup 2x2 Grid Butonlar (382x134 Kartlar):
+            // Row 1 (y = -130f): [MAĞAZA & GARDIROP]   [GÜNLÜK ÖDÜL]
             // Row 2 (y = -282f): [NASIL OYNANIR?]       [REKLAM İZLE CAN AL ❤️]
-            Vector2 gridSize = new Vector2(382f, 118f);
-            float row1Y = -150f;
+            Vector2 gridSize = new Vector2(382f, 134f);
+            float row1Y = -130f;
             float row2Y = -282f;
             float colLeftX = -198f;
             float colRightX = 198f;
 
-            // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Asil Mor #6D28D9)
-            Color purpleBg = new Color(0.45f, 0.22f, 0.88f);
-            Color purpleHighlight = new Color(0.70f, 0.45f, 1.0f, 0.35f);
-            GameObject wardrobeBtnObj = CreateMenuGridButton(card.transform, "WardrobeGridButton", "🛍️", "MAĞAZA &", "GARDIROP", new Vector2(colLeftX, row1Y), gridSize, purpleBg, purpleHighlight);
-            Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
-            wardrobeBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
-                if (UI.WardrobeModalUI.Instance != null)
-                {
-                    UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
-                }
-            });
+            // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Mor İllüstrasyonlu Buton)
+            Sprite wardrobeSp = LoadMainMenuSprite("btn_wardrobe");
+            if (wardrobeSp != null)
+            {
+                CreateSpriteButton(card.transform, "WardrobeGridButton", wardrobeSp, new Vector2(colLeftX, row1Y), gridSize, () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.WardrobeModalUI.Instance != null)
+                    {
+                        UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
+                    }
+                });
+            }
+            else
+            {
+                Color purpleBg = new Color(0.45f, 0.22f, 0.88f);
+                Color purpleHighlight = new Color(0.70f, 0.45f, 1.0f, 0.35f);
+                GameObject wardrobeBtnObj = CreateMenuGridButton(card.transform, "WardrobeGridButton", "🛍️", "MAĞAZA &", "GARDIROP", new Vector2(colLeftX, row1Y), gridSize, purpleBg, purpleHighlight);
+                wardrobeBtnObj.GetComponent<Button>().onClick.AddListener(() => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.WardrobeModalUI.Instance != null) UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
+                });
+            }
 
-            // Buton 2 (Sağ Üst): 🎁 Günlük Ödül (Hazine Kehribarı #EA8800)
-            Color goldBg = new Color(0.92f, 0.56f, 0.10f);
-            Color goldHighlight = new Color(1.0f, 0.80f, 0.40f, 0.35f);
-            GameObject rewardBtnObj = CreateMenuGridButton(card.transform, "DailyRewardGridButton", "🎁", "GÜNLÜK", "ÖDÜL", new Vector2(colRightX, row1Y), gridSize, goldBg, goldHighlight);
-            Button rewardBtn = rewardBtnObj.GetComponent<Button>();
-            rewardBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
-                if (DailyRewardModalUI.Instance != null)
-                {
-                    DailyRewardModalUI.Instance.gameObject.SetActive(true);
-                }
-            });
+            // Buton 2 (Sağ Üst): 🎁 Günlük Ödül (Kehribar Takvim İllüstrasyonlu Buton)
+            Sprite rewardSp = LoadMainMenuSprite("btn_reward");
+            if (rewardSp != null)
+            {
+                CreateSpriteButton(card.transform, "DailyRewardGridButton", rewardSp, new Vector2(colRightX, row1Y), gridSize, () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (DailyRewardModalUI.Instance != null)
+                    {
+                        DailyRewardModalUI.Instance.gameObject.SetActive(true);
+                    }
+                });
+            }
+            else
+            {
+                Color goldBg = new Color(0.92f, 0.56f, 0.10f);
+                Color goldHighlight = new Color(1.0f, 0.80f, 0.40f, 0.35f);
+                GameObject rewardBtnObj = CreateMenuGridButton(card.transform, "DailyRewardGridButton", "🎁", "GÜNLÜK", "ÖDÜL", new Vector2(colRightX, row1Y), gridSize, goldBg, goldHighlight);
+                rewardBtnObj.GetComponent<Button>().onClick.AddListener(() => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (DailyRewardModalUI.Instance != null) DailyRewardModalUI.Instance.gameObject.SetActive(true);
+                });
+            }
 
-            // Buton 3 (Sol Alt): 📖 Nasıl Oynanır? (Okyanus Mavisi #0284C7)
-            Color tealBg = new Color(0.08f, 0.62f, 0.82f);
-            Color tealHighlight = new Color(0.40f, 0.85f, 1.0f, 0.35f);
-            GameObject rulesBtnObj = CreateMenuGridButton(card.transform, "RulesGridButton", "📖", "NASIL", "OYNANIR?", new Vector2(colLeftX, row2Y), gridSize, tealBg, tealHighlight);
-            Button rulesBtn = rulesBtnObj.GetComponent<Button>();
-            rulesBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
-                if (UI.OnboardingModalUI.Instance != null)
-                {
-                    UI.OnboardingModalUI.Instance.OpenModal();
-                }
-                else
-                {
-                    var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true);
-                    if (found != null) found.OpenModal();
-                }
-            });
+            // Buton 3 (Sol Alt): 📖 Nasıl Oynanır? (Camgöbeği Kitap İllüstrasyonlu Buton)
+            Sprite rulesSp = LoadMainMenuSprite("btn_rules");
+            if (rulesSp != null)
+            {
+                CreateSpriteButton(card.transform, "RulesGridButton", rulesSp, new Vector2(colLeftX, row2Y), gridSize, () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.OnboardingModalUI.Instance != null)
+                    {
+                        UI.OnboardingModalUI.Instance.OpenModal();
+                    }
+                    else
+                    {
+                        var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true);
+                        if (found != null) found.OpenModal();
+                    }
+                });
+            }
+            else
+            {
+                Color tealBg = new Color(0.08f, 0.62f, 0.82f);
+                Color tealHighlight = new Color(0.40f, 0.85f, 1.0f, 0.35f);
+                GameObject rulesBtnObj = CreateMenuGridButton(card.transform, "RulesGridButton", "📖", "NASIL", "OYNANIR?", new Vector2(colLeftX, row2Y), gridSize, tealBg, tealHighlight);
+                rulesBtnObj.GetComponent<Button>().onClick.AddListener(() => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.OnboardingModalUI.Instance != null) UI.OnboardingModalUI.Instance.OpenModal();
+                    else { var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true); if (found != null) found.OpenModal(); }
+                });
+            }
 
-            // Buton 4 (Sağ Alt): 🎬 Reklam İzle Can Al ❤️ (Zümrüt Yeşili #059669 - Can ve Altın Ödülü)
-            Color greenBg = new Color(0.08f, 0.72f, 0.45f);
-            Color greenHighlight = new Color(0.45f, 0.95f, 0.65f, 0.35f);
-            GameObject adBtnObj = CreateMenuGridButton(card.transform, "AdGridButton", "🎬", "REKLAM İZLE", "CAN AL  ❤️", new Vector2(colRightX, row2Y), gridSize, greenBg, greenHighlight);
-            Button adBtn = adBtnObj.GetComponent<Button>();
-            adBtn.onClick.AddListener(() => {
+            // Buton 4 (Sağ Alt): 🎬 Reklam İzle Can Al ❤️ (Yeşil Klaket İllüstrasyonlu Buton)
+            UnityEngine.Events.UnityAction adRewardAction = () => {
                 AudioManager.Instance?.PlayJumpSound();
                 if (MonetizationManager.Instance != null)
                 {
@@ -1026,7 +1146,20 @@ namespace ZiplaKac.Utils
                         Instance.ShowRewardToast(card.transform, "❤️ +1 CAN & +25 ALTIN KAZANDIN!");
                     }
                 }
-            });
+            };
+
+            Sprite adSp = LoadMainMenuSprite("btn_ad");
+            if (adSp != null)
+            {
+                CreateSpriteButton(card.transform, "AdGridButton", adSp, new Vector2(colRightX, row2Y), gridSize, adRewardAction);
+            }
+            else
+            {
+                Color greenBg = new Color(0.08f, 0.72f, 0.45f);
+                Color greenHighlight = new Color(0.45f, 0.95f, 0.65f, 0.35f);
+                GameObject adBtnObj = CreateMenuGridButton(card.transform, "AdGridButton", "🎬", "REKLAM İZLE", "CAN AL  ❤️", new Vector2(colRightX, row2Y), gridSize, greenBg, greenHighlight);
+                adBtnObj.GetComponent<Button>().onClick.AddListener(adRewardAction);
+            }
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
