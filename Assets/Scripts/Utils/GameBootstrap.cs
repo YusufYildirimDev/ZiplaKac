@@ -706,89 +706,278 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = panel.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.45f);
+            bg.color = new Color(0.04f, 0.06f, 0.11f, 0.85f);
 
-            // Centered Glassmorphic Card (920x1260, Y: +90 so player is clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
+            // Centered Glassmorphic Menu Card (960x1460, Y: +40)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(960f, 1460f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 40f);
 
-            // Başlık "HOPPZY" (Büyük ve Belirgin, Şık Sıcak Altın)
-            CreateText(card.transform, "TitleText", "HOPPZY", 72, new Vector2(0f, 510f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+            Image cardImg = card.GetComponent<Image>();
+            if (cardImg != null)
+            {
+                cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                    new Color(0.05f, 0.07f, 0.13f, 0.96f),
+                    new Color(0.12f, 0.18f, 0.28f, 0.85f),
+                    2f, 32, 128, 128
+                );
+            }
 
-            // Alt Başlık "tek dokunuş, sonsuz kaçış"
-            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 435f), new Color(0.62f, 0.70f, 0.82f), false);
+            // 1. Başlık "HOPPZY"
+            CreateText(card.transform, "TitleText", "HOPPZY", 72, new Vector2(0f, 560f), new Color(1.0f, 0.86f, 0.40f), false, FontStyle.Bold);
 
-            // "KARAKTER SEÇ" etiketi
-            CreateText(card.transform, "SelectPrompt", "KARAKTER SEÇ", 26, new Vector2(0f, 320f), new Color(0.72f, 0.80f, 0.92f), false, FontStyle.Bold);
+            // 2. Alt Başlık "tek dokunuş, sonsuz kaçış"
+            CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 26, new Vector2(0f, 495f), new Color(0.58f, 0.66f, 0.78f), false);
 
-            // Karakter Galerisi UI (Swatches - Genişletilmiş Alan)
+            // 3. "KARAKTERİNİ SEÇ" Bölüm Başlığı (Ekran görüntüsündeki gibi modern ve sade)
+            CreateText(card.transform, "SelectPrompt", "KARAKTERİNİ SEÇ", 26, new Vector2(0f, 395f), new Color(0.48f, 0.56f, 0.68f), false, FontStyle.Bold);
+
+            // 4. Karakter Galerisi UI (5 Swatch - Klasik, Ateş, Buz, Zehir, Gece)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 175f);
-            galleryRt.sizeDelta = new Vector2(880f, 210f);
-
+            galleryRt.anchoredPosition = new Vector2(0f, 235f);
+            galleryRt.sizeDelta = new Vector2(900f, 230f);
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 1. "BAŞLA" Butonu (Hero Action - Şık Safir Mavi #2563eb - Standart 540x86, Çerçevesiz)
-            Color primaryBlue = new Color(0.14f, 0.40f, 0.90f);
-            GameObject btnObj = CreatePillButton(card.transform, "StartButton", "BAŞLA", new Vector2(0f, -60f), new Vector2(540f, 86f), primaryBlue, Color.white, 32);
-            Button btn = btnObj.GetComponent<Button>();
-            btn.onClick.AddListener(() => {
+            // 5. "▶ OYNA" Butonu (Ekran görüntüsündeki dev mint yeşili kapsül + neon parlama)
+            GameObject playBtnObj = new GameObject("PlayButton");
+            playBtnObj.transform.SetParent(card.transform, false);
+            RectTransform playRt = playBtnObj.AddComponent<RectTransform>();
+            playRt.anchoredPosition = new Vector2(0f, 15f);
+            playRt.sizeDelta = new Vector2(880f, 134f);
+
+            // Parlama / Glow Gölgesi (Altında hafif taşan yumuşak neon ışık)
+            GameObject glowObj = new GameObject("PlayGlow");
+            glowObj.transform.SetParent(playBtnObj.transform, false);
+            RectTransform glowRt = glowObj.AddComponent<RectTransform>();
+            glowRt.anchoredPosition = new Vector2(0f, -6f);
+            glowRt.sizeDelta = new Vector2(910f, 156f);
+            Image glowImg = glowObj.AddComponent<Image>();
+            glowImg.sprite = ProceduralSpriteGenerator.CreateGlowPillSprite(new Color(0.16f, 0.86f, 0.62f, 0.40f), 256, 96);
+            glowImg.type = Image.Type.Sliced;
+            glowImg.raycastTarget = false;
+
+            // Mint degrade gövde
+            Image playBg = playBtnObj.AddComponent<Image>();
+            playBg.sprite = ProceduralSpriteGenerator.CreateMintPillSprite(256, 96);
+            playBg.type = Image.Type.Sliced;
+            playBg.raycastTarget = true;
+
+            Button playBtn = playBtnObj.AddComponent<Button>();
+            playBtn.targetGraphic = playBg;
+            ColorBlock pcb = playBtn.colors;
+            pcb.normalColor = Color.white;
+            pcb.highlightedColor = new Color(1.08f, 1.08f, 1.08f);
+            pcb.pressedColor = new Color(0.85f, 0.95f, 0.90f);
+            playBtn.colors = pcb;
+            playBtn.onClick.AddListener(() => {
                 if (GameManager.Instance != null) GameManager.Instance.StartGame();
             });
 
-            // 2. 🛒 Mağaza & Gardırop Butonu (Şık Ametist / Asil Mor #6d28d9 - Standart 540x86, Çerçevesiz)
-            Color purpleBg = new Color(0.42f, 0.22f, 0.78f);
-            GameObject wardrobeBtnObj = CreatePillButton(card.transform, "WardrobeButton", "🛒 MAĞAZA & GARDIROP", new Vector2(0f, -165f), new Vector2(540f, 86f), purpleBg, Color.white, 30);
-            Button wardrobeBtn = wardrobeBtnObj.GetComponent<Button>();
-            wardrobeBtn.onClick.AddListener(() => {
-                if (UI.WardrobeModalUI.Instance != null)
-                {
-                    UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
-                }
-            });
+            // "▶  OYNA" İçeriği (İkon + Metin Yatay Hizalı)
+            Color darkPine = new Color(0.04f, 0.20f, 0.16f); // #083329
 
-            // 3. 🎁 Günlük Ödül Sandığı Butonu (Sıcak Kehribar / Hazine Altını #d97706 - Standart 540x86, Çerçevesiz)
-            Color goldBg = new Color(0.85f, 0.52f, 0.08f);
-            GameObject rewardBtnObj = CreatePillButton(card.transform, "DailyRewardButton", "🎁 GÜNLÜK ÖDÜL SANDIĞI", new Vector2(0f, -270f), new Vector2(540f, 86f), goldBg, Color.white, 30);
-            Button rewardBtn = rewardBtnObj.GetComponent<Button>();
-            rewardBtn.onClick.AddListener(() => {
-                if (DailyRewardModalUI.Instance != null)
-                {
-                    DailyRewardModalUI.Instance.gameObject.SetActive(true);
-                }
-            });
+            GameObject playIconObj = new GameObject("PlayIcon");
+            playIconObj.transform.SetParent(playBtnObj.transform, false);
+            RectTransform pIconRt = playIconObj.AddComponent<RectTransform>();
+            pIconRt.anchoredPosition = new Vector2(-75f, 0f);
+            pIconRt.sizeDelta = new Vector2(34f, 34f);
+            Image pIconImg = playIconObj.AddComponent<Image>();
+            pIconImg.sprite = ProceduralSpriteGenerator.CreatePlayIconSprite(64);
+            pIconImg.color = darkPine;
+            pIconImg.preserveAspect = true;
+            pIconImg.raycastTarget = false;
 
-            // 4. 📖 Nasıl Oynanır & Rehber Butonu (Derin Okyanus / Çelik Camgöbeği #0284c7 - Standart 540x86, Çerçevesiz)
-            Color tealBg = new Color(0.08f, 0.50f, 0.72f);
-            GameObject rulesBtnObj = CreatePillButton(card.transform, "RulesButton", "📖 NASIL OYNANIR?", new Vector2(0f, -375f), new Vector2(540f, 86f), tealBg, Color.white, 30);
-            Button rulesBtn = rulesBtnObj.GetComponent<Button>();
-            rulesBtn.onClick.AddListener(() => {
-                Debug.Log("[RulesButton] Clicked! Opening onboarding modal...");
-                AudioManager.Instance?.PlayJumpSound();
-                if (UI.OnboardingModalUI.Instance != null)
-                {
-                    UI.OnboardingModalUI.Instance.OpenModal();
-                }
-                else
-                {
-                    var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true);
-                    if (found != null)
-                    {
-                        found.OpenModal();
-                    }
-                    else
-                    {
-                        Debug.LogError("[RulesButton] OnboardingModalUI not found!");
-                    }
-                }
-            });
+            GameObject playTextObj = new GameObject("PlayText");
+            playTextObj.transform.SetParent(playBtnObj.transform, false);
+            RectTransform pTextRt = playTextObj.AddComponent<RectTransform>();
+            pTextRt.anchoredPosition = new Vector2(25f, 0f);
+            pTextRt.sizeDelta = new Vector2(240f, 60f);
+            Text pTxt = playTextObj.AddComponent<Text>();
+            pTxt.font = GetSafeDefaultFont();
+            pTxt.text = "OYNA";
+            pTxt.fontSize = 46;
+            pTxt.fontStyle = FontStyle.Bold;
+            pTxt.alignment = TextAnchor.MiddleLeft;
+            pTxt.color = darkPine;
+            pTxt.raycastTarget = false;
 
-            // Alt İpucu
-            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -470f), new Color(0.55f, 0.65f, 0.8f), false);
+            // 6. Alt 4 Aksiyon Kartı (Mağaza, Gardırop, Günlük, Rehber)
+            CreateBottomActionCards(card.transform, new Vector2(0f, -220f));
+
+            // 7. Alt İpucu
+            CreateText(card.transform, "ControlHint", "Zıplamak için dokun / Boşluk", 24, new Vector2(0f, -385f), new Color(0.42f, 0.50f, 0.62f, 0.75f), false);
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
+        }
+
+        private void CreateBottomActionCards(Transform parent, Vector2 position)
+        {
+            GameObject container = new GameObject("BottomCardsContainer");
+            container.transform.SetParent(parent, false);
+            RectTransform cRt = container.AddComponent<RectTransform>();
+            cRt.anchoredPosition = position;
+            cRt.sizeDelta = new Vector2(880f, 230f);
+
+            float cardW = 204f;
+            float cardH = 228f;
+            float[] xOffsets = new float[] { -336f, -112f, 112f, 336f };
+
+            // 1. Mağaza Kartı
+            CreateSingleActionCard(container.transform, "Card_Shop", xOffsets[0], cardW, cardH,
+                "Mağaza",
+                new Color(0.15f, 0.14f, 0.27f),
+                ProceduralSpriteGenerator.CreateShopBagOutlineIcon(new Color(0.65f, 0.58f, 0.95f), 96),
+                () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.WardrobeModalUI.Instance != null)
+                    {
+                        UI.WardrobeModalUI.Instance.OpenWithTab(UI.ShopTab.Upgrades);
+                    }
+                },
+                false
+            );
+
+            // 2. Gardırop Kartı
+            CreateSingleActionCard(container.transform, "Card_Wardrobe", xOffsets[1], cardW, cardH,
+                "Gardırop",
+                new Color(0.23f, 0.13f, 0.20f),
+                ProceduralSpriteGenerator.CreateTShirtOutlineIcon(new Color(0.96f, 0.48f, 0.65f), 96),
+                () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.WardrobeModalUI.Instance != null)
+                    {
+                        UI.WardrobeModalUI.Instance.OpenWithTab(UI.ShopTab.Outfits);
+                    }
+                },
+                false
+            );
+
+            // 3. Günlük Kartı (Kırmızı Bildirim Noktalı)
+            CreateSingleActionCard(container.transform, "Card_Daily", xOffsets[2], cardW, cardH,
+                "Günlük",
+                new Color(0.23f, 0.20f, 0.13f),
+                ProceduralSpriteGenerator.CreateDailyChestOutlineIcon(new Color(0.98f, 0.78f, 0.22f), 96),
+                () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (DailyRewardModalUI.Instance != null)
+                    {
+                        DailyRewardModalUI.Instance.gameObject.SetActive(true);
+                    }
+                },
+                SaveSystem.CanClaimDailyReward()
+            );
+
+            // 4. Rehber Kartı
+            CreateSingleActionCard(container.transform, "Card_Guide", xOffsets[3], cardW, cardH,
+                "Rehber",
+                new Color(0.09f, 0.15f, 0.26f),
+                ProceduralSpriteGenerator.CreateBookOutlineIcon(new Color(0.42f, 0.68f, 0.98f), 96),
+                () => {
+                    AudioManager.Instance?.PlayJumpSound();
+                    if (UI.OnboardingModalUI.Instance != null)
+                    {
+                        UI.OnboardingModalUI.Instance.OpenModal();
+                    }
+                },
+                false
+            );
+        }
+
+        private void CreateSingleActionCard(Transform parent, string name, float xPos, float w, float h, string label, Color innerBadgeBgColor, Sprite iconSprite, System.Action onClick, bool showNotificationDot)
+        {
+            GameObject cardObj = new GameObject(name);
+            cardObj.transform.SetParent(parent, false);
+            RectTransform rt = cardObj.AddComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(xPos, 0f);
+            rt.sizeDelta = new Vector2(w, h);
+
+            Image cardBg = cardObj.AddComponent<Image>();
+            cardBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.075f, 0.106f, 0.165f, 0.98f),
+                new Color(0.12f, 0.17f, 0.25f, 1f),
+                1.5f, 26, 128, 128
+            );
+            cardBg.type = Image.Type.Sliced;
+            cardBg.raycastTarget = true;
+
+            Button btn = cardObj.AddComponent<Button>();
+            btn.targetGraphic = cardBg;
+            ColorBlock cb = btn.colors;
+            cb.normalColor = Color.white;
+            cb.highlightedColor = new Color(1.15f, 1.15f, 1.25f);
+            cb.pressedColor = new Color(0.85f, 0.88f, 0.95f);
+            btn.colors = cb;
+            if (onClick != null) btn.onClick.AddListener(() => onClick.Invoke());
+
+            // İç Squircle Rozet (94x94 px)
+            GameObject badgeObj = new GameObject("InnerBadge");
+            badgeObj.transform.SetParent(cardObj.transform, false);
+            RectTransform badgeRt = badgeObj.AddComponent<RectTransform>();
+            badgeRt.anchoredPosition = new Vector2(0f, 34f);
+            badgeRt.sizeDelta = new Vector2(94f, 94f);
+
+            Image badgeBg = badgeObj.AddComponent<Image>();
+            badgeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                innerBadgeBgColor,
+                Color.clear,
+                0f, 24, 128, 128
+            );
+            badgeBg.type = Image.Type.Sliced;
+            badgeBg.raycastTarget = false;
+
+            // İkon
+            if (iconSprite != null)
+            {
+                GameObject iconObj = new GameObject("Icon");
+                iconObj.transform.SetParent(badgeObj.transform, false);
+                RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+                iconRt.anchoredPosition = Vector2.zero;
+                iconRt.sizeDelta = new Vector2(58f, 58f);
+
+                Image iconImg = iconObj.AddComponent<Image>();
+                iconImg.sprite = iconSprite;
+                iconImg.preserveAspect = true;
+                iconImg.raycastTarget = false;
+            }
+
+            // Kırmızı Bildirim Noktası
+            if (showNotificationDot)
+            {
+                GameObject dotObj = new GameObject("NotifDot");
+                dotObj.transform.SetParent(badgeObj.transform, false);
+                RectTransform dotRt = dotObj.AddComponent<RectTransform>();
+                dotRt.anchorMin = new Vector2(1f, 1f);
+                dotRt.anchorMax = new Vector2(1f, 1f);
+                dotRt.pivot = new Vector2(1f, 1f);
+                dotRt.anchoredPosition = new Vector2(4f, 4f);
+                dotRt.sizeDelta = new Vector2(22f, 22f);
+
+                Image dotImg = dotObj.AddComponent<Image>();
+                dotImg.sprite = ProceduralSpriteGenerator.CreateCircleSprite(new Color(0.96f, 0.25f, 0.37f), 64);
+                dotImg.raycastTarget = false;
+            }
+
+            // Kart İsmi
+            GameObject labelObj = new GameObject("Label");
+            labelObj.transform.SetParent(cardObj.transform, false);
+            RectTransform labelRt = labelObj.AddComponent<RectTransform>();
+            labelRt.anchoredPosition = new Vector2(0f, -58f);
+            labelRt.sizeDelta = new Vector2(w - 16f, 36f);
+
+            Text labelTxt = labelObj.AddComponent<Text>();
+            labelTxt.font = GetSafeDefaultFont();
+            labelTxt.text = label;
+            labelTxt.fontSize = 24;
+            labelTxt.fontStyle = FontStyle.Bold;
+            labelTxt.alignment = TextAnchor.MiddleCenter;
+            labelTxt.resizeTextForBestFit = true;
+            labelTxt.resizeTextMinSize = 16;
+            labelTxt.resizeTextMaxSize = 24;
+            labelTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+            labelTxt.verticalOverflow = VerticalWrapMode.Truncate;
+            labelTxt.color = new Color(0.88f, 0.91f, 0.95f);
+            labelTxt.raycastTarget = false;
         }
 
         private void CreateHUDPanel(Transform parent)
