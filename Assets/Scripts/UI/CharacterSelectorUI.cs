@@ -184,7 +184,7 @@ namespace ZiplaKac.UI
                     borderImg.raycastTarget = false;
                     card.borderHighlight = borderImg;
 
-                    // Kilit Katmanı (Lock Overlay - Swatch üzerine tam oturan cam buzlu panel)
+                    // Kilit Katmanı (Lock Overlay - Swatch üzerine tam oturan katman)
                     GameObject lockObj = new GameObject("LockOverlay");
                     lockObj.transform.SetParent(swatchObj.transform, false);
                     RectTransform lockRt = lockObj.AddComponent<RectTransform>();
@@ -192,40 +192,79 @@ namespace ZiplaKac.UI
                     lockRt.offsetMin = Vector2.zero; lockRt.offsetMax = Vector2.zero;
 
                     Image lockBg = lockObj.AddComponent<Image>();
-                    lockBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                        new Color(0.04f, 0.06f, 0.10f, 0.84f),
-                        new Color(1f, 1f, 1f, 0.14f),
-                        1.5f, 24
-                    );
-                    lockBg.type = Image.Type.Sliced;
+                    lockBg.color = new Color(0.02f, 0.04f, 0.08f, 0.25f); // Hafif şeffaf derinlik, avatarı örtmez
                     lockBg.raycastTarget = false;
 
-                    // Asma Kilit İkonu (Padlock)
+                    // 1. Köşedeki Kilit Rozeti (Sağ Üst Köşe - 38x38 px)
+                    GameObject cornerBadge = new GameObject("CornerLockBadge");
+                    cornerBadge.transform.SetParent(lockObj.transform, false);
+                    RectTransform badgeRt = cornerBadge.AddComponent<RectTransform>();
+                    badgeRt.anchorMin = new Vector2(1f, 1f);
+                    badgeRt.anchorMax = new Vector2(1f, 1f);
+                    badgeRt.pivot = new Vector2(1f, 1f);
+                    badgeRt.anchoredPosition = new Vector2(-6f, -6f);
+                    badgeRt.sizeDelta = new Vector2(38f, 38f);
+
+                    Image badgeBg = cornerBadge.AddComponent<Image>();
+                    badgeBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                        new Color(0.06f, 0.08f, 0.16f, 0.95f),
+                        new Color(1.0f, 0.82f, 0.35f, 0.95f),
+                        1.5f, 19, 64, 64
+                    );
+                    badgeBg.type = Image.Type.Sliced;
+                    badgeBg.raycastTarget = false;
+
+                    // Asma Kilit İkonu (Altın Sarısı Kilit)
                     GameObject lockIconObj = new GameObject("LockIcon");
-                    lockIconObj.transform.SetParent(lockObj.transform, false);
+                    lockIconObj.transform.SetParent(cornerBadge.transform, false);
                     RectTransform lockIconRt = lockIconObj.AddComponent<RectTransform>();
-                    lockIconRt.anchoredPosition = new Vector2(0f, 10f);
-                    lockIconRt.sizeDelta = new Vector2(50f, 50f);
+                    lockIconRt.anchorMin = new Vector2(0.5f, 0.5f);
+                    lockIconRt.anchorMax = new Vector2(0.5f, 0.5f);
+                    lockIconRt.pivot = new Vector2(0.5f, 0.5f);
+                    lockIconRt.anchoredPosition = Vector2.zero;
+                    lockIconRt.sizeDelta = new Vector2(22f, 22f);
                     Image lockIconImg = lockIconObj.AddComponent<Image>();
                     lockIconImg.sprite = Utils.ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/icon_lock", () => Utils.ProceduralSpriteGenerator.CreateLockIconSprite(128));
+                    lockIconImg.color = new Color(1.0f, 0.85f, 0.35f);
                     lockIconImg.preserveAspect = true;
                     lockIconImg.raycastTarget = false;
 
-                    // Kilit Gereksinim Metni ("2500 Skor")
+                    // 2. Kilit Gereksinim Şeridi (Alt Kenarda Zarif Bant - Avatar yüzünü kapatmaz)
+                    GameObject lockPillObj = new GameObject("LockPill");
+                    lockPillObj.transform.SetParent(lockObj.transform, false);
+                    RectTransform lockPillRt = lockPillObj.AddComponent<RectTransform>();
+                    lockPillRt.anchorMin = new Vector2(0.5f, 0f);
+                    lockPillRt.anchorMax = new Vector2(0.5f, 0f);
+                    lockPillRt.pivot = new Vector2(0.5f, 0f);
+                    lockPillRt.anchoredPosition = new Vector2(0f, 6f);
+                    lockPillRt.sizeDelta = new Vector2(100f, 24f);
+
+                    Image pillBg = lockPillObj.AddComponent<Image>();
+                    pillBg.sprite = Utils.ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                        new Color(0.05f, 0.07f, 0.14f, 0.90f),
+                        new Color(1f, 1f, 1f, 0.15f),
+                        1f, 10, 64, 32
+                    );
+                    pillBg.type = Image.Type.Sliced;
+                    pillBg.raycastTarget = false;
+
                     GameObject lockTextObj = new GameObject("LockText");
-                    lockTextObj.transform.SetParent(lockObj.transform, false);
+                    lockTextObj.transform.SetParent(lockPillObj.transform, false);
                     RectTransform lockTextRt = lockTextObj.AddComponent<RectTransform>();
-                    lockTextRt.anchoredPosition = new Vector2(0f, -28f);
-                    lockTextRt.sizeDelta = new Vector2(110f, 24f);
+                    lockTextRt.anchorMin = Vector2.zero;
+                    lockTextRt.anchorMax = Vector2.one;
+                    lockTextRt.offsetMin = new Vector2(4f, 0f);
+                    lockTextRt.offsetMax = new Vector2(-4f, 0f);
+
                     Text lockTxt = lockTextObj.AddComponent<Text>();
                     lockTxt.font = GetSafeFont();
                     lockTxt.text = "2500 Skor";
-                    lockTxt.fontSize = 17;
+                    lockTxt.fontSize = 16;
                     lockTxt.fontStyle = FontStyle.Bold;
                     lockTxt.alignment = TextAnchor.MiddleCenter;
                     lockTxt.resizeTextForBestFit = true;
-                    lockTxt.resizeTextMinSize = 12;
-                    lockTxt.resizeTextMaxSize = 17;
+                    lockTxt.resizeTextMinSize = 11;
+                    lockTxt.resizeTextMaxSize = 16;
                     lockTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
                     lockTxt.verticalOverflow = VerticalWrapMode.Truncate;
                     lockTxt.color = new Color(1f, 0.85f, 0.35f, 0.95f);
@@ -334,7 +373,7 @@ namespace ZiplaKac.UI
 
                 if (card.iconImage != null)
                 {
-                    card.iconImage.color = isUnlocked ? Color.white : new Color(0.40f, 0.40f, 0.45f, 0.60f);
+                    card.iconImage.color = isUnlocked ? Color.white : new Color(0.65f, 0.65f, 0.70f, 0.88f);
                 }
 
                 if (card.borderHighlight != null)

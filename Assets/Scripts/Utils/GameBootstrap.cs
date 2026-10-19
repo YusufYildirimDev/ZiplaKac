@@ -1531,12 +1531,25 @@ namespace ZiplaKac.Utils
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             modalUI.modalCard = card;
 
-            // 1. Üst Rozet & Başlık (Büyütülmüş)
-            modalUI.stepBadgeText = CreateText(card.transform, "StepBadge", "REHBER • ADIM 1 / 4", 28, new Vector2(0f, 660f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
-            modalUI.titleText = CreateText(card.transform, "TitleText", "OYUN KURALLARI & KONTROLLER", 44, new Vector2(0f, 605f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+            // 1. Üst Rozet & Başlık
+            modalUI.stepBadgeText = CreateText(card.transform, "StepBadge", "REHBER • ADIM 1 / 4", 28, new Vector2(0f, 695f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            RectTransform sbRt = modalUI.stepBadgeText.GetComponent<RectTransform>();
+            sbRt.sizeDelta = new Vector2(400f, 44f);
 
-            // Sağ Üst "✕ KAPAT" Butonu (Genişletilmiş dokunma alanı)
-            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ KAPAT", new Vector2(350f, 660f), new Vector2(180f, 64f), new Color(0.18f, 0.24f, 0.38f, 0.95f), new Color(0.9f, 0.95f, 1f), 24);
+            modalUI.titleText = CreateText(card.transform, "TitleText", "OYUN KURALLARI & KONTROLLER", 44, new Vector2(0f, 622f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+            RectTransform ttRt = modalUI.titleText.GetComponent<RectTransform>();
+            ttRt.sizeDelta = new Vector2(860f, 56f);
+            modalUI.titleText.resizeTextForBestFit = true;
+            modalUI.titleText.resizeTextMinSize = 28;
+            modalUI.titleText.resizeTextMaxSize = 44;
+
+            // Sağ Üst "✕ KAPAT" Butonu (Kartın sağ üst köşesine 32px simetrik kenar boşluğuyla tam hizalı)
+            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "✕ KAPAT", Vector2.zero, new Vector2(160f, 58f), new Color(0.18f, 0.24f, 0.38f, 0.95f), new Color(0.9f, 0.95f, 1f), 24);
+            RectTransform skipRt = skipBtnObj.GetComponent<RectTransform>();
+            skipRt.anchorMin = new Vector2(1f, 1f);
+            skipRt.anchorMax = new Vector2(1f, 1f);
+            skipRt.pivot = new Vector2(1f, 1f);
+            skipRt.anchoredPosition = new Vector2(-32f, -32f);
             modalUI.closeButton = skipBtnObj.GetComponent<Button>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
