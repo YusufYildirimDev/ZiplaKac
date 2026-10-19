@@ -52,11 +52,20 @@ namespace ZiplaKac.UI
 
         private Coroutine comboCoroutine;
         private Coroutine pulseCoroutine;
-        private readonly Vector2 comboBasePosition = new Vector2(0f, 520f);
+        private Vector2 comboBasePosition = new Vector2(0f, -140f);
 
         // Son gösterilen güçlendirme tipi — değişim animasyonu için
         private enum PowerupType { None, Slow, Multi }
         private PowerupType lastShownType = PowerupType.None;
+
+        private void Start()
+        {
+            if (comboBannerObject != null)
+            {
+                RectTransform rt = comboBannerObject.GetComponent<RectTransform>();
+                if (rt != null) comboBasePosition = rt.anchoredPosition;
+            }
+        }
 
         private void OnEnable()
         {

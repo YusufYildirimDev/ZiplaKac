@@ -90,6 +90,11 @@ namespace ZiplaKac.Utils
             {
                 camData.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.FastApproximateAntialiasing;
             }
+
+            if (mainCam.GetComponent<ResponsiveCamera>() == null)
+            {
+                mainCam.gameObject.AddComponent<ResponsiveCamera>();
+            }
         }
 
         private void SetupManagers()
@@ -525,6 +530,7 @@ namespace ZiplaKac.Utils
                 CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
                 scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 scaler.referenceResolution = new Vector2(1080, 1920);
+                canvasObj.AddComponent<UI.ResponsiveCanvasScaler>();
 
                 canvasObj.AddComponent<GraphicRaycaster>();
                 canvasObj.AddComponent<UIManager>();
@@ -584,6 +590,11 @@ namespace ZiplaKac.Utils
             rt.sizeDelta = size;
             rt.anchoredPosition = Vector2.zero;
 
+            var responsive = card.AddComponent<UI.CardResponsiveScaler>();
+            responsive.targetWidth = size.x;
+            responsive.targetHeight = size.y;
+            responsive.padding = 30f;
+
             Image img = card.AddComponent<Image>();
             // #141a30 (%88 alpha) + subtle border (%14 alpha)
             img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -633,11 +644,16 @@ namespace ZiplaKac.Utils
             return obj;
         }
 
-        private static GameObject CreateHUDBadge(Transform parent, string name, Vector2 size, Vector2 position, Color bgColor, Color borderColor, float borderWidth, Sprite iconSprite, string initialText, Color textColor, int fontSize, out Text outText)
+        private static GameObject CreateHUDBadge(Transform parent, string name, Vector2 size, Vector2 position, Color bgColor, Color borderColor, float borderWidth, Sprite iconSprite, string initialText, Color textColor, int fontSize, out Text outText, Vector2? anchor = null, Vector2? pivot = null)
         {
             GameObject card = new GameObject(name);
             card.transform.SetParent(parent, false);
             RectTransform rt = card.AddComponent<RectTransform>();
+            Vector2 anc = anchor ?? new Vector2(0.5f, 0.5f);
+            Vector2 piv = pivot ?? new Vector2(0.5f, 0.5f);
+            rt.anchorMin = anc;
+            rt.anchorMax = anc;
+            rt.pivot = piv;
             rt.sizeDelta = size;
             rt.anchoredPosition = position;
 
@@ -702,9 +718,11 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.45f);
 
-            // Centered Glassmorphic Card (920x1260, Y: +90 so player is clearly visible below)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
-            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
+            GameObject safeArea = UI.SafeAreaFitter.Create(panel.transform, "Menu_SafeArea");
+
+            // Centered Glassmorphic Card (920x1260, Y: +40 so player is clearly visible below)
+            GameObject card = CreateCardContainer(safeArea.transform, "MenuCard", new Vector2(920f, 1260f));
+            card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 40f);
 
             // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin, Şık Sıcak Altın)
             CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 72, new Vector2(0f, 510f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
@@ -794,52 +812,61 @@ namespace ZiplaKac.Utils
 
             HUDController hud = panel.AddComponent<HUDController>();
 
+            // SafeArea Konteyneri (Çentik, Dynamic Island ve alt bar koruması)
+            GameObject safeArea = UI.SafeAreaFitter.Create(panel.transform, "HUD_SafeArea");
+
             // Top Header Bar — Premium Arcade Glassmorphic Badges
-            // 1. Anlık Skor (Sol Üst Neon Mint Badge)
+            // 1. Anlık Skor (Sol Üst Neon Mint Badge - Güvenli Alan Köşesine Sabitli)
             Sprite scoreIcon = ProceduralSpriteGenerator.CreateScoreStarSprite();
-            CreateHUDBadge(panel.transform, "ScorePill", new Vector2(340f, 96f), new Vector2(-330f, 830f),
+            CreateHUDBadge(safeArea.transform, "ScorePill", new Vector2(340f, 96f), new Vector2(28f, -24f),
                 new Color(0.06f, 0.09f, 0.18f, 0.94f), new Color(0.024f, 0.839f, 0.627f, 0.95f), 3.0f,
                 scoreIcon, "<size=20><color=#8da4c4>SKOR</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
-                Color.white, 24, out hud.currentScoreText);
+                Color.white, 24, out hud.currentScoreText, new Vector2(0f, 1f), new Vector2(0f, 1f));
 
             // 2. Altın Rozeti (Sol Üst Skorun altında — Parlak Altın Sikke Rozeti)
             Sprite coinIcon = ProceduralSpriteGenerator.CreateGoldCoinSprite();
-            CreateHUDBadge(panel.transform, "GoldPill", new Vector2(280f, 86f), new Vector2(-360f, 715f),
+            CreateHUDBadge(safeArea.transform, "GoldPill", new Vector2(280f, 86f), new Vector2(28f, -132f),
                 new Color(0.09f, 0.08f, 0.14f, 0.94f), new Color(1.0f, 0.82f, 0.25f, 0.95f), 3.0f,
                 coinIcon, "<size=18><color=#ffd166>ALTIN</color></size>\n<size=38><color=#ffea79><b>0</b></color></size>",
-                new Color(1.0f, 0.92f, 0.45f), 22, out hud.goldText);
+                new Color(1.0f, 0.92f, 0.45f), 22, out hud.goldText, new Vector2(0f, 1f), new Vector2(0f, 1f));
 
             // 3. En İyi Skor (Sağ Üst — Parlak Altın Kupa / Rekor Rozeti)
             Sprite trophyIcon = ProceduralSpriteGenerator.CreateTrophyIconSprite();
-            CreateHUDBadge(panel.transform, "HighScorePill", new Vector2(340f, 96f), new Vector2(330f, 830f),
+            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(340f, 96f), new Vector2(-28f, -24f),
                 new Color(0.08f, 0.07f, 0.16f, 0.94f), new Color(0.98f, 0.75f, 0.18f, 0.95f), 3.0f,
                 trophyIcon, "<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
-                Color.white, 24, out hud.highScoreText);
+                Color.white, 24, out hud.highScoreText, new Vector2(1f, 1f), new Vector2(1f, 1f));
 
             // Active PowerUp Badges Bar (Üst Orta - İki rozet arası)
             GameObject badgeBar = new GameObject("PowerUpBadgeBar");
-            badgeBar.transform.SetParent(panel.transform, false);
+            badgeBar.transform.SetParent(safeArea.transform, false);
             RectTransform barRt = badgeBar.AddComponent<RectTransform>();
-            barRt.anchoredPosition = new Vector2(0f, 830f);
+            barRt.anchorMin = new Vector2(0.5f, 1f);
+            barRt.anchorMax = new Vector2(0.5f, 1f);
+            barRt.pivot = new Vector2(0.5f, 1f);
+            barRt.anchoredPosition = new Vector2(0f, -24f);
             barRt.sizeDelta = new Vector2(300f, 80f);
 
-            hud.shieldBadgeText = CreateText(badgeBar.transform, "ShieldBadge", "Kalkan", 26, new Vector2(-95f, 0f), new Color(0.30f, 0.79f, 0.94f), false, FontStyle.Bold);
+            hud.shieldBadgeText = CreateText(badgeBar.transform, "ShieldBadge", "Kalkan", 26, new Vector2(-95f, -40f), new Color(0.30f, 0.79f, 0.94f), false, FontStyle.Bold);
             hud.shieldBadgeObject = hud.shieldBadgeText.gameObject;
             hud.shieldBadgeObject.SetActive(false);
 
-            hud.slowBadgeText = CreateText(badgeBar.transform, "SlowBadge", "Yavaş", 26, new Vector2(0f, 0f), new Color(0.56f, 0.88f, 0.94f), false, FontStyle.Bold);
+            hud.slowBadgeText = CreateText(badgeBar.transform, "SlowBadge", "Yavaş", 26, new Vector2(0f, -40f), new Color(0.56f, 0.88f, 0.94f), false, FontStyle.Bold);
             hud.slowBadgeObject = hud.slowBadgeText.gameObject;
             hud.slowBadgeObject.SetActive(false);
 
-            hud.multiBadgeText = CreateText(badgeBar.transform, "MultiBadge", "x2 Puan", 26, new Vector2(95f, 0f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            hud.multiBadgeText = CreateText(badgeBar.transform, "MultiBadge", "x2 Puan", 26, new Vector2(95f, -40f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
             hud.multiBadgeObject = hud.multiBadgeText.gameObject;
             hud.multiBadgeObject.SetActive(false);
 
             // Merkez Güçlendirme Geri Sayaç (Ekranın Tam Ortasında Büyük Halka/Panel)
             GameObject countdownPanel = new GameObject("PowerUpCountdownPanel");
-            countdownPanel.transform.SetParent(panel.transform, false);
+            countdownPanel.transform.SetParent(safeArea.transform, false);
             RectTransform cdRt = countdownPanel.AddComponent<RectTransform>();
-            cdRt.anchoredPosition = new Vector2(0f, 150f);
+            cdRt.anchorMin = new Vector2(0.5f, 0.5f);
+            cdRt.anchorMax = new Vector2(0.5f, 0.5f);
+            cdRt.pivot = new Vector2(0.5f, 0.5f);
+            cdRt.anchoredPosition = new Vector2(0f, 60f);
             cdRt.sizeDelta = new Vector2(240f, 240f);
 
             Image ringImg = countdownPanel.AddComponent<Image>();
@@ -862,13 +889,21 @@ namespace ZiplaKac.Utils
             hud.countdownRingImage = ringImg;
             countdownPanel.SetActive(false);
 
-            // Alt Kontrol İpucu
-            hud.controlTipText = CreateText(panel.transform, "ControlTipText", "Zıpla: Dokun / Space", 24, new Vector2(0f, -840f), new Color(0.6f, 0.7f, 0.85f, 0.7f), false);
+            // Alt Kontrol İpucu (Güvenli Alan Altına Sabitli)
+            hud.controlTipText = CreateText(safeArea.transform, "ControlTipText", "Zıpla: Dokun / Space", 24, Vector2.zero, new Color(0.6f, 0.7f, 0.85f, 0.7f), false);
+            RectTransform tipRt = hud.controlTipText.GetComponent<RectTransform>();
+            tipRt.anchorMin = new Vector2(0.5f, 0f);
+            tipRt.anchorMax = new Vector2(0.5f, 0f);
+            tipRt.pivot = new Vector2(0.5f, 0f);
+            tipRt.anchoredPosition = new Vector2(0f, 25f);
 
-            // Kombo Bildirim Kartı (Ekranın Üst-Orta Kısmı, Y: 520, X: 0 - Asla sola kaymaz, taşmaz)
-            GameObject comboCard = CreateCardContainer(panel.transform, "ComboNotificationCard", new Vector2(460f, 84f));
+            // Kombo Bildirim Kartı (Ekranın Üst-Orta Kısmı, Y: -135)
+            GameObject comboCard = CreateCardContainer(safeArea.transform, "ComboNotificationCard", new Vector2(460f, 84f));
             RectTransform comboRt = comboCard.GetComponent<RectTransform>();
-            comboRt.anchoredPosition = new Vector2(0f, 520f);
+            comboRt.anchorMin = new Vector2(0.5f, 1f);
+            comboRt.anchorMax = new Vector2(0.5f, 1f);
+            comboRt.pivot = new Vector2(0.5f, 1f);
+            comboRt.anchoredPosition = new Vector2(0f, -135f);
 
             Image comboBg = comboCard.GetComponent<Image>();
             comboBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -911,12 +946,22 @@ namespace ZiplaKac.Utils
 
             GameOverUI goUI = panel.AddComponent<GameOverUI>();
 
+            GameObject safeArea = UI.SafeAreaFitter.Create(panel.transform, "GameOver_SafeArea");
+
             // Ana Kart (920x1340 px, #18263b - Ekran Orantısı Tam Dengeli)
             GameObject card = new GameObject("GameOverCard");
-            card.transform.SetParent(panel.transform, false);
+            card.transform.SetParent(safeArea.transform, false);
             RectTransform cardRt = card.AddComponent<RectTransform>();
+            cardRt.anchorMin = new Vector2(0.5f, 0.5f);
+            cardRt.anchorMax = new Vector2(0.5f, 0.5f);
+            cardRt.pivot = new Vector2(0.5f, 0.5f);
             cardRt.sizeDelta = new Vector2(920f, 1340f);
-            cardRt.anchoredPosition = new Vector2(0f, 20f);
+            cardRt.anchoredPosition = Vector2.zero;
+
+            var cardScaler = card.AddComponent<UI.CardResponsiveScaler>();
+            cardScaler.targetWidth = 920f;
+            cardScaler.targetHeight = 1340f;
+            cardScaler.padding = 30f;
 
             Color cardBg = new Color(0.094f, 0.149f, 0.231f, 0.98f);
             Color cardBorder = new Color(0.18f, 0.28f, 0.40f, 0.55f);
@@ -1339,8 +1384,10 @@ namespace ZiplaKac.Utils
 
             UI.DailyRewardModalUI modalUI = modal.AddComponent<UI.DailyRewardModalUI>();
 
+            GameObject safeArea = UI.SafeAreaFitter.Create(modal.transform, "Reward_SafeArea");
+
             // Modal Card (920x1360) - Ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(920f, 1360f));
+            GameObject card = CreateCardContainer(safeArea.transform, "RewardCard", new Vector2(920f, 1360f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
             // Başlık (Büyük ve Belirgin)
@@ -1395,8 +1442,10 @@ namespace ZiplaKac.Utils
 
             UI.WardrobeModalUI modalUI = modal.AddComponent<UI.WardrobeModalUI>();
 
+            GameObject safeArea = UI.SafeAreaFitter.Create(modal.transform, "Wardrobe_SafeArea");
+
             // Modal Card (940x1520) - Geniş, ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(940f, 1520f));
+            GameObject card = CreateCardContainer(safeArea.transform, "WardrobeCard", new Vector2(940f, 1520f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             Image cardImg = card.GetComponent<Image>();
             cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
@@ -1485,8 +1534,10 @@ namespace ZiplaKac.Utils
 
             UI.OnboardingModalUI modalUI = modal.AddComponent<UI.OnboardingModalUI>();
 
+            GameObject safeArea = UI.SafeAreaFitter.Create(modal.transform, "Onboarding_SafeArea");
+
             // Onboarding Card (940x1520)
-            GameObject card = CreateCardContainer(modal.transform, "OnboardingCard", new Vector2(940f, 1520f));
+            GameObject card = CreateCardContainer(safeArea.transform, "OnboardingCard", new Vector2(940f, 1520f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             modalUI.modalCard = card;
 
