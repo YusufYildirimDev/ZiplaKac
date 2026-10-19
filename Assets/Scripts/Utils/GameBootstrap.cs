@@ -712,8 +712,8 @@ namespace ZiplaKac.Utils
             GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1260f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 90f);
 
-            // Başlık "ZIPLA KAÇ" (Büyük ve Belirgin, Şık Sıcak Altın)
-            CreateText(card.transform, "TitleText", "ZIPLA KAÇ", 72, new Vector2(0f, 510f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
+            // Başlık "HOPPZY" (Büyük ve Belirgin, Şık Sıcak Altın)
+            CreateText(card.transform, "TitleText", "HOPPZY", 72, new Vector2(0f, 510f), new Color(1.0f, 0.84f, 0.35f), false, FontStyle.Bold);
 
             // Alt Başlık "tek dokunuş, sonsuz kaçış"
             CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 435f), new Color(0.62f, 0.70f, 0.82f), false);
