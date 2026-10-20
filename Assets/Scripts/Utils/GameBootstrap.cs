@@ -589,10 +589,10 @@ namespace ZiplaKac.Utils
             rt.anchoredPosition = Vector2.zero;
 
             Image img = card.AddComponent<Image>();
-            // Solid Deep Navy (#151e36, %98 alpha) + yumuşak 48px köşe kavisleri (HD Retina 256x256)
+            // Dark Cinematic #101F38 Koyu Lacivert + İnce Mavi Kenarlık + 48px Yumuşak Köşe Kavisleri
             img.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.082f, 0.118f, 0.212f, 0.98f),
-                new Color(1f, 1f, 1f, 0.08f),
+                new Color(0.063f, 0.122f, 0.220f, 0.98f),
+                new Color(0.153f, 0.353f, 0.647f, 0.35f),
                 2.0f, 48, 256, 256);
             img.type = Image.Type.Sliced;
             img.raycastTarget = true;
@@ -957,11 +957,11 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.40f);
 
-            // Mockup ile 1:1 Kart Konteyneri (880x1050, Y: +110 altındaki karakter ve kaktüs engelleri tam görünür)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(880f, 1050f));
+            // Dark Cinematic + Playful 3D Ana Panel (#101F38 Koyu Lacivert, 920x1060, Ekran genişliğinin %85'i)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1060f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
 
-            // 1. Mockup Başlık "= HOPPZY =" (3D Şişkin Bubble Sarı Tipografi)
+            // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi)
             Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
             if (titleSp != null)
             {
@@ -972,51 +972,51 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 74, new Vector2(0f, 440f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
-            // 2. Mockup Alt Başlık "tek dokunuş, sonsuz kaçış"
+            // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
             if (subSp != null)
             {
-                CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 380f), new Vector2(330f, 34f));
+                CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 380f), new Vector2(350f, 34f));
             }
             else
             {
-                CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 380f), new Color(0.48f, 0.62f, 0.80f), false);
+                CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 380f), new Color(0.61f, 0.73f, 0.88f), false);
             }
 
-            // 3. Mockup "─── KARAKTER SEÇ ───" Bölücü Başlık
+            // 3. Bölücü Çizgi "─── KARAKTER SEÇ ───" (#9DBCE0)
             Sprite divSp = LoadMainMenuSprite("divider_karakter_sec");
             if (divSp != null)
             {
-                CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 320f), new Vector2(415f, 31f));
+                CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 320f), new Vector2(440f, 31f));
             }
             else
             {
                 CreateSectionDivider(card.transform, "KARAKTER SEÇ", 320f);
             }
 
-            // 4. Karakter Galerisi UI (5 Karakter Kartı - Seçili olan Açık Mavi Rozetli)
+            // 4. Karakter Galerisi UI (5 Karakter Kartı - Seçili olan #27C7FF Neon Mavi Çerçeveli)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
             galleryRt.anchoredPosition = new Vector2(0f, 180f);
-            galleryRt.sizeDelta = new Vector2(820f, 185f);
+            galleryRt.sizeDelta = new Vector2(840f, 185f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 5. Mockup "▶ OYNA" Butonu (Elektrik Mavisi Kapsül Buton - 790x132)
+            // 5. "▶ OYNA" Butonu (#1678FF Canlı Mavi, Panel İç Genişliğini Kaplar: 840x126)
             Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
             if (oynaSp != null)
             {
-                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(790f, 132f), () => {
+                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(840f, 126f), () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
             }
             else
             {
-                Color primaryBlue = new Color(0.12f, 0.48f, 0.98f);
+                Color primaryBlue = new Color(0.086f, 0.471f, 1.0f); // #1678FF
                 Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(790f, 132f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(840f, 126f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
@@ -1024,14 +1024,14 @@ namespace ZiplaKac.Utils
                 });
             }
 
-            // 6. Mockup 2x2 Grid Butonlar (382x134 Kartlar):
-            // Row 1 (y = -130f): [MAĞAZA & GARDIROP]   [GÜNLÜK ÖDÜL]
-            // Row 2 (y = -282f): [NASIL OYNANIR?]       [REKLAM İZLE CAN AL ❤️]
-            Vector2 gridSize = new Vector2(382f, 134f);
+            // 6. 2x2 Grid Özellik Kartları (Eşit Boyut: 408x134, 24px Ara Boşluk):
+            // Row 1 (y = -130f): [MAĞAZA & GARDIROP (#7028D9)]   [GÜNLÜK ÖDÜL (#FF9F1C)]
+            // Row 2 (y = -282f): [NASIL OYNANIR? (#08A8CC)]       [REKLAM İZLE / CAN AL (#08BD79)]
+            Vector2 gridSize = new Vector2(408f, 134f);
             float row1Y = -130f;
             float row2Y = -282f;
-            float colLeftX = -198f;
-            float colRightX = 198f;
+            float colLeftX = -216f;
+            float colRightX = 216f;
 
             // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Mor İllüstrasyonlu Buton)
             Sprite wardrobeSp = LoadMainMenuSprite("btn_wardrobe");

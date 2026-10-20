@@ -503,11 +503,11 @@ namespace ZiplaKac.UI
                     }
                     else if (isUnlocked)
                     {
-                        card.nameText.color = new Color(0.92f, 0.95f, 1.0f);
+                        card.nameText.color = new Color(0.615f, 0.737f, 0.878f); // #9DBCE0 Secondary text
                     }
                     else
                     {
-                        card.nameText.color = new Color(0.55f, 0.62f, 0.74f);
+                        card.nameText.color = new Color(0.45f, 0.55f, 0.70f);
                     }
                 }
             }
