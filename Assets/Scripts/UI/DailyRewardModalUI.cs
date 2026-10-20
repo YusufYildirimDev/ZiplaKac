@@ -7,8 +7,8 @@ using ZiplaKac.Utils;
 namespace ZiplaKac.UI
 {
     /// <summary>
-    /// Spesifikasyonda belirtilen Ödül Sandığı (Treasure Chest) ve Günlük Giriş Ödülü modalı.
-    /// Sandık görselini görüntüler, açılma animasyonu oynatır ve bonus puan kazandırır.
+    /// Spesifikasyonda ve referans ekran görüntülerinde belirtilen Günlük Ödül Sandığı modalı.
+    /// Kapalı ve açık sandık durumları, seri altın ödülü, yeşil kapsül ve lacivert kapat butonları ile birebir eşleşir.
     /// </summary>
     public class DailyRewardModalUI : MonoBehaviour
     {
@@ -17,12 +17,20 @@ namespace ZiplaKac.UI
         public Image chestImage;
         public Sprite closedChestSprite;
         public Sprite openChestSprite;
+
         public Text titleText;
         public Text descriptionText;
         public Text statusText;
+        public Image coinIconImage;
+
         public Button claimButton;
+        public Image claimButtonImage;
         public Text claimButtonText;
+        public Sprite claimOpenSprite;
+        public Sprite claimClaimedSprite;
+
         public Button closeButton;
+        public Image closeButtonImage;
 
         private bool hasClaimed = false;
 
@@ -36,11 +44,27 @@ namespace ZiplaKac.UI
         {
             if (closedChestSprite == null)
             {
-                closedChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
+                closedChestSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/chest_closed");
+                if (closedChestSprite == null)
+                {
+                    closedChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
+                }
             }
             if (openChestSprite == null)
             {
-                openChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest_open", () => closedChestSprite);
+                openChestSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/chest_open");
+                if (openChestSprite == null)
+                {
+                    openChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest_open", () => closedChestSprite);
+                }
+            }
+            if (claimOpenSprite == null)
+            {
+                claimOpenSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_sandigi_ac");
+            }
+            if (claimClaimedSprite == null)
+            {
+                claimClaimedSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_harika");
             }
         }
 
@@ -76,15 +100,37 @@ namespace ZiplaKac.UI
 
             if (canClaim)
             {
-                if (statusText != null) statusText.text = "🎁 Bugünün sandığı açılmaya hazır!";
-                if (claimButtonText != null) claimButtonText.text = "SANDIĞI AÇ";
+                if (coinIconImage != null) coinIconImage.gameObject.SetActive(false);
+                if (statusText != null)
+                {
+                    statusText.text = "Bugünün sandığı açılmaya hazır!";
+                    statusText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
+                }
+
+                if (claimButtonImage != null && claimOpenSprite != null)
+                {
+                    claimButtonImage.sprite = claimOpenSprite;
+                }
+                if (claimButtonText != null) claimButtonText.text = "";
                 if (claimButton != null) claimButton.interactable = true;
             }
             else
             {
-                if (statusText != null) statusText.text = "✅ Bugünkü hediyeni aldın! Yarın tekrar gel.";
-                if (claimButtonText != null) claimButtonText.text = "ALINDI";
-                if (claimButton != null) claimButton.interactable = false;
+                int streak = SaveSystem.GetDailyStreak();
+                int goldReward = streak * 10;
+                if (coinIconImage != null) coinIconImage.gameObject.SetActive(true);
+                if (statusText != null)
+                {
+                    statusText.text = $"{streak}. GÜN SERİSİ! +{goldReward} ALTIN KAZANDIN!";
+                    statusText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
+                }
+
+                if (claimButtonImage != null && claimClaimedSprite != null)
+                {
+                    claimButtonImage.sprite = claimClaimedSprite;
+                }
+                if (claimButtonText != null) claimButtonText.text = "";
+                if (claimButton != null) claimButton.interactable = true;
             }
         }
 
@@ -106,14 +152,26 @@ namespace ZiplaKac.UI
                 chestImage.sprite = openChestSprite;
             }
 
+            // Butonu "HARİKA!" butonuna çevir
+            if (claimButtonImage != null && claimClaimedSprite != null)
+            {
+                claimButtonImage.sprite = claimClaimedSprite;
+            }
+            if (claimButtonText != null) claimButtonText.text = "";
+
+            // Durum bilgisini seri ve altın olarak güncelle
+            if (coinIconImage != null) coinIconImage.gameObject.SetActive(true);
+            if (statusText != null)
+            {
+                statusText.text = $"{streak}. GÜN SERİSİ! +{goldReward} ALTIN KAZANDIN!";
+                statusText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
+            }
+
             AudioManager.Instance?.PlayNewRecordSound();
             AudioManager.Instance?.TriggerHapticFeedback();
 
             // Sandık açılma ve zıplama efekti
             StartCoroutine(AnimateChestOpening());
-
-            if (statusText != null) statusText.text = $"🎉 {streak}. GÜN SERİSİ! +{goldReward} 🪙 ALTIN KAZANDIN!";
-            if (claimButtonText != null) claimButtonText.text = "HARİKA!";
         }
 
         public void CloseModal()
@@ -129,7 +187,7 @@ namespace ZiplaKac.UI
 
             while (gameObject.activeInHierarchy && !hasClaimed)
             {
-                float t = Mathf.Sin(Time.time * 3f) * 0.06f;
+                float t = Mathf.Sin(Time.time * 3f) * 0.05f;
                 tr.localScale = new Vector3(1f + t, 1f - t, 1f);
                 yield return null;
             }
@@ -145,7 +203,7 @@ namespace ZiplaKac.UI
             while (elapsed < 0.45f)
             {
                 elapsed += Time.deltaTime;
-                float s = 1f + Mathf.Sin(elapsed * Mathf.PI / 0.45f) * 0.35f;
+                float s = 1f + Mathf.Sin(elapsed * Mathf.PI / 0.45f) * 0.28f;
                 tr.localScale = Vector3.one * s;
                 yield return null;
             }

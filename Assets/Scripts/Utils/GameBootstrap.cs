@@ -1749,49 +1749,97 @@ namespace ZiplaKac.Utils
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
 
             Image bg = modal.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.75f);
+            bg.color = new Color(0.02f, 0.04f, 0.08f, 0.88f); // Koyu arka plan karartması
+            bg.raycastTarget = true;
 
             UI.DailyRewardModalUI modalUI = modal.AddComponent<UI.DailyRewardModalUI>();
 
-            // Modal Card (920x1360) - Ferah ve büyük ekran kartı
-            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(920f, 1360f));
+            // Modal Card (940x1320) - Referans tasarıma birebir uygun modern koyu kart
+            GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(940f, 1320f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            Image cardImg = card.GetComponent<Image>();
+            cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.051f, 0.106f, 0.196f, 0.98f), // #0D1B32
+                new Color(0.125f, 0.247f, 0.420f, 0.40f), // #203F6B
+                2.0f, 40, 256, 256);
 
-            // Başlık (Büyük ve Belirgin)
-            modalUI.titleText = CreateText(card.transform, "Title", "GÜNLÜK ÖDÜL SANDIĞI", 52, new Vector2(0f, 540f), new Color(1.0f, 0.84f, 0.04f), false, FontStyle.Bold);
+            // Başlık (Üstte - Büyük ve Belirgin, Altın Sarısı #FFC700, 52pt)
+            modalUI.titleText = CreateText(card.transform, "Title", "GÜNLÜK ÖDÜL SANDIĞI", 52, new Vector2(0f, 520f), new Color(1.0f, 0.784f, 0.05f), false, FontStyle.Bold);
 
-            // Sandık Görseli (420x420)
+            // Sprite Kaynaklarını Yükle
+            modalUI.closedChestSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/chest_closed");
+            modalUI.openChestSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/chest_open");
+            modalUI.claimOpenSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_sandigi_ac");
+            modalUI.claimClaimedSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_harika");
+            Sprite closeBtnSp = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_kapat");
+            Sprite coinSp = Resources.Load<Sprite>("Sprites/UI_DailyReward/icon_coin_streak");
+
+            // Sandık Görseli (640x498 - Referans oranına birebir hizalı)
             GameObject chestObj = new GameObject("ChestImage");
             chestObj.transform.SetParent(card.transform, false);
             RectTransform chestRt = chestObj.AddComponent<RectTransform>();
-            chestRt.anchoredPosition = new Vector2(0f, 210f);
-            chestRt.sizeDelta = new Vector2(420f, 420f);
+            chestRt.anchoredPosition = new Vector2(0f, 180f);
+            chestRt.sizeDelta = new Vector2(640f, 498f);
             Image chestImg = chestObj.AddComponent<Image>();
-            modalUI.closedChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest", () => ProceduralSpriteGenerator.CreateRectangleSprite(Color.yellow, 128, 128));
-            modalUI.openChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest_open", () => modalUI.closedChestSprite);
             chestImg.sprite = SaveSystem.CanClaimDailyReward() ? modalUI.closedChestSprite : modalUI.openChestSprite;
             chestImg.preserveAspect = true;
             chestImg.raycastTarget = false;
             modalUI.chestImage = chestImg;
 
-            // Açıklama (Büyük ve Okunaklı)
-            modalUI.descriptionText = CreateText(card.transform, "Desc", "Her gün oyuna gir, sandığını aç ve bonus altınları topla!", 32, new Vector2(0f, -80f), new Color(0.75f, 0.85f, 0.98f), false);
+            // Açıklama Metni: "Her gün oyuna gir, sandığını aç ve bonus altınları topla!"
+            modalUI.descriptionText = CreateText(card.transform, "Desc", "Her gün oyuna gir, sandığını aç ve bonus altınları topla!", 32, new Vector2(0f, -115f), new Color(0.62f, 0.72f, 0.84f), false);
 
-            // Durum Mesajı
-            modalUI.statusText = CreateText(card.transform, "Status", "🎁 Bugünün sandığı açılmaya hazır!", 36, new Vector2(0f, -190f), new Color(0.024f, 0.839f, 0.627f), false, FontStyle.Bold);
+            // Durum / Seri Satırı Konteyneri (İkon + Metin hizalama)
+            GameObject statusContainer = new GameObject("StatusContainer");
+            statusContainer.transform.SetParent(card.transform, false);
+            RectTransform statusRt = statusContainer.AddComponent<RectTransform>();
+            statusRt.anchoredPosition = new Vector2(0f, -195f);
+            statusRt.sizeDelta = new Vector2(860f, 55f);
 
-            // Sandığı Aç Butonu (Standart 540x96)
-            Color mintColor = new Color(0.024f, 0.839f, 0.627f);
-            Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
-            GameObject claimBtnObj = CreatePillButton(card.transform, "ClaimButton", "SANDIĞI AÇ", new Vector2(0f, -320f), new Vector2(540f, 96f), mintColor, darkNavy, 34);
+            HorizontalLayoutGroup hlg = statusContainer.AddComponent<HorizontalLayoutGroup>();
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.spacing = 14f;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            // Coin İkonu (Seri ödülü gösterildiğinde aktif)
+            GameObject coinIconObj = new GameObject("CoinIcon");
+            coinIconObj.transform.SetParent(statusContainer.transform, false);
+            RectTransform coinRt = coinIconObj.AddComponent<RectTransform>();
+            coinRt.sizeDelta = new Vector2(44f, 44f);
+            Image coinImg = coinIconObj.AddComponent<Image>();
+            coinImg.sprite = coinSp;
+            coinImg.preserveAspect = true;
+            coinImg.raycastTarget = false;
+            modalUI.coinIconImage = coinImg;
+
+            // Durum Metni
+            GameObject statusTextObj = new GameObject("StatusText");
+            statusTextObj.transform.SetParent(statusContainer.transform, false);
+            RectTransform stRt = statusTextObj.AddComponent<RectTransform>();
+            stRt.sizeDelta = new Vector2(760f, 50f);
+            Text stText = statusTextObj.AddComponent<Text>();
+            stText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            stText.fontStyle = FontStyle.Bold;
+            stText.fontSize = 34;
+            stText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
+            stText.alignment = TextAnchor.MiddleCenter;
+            stText.raycastTarget = false;
+            modalUI.statusText = stText;
+
+            // Sandığı Aç / Harika Butonu (640x107 - 1080x180 kapsül oranına birebir)
+            Vector2 btnSize = new Vector2(640f, 107f);
+            Sprite initialClaimSp = SaveSystem.CanClaimDailyReward() ? modalUI.claimOpenSprite : modalUI.claimClaimedSprite;
+            GameObject claimBtnObj = CreateSpriteButton(card.transform, "ClaimButton", initialClaimSp, new Vector2(0f, -320f), btnSize, modalUI.OnClaimButtonClicked);
             modalUI.claimButton = claimBtnObj.GetComponent<Button>();
-            modalUI.claimButtonText = claimBtnObj.GetComponentInChildren<Text>();
-            modalUI.claimButton.onClick.AddListener(modalUI.OnClaimButtonClicked);
+            modalUI.claimButtonImage = claimBtnObj.GetComponent<Image>();
 
-            // Kapat Butonu (Standart 540x96)
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -440f), new Vector2(540f, 96f), new Color(0.15f, 0.20f, 0.35f, 0.9f), Color.white, 32);
+            // Kapat Butonu (640x107)
+            GameObject closeBtnObj = CreateSpriteButton(card.transform, "CloseButton", closeBtnSp, new Vector2(0f, -450f), btnSize, modalUI.CloseModal);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
-            modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
+            modalUI.closeButtonImage = closeBtnObj.GetComponent<Image>();
 
             modal.SetActive(false);
         }
