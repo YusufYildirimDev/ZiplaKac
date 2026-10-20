@@ -1024,10 +1024,10 @@ namespace ZiplaKac.Utils
                 });
             }
 
-            // 6. 2x2 Grid Özellik Kartları (Master Referans, Boyut: 390x136):
+            // 6. 2x2 Grid Özellik Kartları (Master Referans, Boyut: 390x134, 924x318 HD Varlıklar):
             // Row 1 (y = -129f): [MAĞAZA & GARDIROP (Mor)]   [GÜNLÜK ÖDÜL (Turuncu)]
             // Row 2 (y = -285f): [NASIL OYNANIR? (Camgöbeği)] [REKLAM İZLE / CAN AL (Yeşil)]
-            Vector2 gridSize = new Vector2(390f, 136f);
+            Vector2 gridSize = new Vector2(390f, 134f);
             float row1Y = -129f;
             float row2Y = -285f;
             float colLeftX = -205f;
