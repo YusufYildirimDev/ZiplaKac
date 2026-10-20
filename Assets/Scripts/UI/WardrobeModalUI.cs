@@ -209,9 +209,9 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 155f;
-            float spacing = 14f;
-            float topPadding = 14f;
+            float rowHeight = 175f;
+            float spacing = 16f;
+            float topPadding = 16f;
             int totalItems = consumableConfigs.Count + upgradeConfigs.Count;
             float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
 
@@ -295,9 +295,9 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 155f;
-            float spacing = 14f;
-            float topPadding = 14f;
+            float rowHeight = 175f;
+            float spacing = 16f;
+            float topPadding = 16f;
             int totalItems = outfitConfigs.Count;
             float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
 
@@ -386,7 +386,7 @@ namespace ZiplaKac.UI
             iconRt.anchorMax = new Vector2(0f, 0.5f);
             iconRt.pivot = new Vector2(0f, 0.5f);
             iconRt.anchoredPosition = new Vector2(22f, 0f);
-            iconRt.sizeDelta = new Vector2(118f, 118f);
+            iconRt.sizeDelta = new Vector2(125f, 125f);
 
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
@@ -420,28 +420,29 @@ namespace ZiplaKac.UI
             labelRt.anchorMin = new Vector2(0f, 0.5f);
             labelRt.anchorMax = new Vector2(0f, 0.5f);
             labelRt.pivot = new Vector2(0f, 0.5f);
-            labelRt.anchoredPosition = new Vector2(160f, 0f);
-            labelRt.sizeDelta = new Vector2(430f, rowHeight - 20f);
+            labelRt.anchoredPosition = new Vector2(165f, 0f);
+            labelRt.sizeDelta = new Vector2(430f, 160f);
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;
-            labelText.fontSize = 32;
+            labelText.fontSize = 28;
             labelText.fontStyle = FontStyle.Bold;
             labelText.alignment = TextAnchor.MiddleLeft;
             labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            labelText.verticalOverflow = VerticalWrapMode.Truncate;
+            labelText.verticalOverflow = VerticalWrapMode.Overflow;
+            labelText.lineSpacing = 1.05f;
             labelText.color = Color.white;
-            labelText.text = $"{title}\n<size=24><color=#94A3B8>{subtitle}</color></size>";
+            labelText.text = $"{title}\n<size=22><color=#94A3B8>{subtitle}</color></size>";
 
-            // 3. Buton Alanı (230x74)
+            // 3. Buton Alanı (245x76)
             GameObject btnObj = new GameObject("ActionBtn");
             btnObj.transform.SetParent(rowObj.transform, false);
             RectTransform btnRt = btnObj.AddComponent<RectTransform>();
             btnRt.anchorMin = new Vector2(1f, 0.5f);
             btnRt.anchorMax = new Vector2(1f, 0.5f);
             btnRt.pivot = new Vector2(1f, 0.5f);
-            btnRt.anchoredPosition = new Vector2(-20f, 0f);
-            btnRt.sizeDelta = new Vector2(230f, 74f);
+            btnRt.anchoredPosition = new Vector2(-16f, 0f);
+            btnRt.sizeDelta = new Vector2(245f, 76f);
 
             Image btnBg = btnObj.AddComponent<Image>();
             Color finalBtnColor = btnColor ?? new Color(0.98f, 0.75f, 0.14f);
@@ -473,7 +474,7 @@ namespace ZiplaKac.UI
 
                 HorizontalLayoutGroup hlg = contentObj.AddComponent<HorizontalLayoutGroup>();
                 hlg.childAlignment = TextAnchor.MiddleCenter;
-                hlg.spacing = 8f;
+                hlg.spacing = 6f;
                 hlg.childControlWidth = false;
                 hlg.childControlHeight = false;
                 hlg.childForceExpandWidth = false;
@@ -484,18 +485,18 @@ namespace ZiplaKac.UI
                 actObj.transform.SetParent(contentObj.transform, false);
                 Text actTxt = actObj.AddComponent<Text>();
                 actTxt.font = font;
-                actTxt.fontSize = 24;
+                actTxt.fontSize = 22;
                 actTxt.fontStyle = FontStyle.Bold;
                 actTxt.color = textCol;
                 actTxt.text = btnText;
                 actTxt.alignment = TextAnchor.MiddleCenter;
                 actObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-                // 2. Altın Sikke Görseli (28x28)
+                // 2. Altın Sikke Görseli (24x24)
                 GameObject coinObj = new GameObject("CoinIcon");
                 coinObj.transform.SetParent(contentObj.transform, false);
                 RectTransform coinRt = coinObj.AddComponent<RectTransform>();
-                coinRt.sizeDelta = new Vector2(28f, 28f);
+                coinRt.sizeDelta = new Vector2(24f, 24f);
                 Image coinImg = coinObj.AddComponent<Image>();
                 coinImg.sprite = ProceduralSpriteGenerator.CreateGoldCoinSprite(64);
                 coinImg.preserveAspect = true;
@@ -506,7 +507,7 @@ namespace ZiplaKac.UI
                 priceObj.transform.SetParent(contentObj.transform, false);
                 Text priceTxt = priceObj.AddComponent<Text>();
                 priceTxt.font = font;
-                priceTxt.fontSize = 24;
+                priceTxt.fontSize = 22;
                 priceTxt.fontStyle = FontStyle.Bold;
                 priceTxt.color = textCol;
                 priceTxt.text = price.ToString();
@@ -526,12 +527,12 @@ namespace ZiplaKac.UI
 
                 Text bTxt = btnTxtObj.AddComponent<Text>();
                 bTxt.font = font;
-                bTxt.fontSize = 26;
+                bTxt.fontSize = 24;
                 bTxt.fontStyle = FontStyle.Bold;
                 bTxt.alignment = TextAnchor.MiddleCenter;
                 bTxt.resizeTextForBestFit = true;
                 bTxt.resizeTextMinSize = 18;
-                bTxt.resizeTextMaxSize = 28;
+                bTxt.resizeTextMaxSize = 26;
                 bTxt.color = textCol;
                 bTxt.text = btnText;
             }
