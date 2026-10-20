@@ -163,43 +163,61 @@ namespace ZiplaKac.UI
                 }
             }
 
-            // 3. Buton Yerleşimleri ve Standart Boyutları (Uygulamadaki standart 96px yükseklik)
+            // 3. Buton Yerleşimleri ve Standart Boyutları (Referans mockupa birebir)
             RectTransform nextRt = nextButton != null ? nextButton.GetComponent<RectTransform>() : null;
             RectTransform prevRt = prevButton != null ? prevButton.GetComponent<RectTransform>() : null;
 
             if (currentSlideIndex == 0)
             {
-                // İlk slaytta sadece Sonraki var: Ekran ortasında tam boy (540x96)
+                // İlk slaytta sadece Sonraki var: Ekran ortasında (480x96)
                 if (prevButton != null) prevButton.gameObject.SetActive(false);
                 if (nextRt != null)
                 {
-                    nextRt.anchoredPosition = new Vector2(0f, -630f);
-                    nextRt.sizeDelta = new Vector2(540f, 96f);
+                    nextRt.anchoredPosition = new Vector2(0f, -575f);
+                    nextRt.sizeDelta = new Vector2(480f, 96f);
                 }
             }
-            else
+            else if (currentSlideIndex == total - 1)
             {
-                // Diğer slaytlarda hem Önceki hem Sonraki var (380x96)
+                // Son slaytta Önceki (340x96) ve "🚀 HADİ BAŞLAYALIM!" (440x96)
                 if (prevButton != null)
                 {
                     prevButton.gameObject.SetActive(true);
                     if (prevRt != null)
                     {
-                        prevRt.anchoredPosition = new Vector2(-210f, -630f);
-                        prevRt.sizeDelta = new Vector2(380f, 96f);
+                        prevRt.anchoredPosition = new Vector2(-225f, -575f);
+                        prevRt.sizeDelta = new Vector2(340f, 96f);
                     }
                 }
                 if (nextRt != null)
                 {
-                    nextRt.anchoredPosition = new Vector2(210f, -630f);
-                    nextRt.sizeDelta = new Vector2(380f, 96f);
+                    nextRt.anchoredPosition = new Vector2(205f, -575f);
+                    nextRt.sizeDelta = new Vector2(440f, 96f);
+                }
+            }
+            else
+            {
+                // Slide 1 ve 2: Önceki (360x96) ve Sonraki (360x96)
+                if (prevButton != null)
+                {
+                    prevButton.gameObject.SetActive(true);
+                    if (prevRt != null)
+                    {
+                        prevRt.anchoredPosition = new Vector2(-215f, -575f);
+                        prevRt.sizeDelta = new Vector2(360f, 96f);
+                    }
+                }
+                if (nextRt != null)
+                {
+                    nextRt.anchoredPosition = new Vector2(215f, -575f);
+                    nextRt.sizeDelta = new Vector2(360f, 96f);
                 }
             }
 
-            // 4. Sonraki Butonu Metni (Son slaytta "HADİ BAŞLAYALIM! 🚀" olur)
+            // 4. Sonraki Butonu Metni (Son slaytta "🚀 HADİ BAŞLAYALIM!" olur)
             if (nextButtonText != null)
             {
-                nextButtonText.text = (currentSlideIndex == total - 1) ? "HADİ BAŞLAYALIM! 🚀" : "SONRAKİ ➔";
+                nextButtonText.text = (currentSlideIndex == total - 1) ? "🚀 HADİ BAŞLAYALIM!" : "SONRAKİ ➔";
             }
 
             // 5. Sayfa Göstergeleri (Dots)
