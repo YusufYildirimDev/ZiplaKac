@@ -2179,7 +2179,7 @@ namespace ZiplaKac.Utils
                 iconObj.transform.SetParent(row.transform, false);
                 RectTransform iconRt = iconObj.AddComponent<RectTransform>();
                 iconRt.anchoredPosition = new Vector2(-360f, 0f);
-                iconRt.sizeDelta = new Vector2(105f, 105f);
+                iconRt.sizeDelta = new Vector2(110f, 110f);
                 Image iconImg = iconObj.AddComponent<Image>();
                 iconImg.sprite = sp;
                 iconImg.preserveAspect = true;
