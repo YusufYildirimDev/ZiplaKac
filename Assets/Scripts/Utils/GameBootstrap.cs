@@ -1003,11 +1003,11 @@ namespace ZiplaKac.Utils
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 5. "▶ OYNA" Butonu (#1678FF Canlı Mavi, Grid Genişliğiyle Birebir Hizalı: 760x112)
+            // 5. "▶ OYNA" Butonu (#1678FF Canlı Mavi, Kullanıcı Referansıyla Birebir: 771x110)
             Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
             if (oynaSp != null)
             {
-                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 12f), new Vector2(760f, 112f), () => {
+                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 12f), new Vector2(771f, 110f), () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
@@ -1016,7 +1016,7 @@ namespace ZiplaKac.Utils
             {
                 Color primaryBlue = new Color(0.086f, 0.471f, 1.0f); // #1678FF
                 Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 12f), new Vector2(760f, 112f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 12f), new Vector2(771f, 110f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
