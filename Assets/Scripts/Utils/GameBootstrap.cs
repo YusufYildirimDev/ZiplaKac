@@ -998,16 +998,16 @@ namespace ZiplaKac.Utils
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 195f);
+            galleryRt.anchoredPosition = new Vector2(0f, 185f);
             galleryRt.sizeDelta = new Vector2(840f, 185f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 5. "▶ OYNA" Butonu (Yeni Tasarım: 800x133, Birebir Kapsül Tasarım)
+            // 5. "▶ OYNA" Butonu (Master Referans: 800x114, Birebir Kapsül Tasarım)
             Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
             if (oynaSp != null)
             {
-                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(800f, 133f), () => {
+                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(800f, 114f), () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
@@ -1016,7 +1016,7 @@ namespace ZiplaKac.Utils
             {
                 Color primaryBlue = new Color(0.086f, 0.471f, 1.0f); // #1678FF
                 Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(800f, 133f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(800f, 114f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
@@ -1024,14 +1024,14 @@ namespace ZiplaKac.Utils
                 });
             }
 
-            // 6. 2x2 Grid Özellik Kartları (Yeni Tasarım, Boyut: 388x137):
-            // Row 1 (y = -140f): [MAĞAZA & GARDIROP (Mor)]   [GÜNLÜK ÖDÜL (Turuncu)]
-            // Row 2 (y = -298f): [NASIL OYNANIR? (Camgöbeği)] [REKLAM İZLE / CAN AL (Yeşil)]
-            Vector2 gridSize = new Vector2(388f, 137f);
-            float row1Y = -140f;
-            float row2Y = -298f;
-            float colLeftX = -206f;
-            float colRightX = 206f;
+            // 6. 2x2 Grid Özellik Kartları (Master Referans, Boyut: 390x136):
+            // Row 1 (y = -129f): [MAĞAZA & GARDIROP (Mor)]   [GÜNLÜK ÖDÜL (Turuncu)]
+            // Row 2 (y = -285f): [NASIL OYNANIR? (Camgöbeği)] [REKLAM İZLE / CAN AL (Yeşil)]
+            Vector2 gridSize = new Vector2(390f, 136f);
+            float row1Y = -129f;
+            float row2Y = -285f;
+            float colLeftX = -205f;
+            float colRightX = 205f;
 
             // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Mor İllüstrasyonlu Buton)
             Sprite wardrobeSp = LoadMainMenuSprite("btn_wardrobe");
