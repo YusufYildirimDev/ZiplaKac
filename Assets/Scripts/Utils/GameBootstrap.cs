@@ -965,33 +965,33 @@ namespace ZiplaKac.Utils
             Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
             if (titleSp != null)
             {
-                CreateSpriteImage(card.transform, "TitleImage", titleSp, new Vector2(0f, 440f), new Vector2(510f, 122f));
+                CreateSpriteImage(card.transform, "TitleImage", titleSp, new Vector2(0f, 412f), new Vector2(500f, 119f));
             }
             else
             {
-                CreateText(card.transform, "TitleText", "= HOPPZY =", 86, new Vector2(0f, 440f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
+                CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 412f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
             // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
             if (subSp != null)
             {
-                CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 360f), new Vector2(350f, 34f));
+                CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 340f), new Vector2(330f, 30f));
             }
             else
             {
-                CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 28, new Vector2(0f, 360f), new Color(0.61f, 0.73f, 0.88f), false);
+                CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 26, new Vector2(0f, 340f), new Color(0.61f, 0.73f, 0.88f), false);
             }
 
             // 3. Bölücü Çizgi "─── KARAKTER SEÇ ───" (#9DBCE0)
             Sprite divSp = LoadMainMenuSprite("divider_karakter_sec");
             if (divSp != null)
             {
-                CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 320f), new Vector2(440f, 31f));
+                CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 305f), new Vector2(430f, 28f));
             }
             else
             {
-                CreateSectionDivider(card.transform, "KARAKTER SEÇ", 320f);
+                CreateSectionDivider(card.transform, "KARAKTER SEÇ", 305f);
             }
 
             // 4. Karakter Galerisi UI (5 Karakter Kartı - Seçili olan #27C7FF Neon Mavi Çerçeveli)
