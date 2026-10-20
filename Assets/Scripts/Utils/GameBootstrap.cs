@@ -2107,15 +2107,15 @@ namespace ZiplaKac.Utils
             bg.type = Image.Type.Sliced;
             bg.raycastTarget = false;
 
-            // İkon (130x130)
+            // İkon (140x130)
             Sprite sp = !string.IsNullOrEmpty(spritePath) ? Resources.Load<Sprite>(spritePath) : null;
             if (sp != null)
             {
                 GameObject iconObj = new GameObject("Icon");
                 iconObj.transform.SetParent(row.transform, false);
                 RectTransform iconRt = iconObj.AddComponent<RectTransform>();
-                iconRt.anchoredPosition = new Vector2(-335f, 0f);
-                iconRt.sizeDelta = new Vector2(130f, 130f);
+                iconRt.anchoredPosition = new Vector2(-325f, 0f);
+                iconRt.sizeDelta = new Vector2(140f, 130f);
                 Image iconImg = iconObj.AddComponent<Image>();
                 iconImg.sprite = sp;
                 iconImg.preserveAspect = true;
@@ -2126,12 +2126,15 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(65f, 32f);
-            titleRt.sizeDelta = new Vector2(660f, 44f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(215f, 30f);
+            titleRt.sizeDelta = new Vector2(635f, 44f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
             titleTxt.text = title;
-            titleTxt.fontSize = 33;
+            titleTxt.fontSize = 32;
             titleTxt.fontStyle = FontStyle.Bold;
             titleTxt.alignment = TextAnchor.MiddleLeft;
             titleTxt.color = titleColor;
@@ -2141,12 +2144,15 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(65f, -28f);
-            descRt.sizeDelta = new Vector2(660f, 75f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(215f, -28f);
+            descRt.sizeDelta = new Vector2(635f, 75f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
-            descTxt.fontSize = 25;
+            descTxt.fontSize = 24;
             descTxt.alignment = TextAnchor.MiddleLeft;
             descTxt.color = new Color(0.82f, 0.90f, 0.98f);
             descTxt.raycastTarget = false;
@@ -2165,15 +2171,15 @@ namespace ZiplaKac.Utils
             bg.type = Image.Type.Sliced;
             bg.raycastTarget = false;
 
-            // Karakter Avatar İkonu (114x114)
+            // Karakter Avatar İkonu (105x105)
             Sprite sp = !string.IsNullOrEmpty(spritePath) ? Resources.Load<Sprite>(spritePath) : null;
             if (sp != null)
             {
                 GameObject iconObj = new GameObject("Icon");
                 iconObj.transform.SetParent(row.transform, false);
                 RectTransform iconRt = iconObj.AddComponent<RectTransform>();
-                iconRt.anchoredPosition = new Vector2(-345f, 0f);
-                iconRt.sizeDelta = new Vector2(114f, 114f);
+                iconRt.anchoredPosition = new Vector2(-360f, 0f);
+                iconRt.sizeDelta = new Vector2(105f, 105f);
                 Image iconImg = iconObj.AddComponent<Image>();
                 iconImg.sprite = sp;
                 iconImg.preserveAspect = true;
@@ -2184,25 +2190,31 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(-75f, 22f);
-            titleRt.sizeDelta = new Vector2(320f, 38f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(150f, 22f);
+            titleRt.sizeDelta = new Vector2(240f, 38f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
             titleTxt.text = charName;
-            titleTxt.fontSize = 34;
+            titleTxt.fontSize = 33;
             titleTxt.fontStyle = FontStyle.Bold;
             titleTxt.alignment = TextAnchor.MiddleLeft;
             titleTxt.color = charColor;
             titleTxt.raycastTarget = false;
 
-            // Kilit Rozeti (Pill Badge)
+            // Kilit Rozeti (Pill Badge - Sağa Yaslı)
             GameObject badgeObj = new GameObject("Badge");
             badgeObj.transform.SetParent(row.transform, false);
             RectTransform badgeRt = badgeObj.AddComponent<RectTransform>();
-            badgeRt.sizeDelta = new Vector2(badgeWidth, 42f);
-            badgeRt.anchoredPosition = new Vector2(400f - badgeWidth / 2f, 22f);
+            badgeRt.anchorMin = new Vector2(1f, 0.5f);
+            badgeRt.anchorMax = new Vector2(1f, 0.5f);
+            badgeRt.pivot = new Vector2(1f, 0.5f);
+            badgeRt.anchoredPosition = new Vector2(-25f, 22f);
+            badgeRt.sizeDelta = new Vector2(badgeWidth, 40f);
             Image badgeImg = badgeObj.AddComponent<Image>();
-            badgeImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(badgeFillColor, badgeBorderColor, 1.5f, 21);
+            badgeImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(badgeFillColor, badgeBorderColor, 1.5f, 20);
             badgeImg.type = Image.Type.Sliced;
             badgeImg.raycastTarget = false;
 
@@ -2224,8 +2236,11 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(68f, -22f);
-            descRt.sizeDelta = new Vector2(670f, 42f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(150f, -22f);
+            descRt.sizeDelta = new Vector2(705f, 42f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
@@ -2248,15 +2263,15 @@ namespace ZiplaKac.Utils
             bg.type = Image.Type.Sliced;
             bg.raycastTarget = false;
 
-            // İkon (150x150)
+            // İkon (160x150)
             Sprite sp = !string.IsNullOrEmpty(spritePath) ? Resources.Load<Sprite>(spritePath) : null;
             if (sp != null)
             {
                 GameObject iconObj = new GameObject("Icon");
                 iconObj.transform.SetParent(row.transform, false);
                 RectTransform iconRt = iconObj.AddComponent<RectTransform>();
-                iconRt.anchoredPosition = new Vector2(-330f, 0f);
-                iconRt.sizeDelta = new Vector2(150f, 150f);
+                iconRt.anchoredPosition = new Vector2(-310f, 0f);
+                iconRt.sizeDelta = new Vector2(160f, 150f);
                 Image iconImg = iconObj.AddComponent<Image>();
                 iconImg.sprite = sp;
                 iconImg.preserveAspect = true;
@@ -2267,12 +2282,15 @@ namespace ZiplaKac.Utils
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(row.transform, false);
             RectTransform titleRt = titleObj.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(75f, 38f);
-            titleRt.sizeDelta = new Vector2(650f, 46f);
+            titleRt.anchorMin = new Vector2(0f, 0.5f);
+            titleRt.anchorMax = new Vector2(0f, 0.5f);
+            titleRt.pivot = new Vector2(0f, 0.5f);
+            titleRt.anchoredPosition = new Vector2(235f, 38f);
+            titleRt.sizeDelta = new Vector2(615f, 46f);
             Text titleTxt = titleObj.AddComponent<Text>();
             titleTxt.font = GetSafeDefaultFont();
             titleTxt.text = title;
-            titleTxt.fontSize = 35;
+            titleTxt.fontSize = 34;
             titleTxt.fontStyle = FontStyle.Bold;
             titleTxt.alignment = TextAnchor.MiddleLeft;
             titleTxt.color = titleColor;
@@ -2282,8 +2300,11 @@ namespace ZiplaKac.Utils
             GameObject descObj = new GameObject("Desc");
             descObj.transform.SetParent(row.transform, false);
             RectTransform descRt = descObj.AddComponent<RectTransform>();
-            descRt.anchoredPosition = new Vector2(75f, -26f);
-            descRt.sizeDelta = new Vector2(650f, 85f);
+            descRt.anchorMin = new Vector2(0f, 0.5f);
+            descRt.anchorMax = new Vector2(0f, 0.5f);
+            descRt.pivot = new Vector2(0f, 0.5f);
+            descRt.anchoredPosition = new Vector2(235f, -26f);
+            descRt.sizeDelta = new Vector2(615f, 85f);
             Text descTxt = descObj.AddComponent<Text>();
             descTxt.font = GetSafeDefaultFont();
             descTxt.text = desc;
