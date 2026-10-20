@@ -957,8 +957,8 @@ namespace ZiplaKac.Utils
             Image bg = panel.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.40f);
 
-            // Dark Cinematic + Playful 3D Ana Panel (#101F38 Koyu Lacivert, 920x1060, Ekran genişliğinin %85'i)
-            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(920f, 1060f));
+            // Dark Cinematic + Playful 3D Ana Panel (#101F38 Koyu Lacivert, 900x1020)
+            GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(900f, 1020f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
 
             // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi)
@@ -1003,11 +1003,11 @@ namespace ZiplaKac.Utils
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 5. "▶ OYNA" Butonu (#1678FF Canlı Mavi, Panel İç Genişliğini Kaplar: 840x126)
+            // 5. "▶ OYNA" Butonu (#1678FF Canlı Mavi, Panel İç Genişliğini Kaplar: 820x120)
             Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
             if (oynaSp != null)
             {
-                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(840f, 126f), () => {
+                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 18f), new Vector2(820f, 120f), () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
@@ -1016,7 +1016,7 @@ namespace ZiplaKac.Utils
             {
                 Color primaryBlue = new Color(0.086f, 0.471f, 1.0f); // #1678FF
                 Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(840f, 126f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 18f), new Vector2(820f, 120f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
@@ -1024,14 +1024,14 @@ namespace ZiplaKac.Utils
                 });
             }
 
-            // 6. 2x2 Grid Özellik Kartları (Eşit Boyut: 408x134, 24px Ara Boşluk):
-            // Row 1 (y = -130f): [MAĞAZA & GARDIROP (#7028D9)]   [GÜNLÜK ÖDÜL (#FF9F1C)]
-            // Row 2 (y = -282f): [NASIL OYNANIR? (#08A8CC)]       [REKLAM İZLE / CAN AL (#08BD79)]
-            Vector2 gridSize = new Vector2(408f, 134f);
-            float row1Y = -130f;
-            float row2Y = -282f;
-            float colLeftX = -216f;
-            float colRightX = 216f;
+            // 6. 2x2 Grid Özellik Kartları (Pastel Renk Paleti, Boyut: 370x108):
+            // Row 1 (y = -118f): [MAĞAZA & GARDIROP (Pastel Lavanta)]   [GÜNLÜK ÖDÜL (Pastel Şeftali)]
+            // Row 2 (y = -242f): [NASIL OYNANIR? (Pastel Gökyüzü)]      [REKLAM İZLE / CAN AL (Pastel Nane)]
+            Vector2 gridSize = new Vector2(370f, 108f);
+            float row1Y = -118f;
+            float row2Y = -242f;
+            float colLeftX = -195f;
+            float colRightX = 195f;
 
             // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Mor İllüstrasyonlu Buton)
             Sprite wardrobeSp = LoadMainMenuSprite("btn_wardrobe");
