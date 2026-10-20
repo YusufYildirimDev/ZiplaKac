@@ -1829,15 +1829,15 @@ namespace ZiplaKac.Utils
             stText.raycastTarget = false;
             modalUI.statusText = stText;
 
-            // Sandığı Aç / Harika Butonu (620x91 - 1040x152 kapsül oranına birebir)
-            Vector2 btnSize = new Vector2(620f, 91f);
+            // Sandığı Aç / Harika Butonu (600x100 - 1080x180 kapsül oranına 6:1 birebir)
+            Vector2 btnSize = new Vector2(600f, 100f);
             Sprite initialClaimSp = SaveSystem.CanClaimDailyReward() ? modalUI.claimOpenSprite : modalUI.claimClaimedSprite;
             GameObject claimBtnObj = CreateSpriteButton(card.transform, "ClaimButton", initialClaimSp, new Vector2(0f, -320f), btnSize, modalUI.OnClaimButtonClicked);
             modalUI.claimButton = claimBtnObj.GetComponent<Button>();
             modalUI.claimButtonImage = claimBtnObj.GetComponent<Image>();
 
-            // Kapat Butonu (620x91) - Referans görseldeki ✕ ikonuyla
-            GameObject closeBtnObj = CreateSpriteButton(card.transform, "CloseButton", closeBtnSp, new Vector2(0f, -435f), btnSize, modalUI.CloseModal);
+            // Kapat Butonu (600x100) - Referans görseldeki ✕ ikonuyla
+            GameObject closeBtnObj = CreateSpriteButton(card.transform, "CloseButton", closeBtnSp, new Vector2(0f, -440f), btnSize, modalUI.CloseModal);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
             modalUI.closeButtonImage = closeBtnObj.GetComponent<Image>();
 
