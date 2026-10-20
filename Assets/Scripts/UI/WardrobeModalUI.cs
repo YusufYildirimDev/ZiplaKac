@@ -52,10 +52,12 @@ namespace ZiplaKac.UI
         public static WardrobeModalUI Instance { get; private set; }
 
         [Header("Başlık ve Altın Göstergesi")]
+        public Image headerIllustration;
         public Text titleText;
         public Text totalGoldText;
         public Text statusMessageText;
         public Button closeButton;
+        public Button topCloseButton;
 
         [Header("Sekme Butonları")]
         public Button tabUpgradesButton;
@@ -81,18 +83,18 @@ namespace ZiplaKac.UI
 
         private readonly List<ConsumableItemConfig> consumableConfigs = new List<ConsumableItemConfig>
         {
-            new ConsumableItemConfig { id = "shield",        displayName = "Başlangıç Kalkanı",    description = "Oyuna 1 kalkanla başla", price = 90 },
-            new ConsumableItemConfig { id = "slow_start",    displayName = "Yavaş Başlangıç",      description = "İlk 5sn engel hızı %30 yavaş", price = 60 },
-            new ConsumableItemConfig { id = "lucky_pu",      displayName = "Şanslı Güçlendirme",   description = "İlk küre garantili 3. saniyede", price = 45 },
-            new ConsumableItemConfig { id = "second_chance", displayName = "İkinci Şans Bileti",   description = "Çarpışınca 1 kez ücretsiz devam et", price = 120 }
+            new ConsumableItemConfig { id = "shield",        displayName = "Başlangıç Kalkanı",    description = "Oyuna 1 kalkanla başla.", price = 90 },
+            new ConsumableItemConfig { id = "slow_start",    displayName = "Yavaş Başlangıç",      description = "İlk 5 sn engel hızı %30 yavaş.", price = 60 },
+            new ConsumableItemConfig { id = "lucky_pu",      displayName = "Şanslı Güçlendirme",   description = "İlk küre garantili 3 saniyede.", price = 45 },
+            new ConsumableItemConfig { id = "second_chance", displayName = "İkinci Şans Bileti",   description = "Çarpışınca 1 kez ücretsiz devam et.", price = 120 }
         };
 
         private readonly List<UpgradeItemConfig> upgradeConfigs = new List<UpgradeItemConfig>
         {
-            new UpgradeItemConfig { id = "pu_duration",   displayName = "Güçlendirme Süresi",   description = "Kalkan/yavaş/x2 süreleri +%20 uzar", price = 450, maxLevel = 3 },
-            new UpgradeItemConfig { id = "double_jump",   displayName = "Çift Zıplama Ustası",  description = "2. zıplama yüksekliği +%15 artar",  price = 600, maxLevel = 1 },
-            new UpgradeItemConfig { id = "combo_memory",  displayName = "Kombo Hafızası",       description = "Çarpışmada kombonun yarısı korunur", price = 750, maxLevel = 1 },
-            new UpgradeItemConfig { id = "signature",     displayName = "İmza Yeteneği +1",     description = "Karakterin özel yeteneği güçlenir",  price = 900, maxLevel = 1 }
+            new UpgradeItemConfig { id = "pu_duration",   displayName = "Güçlendirme Süresi",   description = "Kalkan/yavaş/x2 süreleri +%20 uzar.", price = 450, maxLevel = 3 },
+            new UpgradeItemConfig { id = "double_jump",   displayName = "Çift Zıplama Ustası",  description = "2. zıplama yüksekliği +%15 artar.",  price = 600, maxLevel = 1 },
+            new UpgradeItemConfig { id = "combo_memory",  displayName = "Kombo Hafızası",       description = "Çarpışmada kombonun yarısı korunur.", price = 750, maxLevel = 1 },
+            new UpgradeItemConfig { id = "signature",     displayName = "İmza Yeteneği +1",     description = "Karakterin özel yeteneği güçlenir.",  price = 900, maxLevel = 1 }
         };
 
         private readonly List<GameObject> spawnedRows = new List<GameObject>();
@@ -146,26 +148,50 @@ namespace ZiplaKac.UI
 
             if (currentTab == ShopTab.Upgrades)
             {
-                if (titleText != null) titleText.text = "⚡ GÜÇLER & YÜKSELTMELER";
+                if (titleText != null) titleText.text = "GÜÇLER &\nYÜKSELTMELER";
+                if (headerIllustration != null)
+                {
+                    Sprite upgHdr = Resources.Load<Sprite>("Sprites/UI_Shop/header_upgrades");
+                    if (upgHdr != null) headerIllustration.sprite = upgHdr;
+                }
                 BuildUpgradesTab(charKey);
             }
             else
             {
-                if (titleText != null) titleText.text = "👔 GARDIROP (KIYAFETLER)";
+                if (titleText != null) titleText.text = "GARDIROP\n(KIYAFETLER)";
+                if (headerIllustration != null)
+                {
+                    Sprite wardHdr = Resources.Load<Sprite>("Sprites/UI_Shop/header_wardrobe");
+                    if (wardHdr != null) headerIllustration.sprite = wardHdr;
+                }
                 BuildOutfitsTab(charKey);
             }
         }
 
         private void UpdateTabButtonStyles()
         {
-            Color activeColor = new Color(0.61f, 0.36f, 0.90f);
-            Color inactiveColor = new Color(0.12f, 0.15f, 0.28f, 0.9f);
+            Color activeColor = new Color(0.55f, 0.36f, 0.96f); // #8B5CF6 Vibrant Purple
+            Color inactiveColor = new Color(0.08f, 0.12f, 0.22f, 0.95f); // #141E38
+            Color activeTextColor = Color.white;
+            Color inactiveTextColor = new Color(0.58f, 0.64f, 0.72f); // #94A3B8
 
             if (tabUpgradesBg != null) tabUpgradesBg.color = (currentTab == ShopTab.Upgrades) ? activeColor : inactiveColor;
             if (tabOutfitsBg != null) tabOutfitsBg.color = (currentTab == ShopTab.Outfits) ? activeColor : inactiveColor;
 
-            if (tabUpgradesText != null) tabUpgradesText.color = (currentTab == ShopTab.Upgrades) ? Color.white : new Color(0.7f, 0.8f, 0.9f);
-            if (tabOutfitsText != null) tabOutfitsText.color = (currentTab == ShopTab.Outfits) ? Color.white : new Color(0.7f, 0.8f, 0.9f);
+            if (tabUpgradesText != null)
+            {
+                tabUpgradesText.text = "📊  YÜKSELTMELER";
+                tabUpgradesText.color = (currentTab == ShopTab.Upgrades) ? activeTextColor : inactiveTextColor;
+                tabUpgradesText.fontStyle = FontStyle.Bold;
+                tabUpgradesText.fontSize = (currentTab == ShopTab.Upgrades) ? 30 : 28;
+            }
+            if (tabOutfitsText != null)
+            {
+                tabOutfitsText.text = "👕  GARDIROP";
+                tabOutfitsText.color = (currentTab == ShopTab.Outfits) ? activeTextColor : inactiveTextColor;
+                tabOutfitsText.fontStyle = FontStyle.Bold;
+                tabOutfitsText.fontSize = (currentTab == ShopTab.Outfits) ? 30 : 28;
+            }
         }
 
         private void ClearSpawnedRows()
@@ -183,9 +209,9 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 175f;
-            float spacing = 16f;
-            float topPadding = 16f;
+            float rowHeight = 155f;
+            float spacing = 14f;
+            float topPadding = 14f;
             int totalItems = consumableConfigs.Count + upgradeConfigs.Count;
             float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
 
@@ -206,20 +232,16 @@ namespace ZiplaKac.UI
                 rowIndex++;
 
                 int count = SaveSystem.GetConsumableCount(cfg.id);
-                string subtitle = $"{cfg.description} · <color=#06d6a0>Envanter: {count}</color>";
+                string subtitle = $"{cfg.description}\n<color=#10B981>Envanter: {count}</color>";
 
-                string emoji = "⚡";
-                if (cfg.id == "shield") emoji = "🛡️";
-                else if (cfg.id == "slow_start") emoji = "🐢";
-                else if (cfg.id == "lucky_pu") emoji = "🍀";
-                else if (cfg.id == "second_chance") emoji = "🎟️";
+                Color goldBtnColor = new Color(0.98f, 0.75f, 0.14f); // #FBBF24 Altın Sarı
 
                 GameObject row = CreateRowObject($"Consumable_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, cfg.price, "AL", font, () => {
                     if (SaveSystem.PurchaseConsumable(cfg.id, cfg.price))
                     {
                         AudioManager.Instance?.PlayNewRecordSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
-                        ShowStatus($"🎉 {cfg.displayName} satın alındı! (+1 Envanter)", new Color(0.024f, 0.839f, 0.627f));
+                        ShowStatus($"🎉 {cfg.displayName} satın alındı! (+1 Envanter)", new Color(0.06f, 0.84f, 0.58f));
                         RefreshUI();
                     }
                     else
@@ -227,7 +249,7 @@ namespace ZiplaKac.UI
                         AudioManager.Instance?.PlayGameOverSound();
                         ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
                     }
-                }, null, null, null, emoji, cfg.id);
+                }, goldBtnColor, null, null, null, cfg.id);
                 spawnedRows.Add(row);
             }
 
@@ -242,17 +264,11 @@ namespace ZiplaKac.UI
                 bool isMax = currentLvl >= cfg.maxLevel;
 
                 string subtitle = cfg.maxLevel > 1
-                    ? $"{cfg.description} · <color=#ffd166>Seviye {currentLvl}/{cfg.maxLevel}</color>"
-                    : (isMax ? $"{cfg.description} · <color=#06d6a0>Açık</color>" : cfg.description);
+                    ? $"{cfg.description}\n<color=#FBBF24>Seviye {currentLvl}/{cfg.maxLevel}</color>"
+                    : (isMax ? $"{cfg.description}\n<color=#10B981>Açık</color>" : cfg.description);
 
                 string btnLabel = isMax ? "MAX" : (cfg.maxLevel > 1 ? "YÜKSELT" : "AÇ");
-                Color btnColor = isMax ? new Color(0.3f, 0.35f, 0.45f) : new Color(0.024f, 0.839f, 0.627f);
-
-                string emoji = "⭐";
-                if (cfg.id == "pu_duration") emoji = "⏳";
-                else if (cfg.id == "double_jump") emoji = "🦘";
-                else if (cfg.id == "combo_memory") emoji = "🧠";
-                else if (cfg.id == "signature") emoji = "⚡";
+                Color btnColor = isMax ? new Color(0.20f, 0.25f, 0.35f) : new Color(0.06f, 0.84f, 0.58f);
 
                 GameObject row = CreateRowObject($"Upgrade_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, isMax ? 0 : cfg.price, btnLabel, font, () => {
                     if (isMax) return;
@@ -260,7 +276,7 @@ namespace ZiplaKac.UI
                     {
                         AudioManager.Instance?.PlayNewRecordSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
-                        ShowStatus($"🎉 {cfg.displayName} seviye atladı!", new Color(0.024f, 0.839f, 0.627f));
+                        ShowStatus($"🎉 {cfg.displayName} seviye atladı!", new Color(0.06f, 0.84f, 0.58f));
                         RefreshUI();
                     }
                     else
@@ -268,7 +284,7 @@ namespace ZiplaKac.UI
                         AudioManager.Instance?.PlayGameOverSound();
                         ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
                     }
-                }, btnColor, null, null, emoji, cfg.id);
+                }, btnColor, null, null, null, cfg.id);
                 spawnedRows.Add(row);
             }
         }
@@ -279,9 +295,9 @@ namespace ZiplaKac.UI
             ClearSpawnedRows();
 
             Font font = GetSafeFont();
-            float rowHeight = 175f;
-            float spacing = 18f;
-            float topPadding = 18f;
+            float rowHeight = 155f;
+            float spacing = 14f;
+            float topPadding = 14f;
             int totalItems = outfitConfigs.Count;
             float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
 
@@ -300,9 +316,11 @@ namespace ZiplaKac.UI
                 bool isPurchased = SaveSystem.IsOutfitPurchased(charKey, cfg.outfitType);
                 bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, cfg.outfitType);
 
-                string subtitle = isPurchased ? "<color=#06d6a0>Sahipsin</color>" : $"Fiyat: {cfg.price} Altın";
-                string btnLabel = !isPurchased ? "SATIN AL" : (isEquipped ? "ÇIKAR" : "GİY");
-                Color btnColor = !isPurchased ? new Color(1.0f, 0.82f, 0.40f) : (isEquipped ? new Color(0.85f, 0.22f, 0.30f) : new Color(0.024f, 0.839f, 0.627f));
+                string subtitle = isPurchased ? "<color=#10B981>Sahipsin</color>" : $"Fiyat: {cfg.price} Altın";
+                string btnLabel = !isPurchased ? "AL" : (isEquipped ? "GİYİLDİ" : "GİY");
+                Color btnColor = !isPurchased 
+                    ? new Color(0.98f, 0.75f, 0.14f) 
+                    : (isEquipped ? new Color(0.12f, 0.55f, 0.88f) : new Color(0.06f, 0.84f, 0.58f));
 
                 string currentType = cfg.outfitType;
                 int cost = cfg.price;
@@ -314,7 +332,7 @@ namespace ZiplaKac.UI
                         {
                             AudioManager.Instance?.PlayNewRecordSound();
                             AudioManager.Instance?.TriggerHapticFeedback();
-                            ShowStatus("🎉 Satın alındı ve giyildi!", new Color(0.024f, 0.839f, 0.627f));
+                            ShowStatus("🎉 Satın alındı ve giyildi!", new Color(0.06f, 0.84f, 0.58f));
                             PlayerController.Instance?.UpdateCharacterAppearance();
                             RefreshUI();
                         }
@@ -329,7 +347,7 @@ namespace ZiplaKac.UI
                         bool nowEq = SaveSystem.ToggleOutfitEquipped(charKey, currentType);
                         AudioManager.Instance?.PlayJumpSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
-                        ShowStatus(nowEq ? "✅ Kıyafet giyildi!" : "ℹ️ Kıyafet çıkarıldı.", nowEq ? new Color(0.024f, 0.839f, 0.627f) : new Color(0.7f, 0.8f, 0.9f));
+                        ShowStatus(nowEq ? "✅ Kıyafet giyildi!" : "ℹ️ Kıyafet çıkarıldı.", nowEq ? new Color(0.06f, 0.84f, 0.58f) : new Color(0.7f, 0.8f, 0.9f));
                         PlayerController.Instance?.UpdateCharacterAppearance();
                         RefreshUI();
                     }
@@ -352,138 +370,95 @@ namespace ZiplaKac.UI
 
             Image bg = rowObj.AddComponent<Image>();
             bg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.10f, 0.13f, 0.24f, 0.96f),
-                new Color(1f, 1f, 1f, 0.12f),
-                1.5f, 22, 128, 128);
+                new Color(0.06f, 0.11f, 0.22f, 0.98f),
+                new Color(0.12f, 0.22f, 0.40f, 0.50f),
+                1.5f, 20, 128, 128);
             bg.type = Image.Type.Sliced;
 
-            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme / Yetenek Rozet İkonu (136x136)
+            // 1. Görsel Alanı: Kıyafet Sprite'ı veya Güçlendirme / Yetenek Rozet İkonu (118x118)
             bool hasOutfit = !string.IsNullOrEmpty(outfitType);
             bool hasShopItem = !string.IsNullOrEmpty(shopItemId);
-            bool hasEmoji = !string.IsNullOrEmpty(iconEmoji);
-            bool hasVisual = hasOutfit || hasShopItem || hasEmoji;
 
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(rowObj.transform, false);
+            RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0f, 0.5f);
+            iconRt.anchorMax = new Vector2(0f, 0.5f);
+            iconRt.pivot = new Vector2(0f, 0.5f);
+            iconRt.anchoredPosition = new Vector2(22f, 0f);
+            iconRt.sizeDelta = new Vector2(118f, 118f);
+
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+
+            Sprite itemSprite = null;
             if (hasOutfit)
             {
-                GameObject iconObj = new GameObject("Icon");
-                iconObj.transform.SetParent(rowObj.transform, false);
-                RectTransform iconRt = iconObj.AddComponent<RectTransform>();
-                iconRt.anchorMin = new Vector2(0f, 0.5f);
-                iconRt.anchorMax = new Vector2(0f, 0.5f);
-                iconRt.pivot = new Vector2(0f, 0.5f);
-                iconRt.anchoredPosition = new Vector2(20f, 0f);
-                iconRt.sizeDelta = new Vector2(136f, 136f);
-
-                Image iconImg = iconObj.AddComponent<Image>();
-                Sprite itemSprite = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_{outfitType}");
-                if (itemSprite != null)
-                {
-                    iconImg.sprite = itemSprite;
-                    iconImg.preserveAspect = true;
-                }
-                else
-                {
-                    iconImg.color = new Color(1f, 1f, 1f, 0.25f);
-                }
+                itemSprite = Resources.Load<Sprite>($"Sprites/Wardrobe/outfit_{outfitType}");
+                if (itemSprite == null) itemSprite = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_{outfitType}");
             }
-            else if (hasShopItem || hasEmoji)
+            else if (hasShopItem)
             {
-                // Güçlendirme / Yetenek Rozet İkonu: 136x136
-                GameObject badgeObj = new GameObject("IconBadge");
-                badgeObj.transform.SetParent(rowObj.transform, false);
-                RectTransform badgeRt = badgeObj.AddComponent<RectTransform>();
-                badgeRt.anchorMin = new Vector2(0f, 0.5f);
-                badgeRt.anchorMax = new Vector2(0f, 0.5f);
-                badgeRt.pivot = new Vector2(0f, 0.5f);
-                badgeRt.anchoredPosition = new Vector2(20f, 0f);
-                badgeRt.sizeDelta = new Vector2(136f, 136f);
-
-                Image badgeImg = badgeObj.AddComponent<Image>();
-                badgeImg.preserveAspect = true;
-                badgeImg.raycastTarget = false;
-
-                Sprite shopIcon = null;
-                if (!string.IsNullOrEmpty(shopItemId))
-                {
-                    shopIcon = ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/Shop/shop_{shopItemId}", null);
-                }
-
-                if (shopIcon != null)
-                {
-                    badgeImg.sprite = shopIcon;
-                }
-                else
-                {
-                    badgeImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                        new Color(0.15f, 0.19f, 0.35f, 0.85f),
-                        new Color(1f, 1f, 1f, 0.12f),
-                        1f, 20, 128, 128);
-                    badgeImg.type = Image.Type.Sliced;
-
-                    GameObject emojiTxtObj = new GameObject("Emoji");
-                    emojiTxtObj.transform.SetParent(badgeObj.transform, false);
-                    RectTransform emojiRt = emojiTxtObj.AddComponent<RectTransform>();
-                    emojiRt.anchorMin = Vector2.zero;
-                    emojiRt.anchorMax = Vector2.one;
-                    emojiRt.offsetMin = Vector2.zero;
-                    emojiRt.offsetMax = Vector2.zero;
-
-                    Text emojiTxt = emojiTxtObj.AddComponent<Text>();
-                    emojiTxt.font = font;
-                    emojiTxt.fontSize = 64;
-                    emojiTxt.alignment = TextAnchor.MiddleCenter;
-                    emojiTxt.text = iconEmoji;
-                }
+                itemSprite = Resources.Load<Sprite>($"Sprites/Shop/shop_{shopItemId}");
+                if (itemSprite == null) itemSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate($"Sprites/Shop/shop_{shopItemId}", null);
             }
 
-            // 2. Metin Alanı (Daha büyük ve okunaklı: 36pt başlık / 26pt alt yazı)
-            float textLeft = hasVisual ? 172f : 24f;
-            float textWidth = hasVisual ? 385f : 530f;
+            if (itemSprite != null)
+            {
+                iconImg.sprite = itemSprite;
+            }
+            else
+            {
+                iconImg.color = new Color(1f, 1f, 1f, 0.25f);
+            }
 
+            // 2. Metin Alanı
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(rowObj.transform, false);
             RectTransform labelRt = labelObj.AddComponent<RectTransform>();
             labelRt.anchorMin = new Vector2(0f, 0.5f);
             labelRt.anchorMax = new Vector2(0f, 0.5f);
             labelRt.pivot = new Vector2(0f, 0.5f);
-            labelRt.anchoredPosition = new Vector2(textLeft, 0f);
-            labelRt.sizeDelta = new Vector2(textWidth, rowHeight - 16f);
+            labelRt.anchoredPosition = new Vector2(160f, 0f);
+            labelRt.sizeDelta = new Vector2(430f, rowHeight - 20f);
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;
-            labelText.fontSize = 34;
+            labelText.fontSize = 32;
             labelText.fontStyle = FontStyle.Bold;
             labelText.alignment = TextAnchor.MiddleLeft;
             labelText.horizontalOverflow = HorizontalWrapMode.Wrap;
             labelText.verticalOverflow = VerticalWrapMode.Truncate;
-            labelText.resizeTextForBestFit = true;
-            labelText.resizeTextMinSize = 22;
-            labelText.resizeTextMaxSize = 34;
             labelText.color = Color.white;
-            labelText.text = $"{title}\n<size=26><color=#b8c8dc>{subtitle}</color></size>";
+            labelText.text = $"{title}\n<size=24><color=#94A3B8>{subtitle}</color></size>";
 
-            // 3. Buton Alanı (Genişletilmiş ve dengeli: 260x82)
+            // 3. Buton Alanı (230x74)
             GameObject btnObj = new GameObject("ActionBtn");
             btnObj.transform.SetParent(rowObj.transform, false);
             RectTransform btnRt = btnObj.AddComponent<RectTransform>();
             btnRt.anchorMin = new Vector2(1f, 0.5f);
             btnRt.anchorMax = new Vector2(1f, 0.5f);
             btnRt.pivot = new Vector2(1f, 0.5f);
-            btnRt.anchoredPosition = new Vector2(-16f, 0f);
-            btnRt.sizeDelta = new Vector2(260f, 82f);
+            btnRt.anchoredPosition = new Vector2(-20f, 0f);
+            btnRt.sizeDelta = new Vector2(230f, 74f);
 
             Image btnBg = btnObj.AddComponent<Image>();
-            Color finalBtnColor = btnColor ?? new Color(1.0f, 0.82f, 0.40f);
+            Color finalBtnColor = btnColor ?? new Color(0.98f, 0.75f, 0.14f);
             btnBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 finalBtnColor,
                 Color.clear,
-                0f, 18, 128, 64);
+                0f, 22, 128, 64);
             btnBg.type = Image.Type.Sliced;
 
             Button btn = btnObj.AddComponent<Button>();
             btn.onClick.AddListener(onClick);
 
-            Color textCol = (finalBtnColor.r > 0.6f && finalBtnColor.g > 0.6f) ? new Color(0.05f, 0.08f, 0.13f) : Color.white;
+            Color textCol = (finalBtnColor.r > 0.6f && finalBtnColor.g > 0.6f) 
+                ? new Color(0.12f, 0.08f, 0.02f) 
+                : ((finalBtnColor.g > 0.7f && finalBtnColor.r < 0.3f) 
+                    ? new Color(0.02f, 0.14f, 0.08f) 
+                    : Color.white);
 
             if (price > 0)
             {
@@ -498,25 +473,22 @@ namespace ZiplaKac.UI
 
                 HorizontalLayoutGroup hlg = contentObj.AddComponent<HorizontalLayoutGroup>();
                 hlg.childAlignment = TextAnchor.MiddleCenter;
-                hlg.spacing = 6f;
+                hlg.spacing = 8f;
                 hlg.childControlWidth = false;
                 hlg.childControlHeight = false;
                 hlg.childForceExpandWidth = false;
                 hlg.childForceExpandHeight = false;
 
-                // 1. Eylem Adı (AL / YÜKSELT)
+                // 1. Eylem Adı (AL / YÜKSELT / AÇ)
                 GameObject actObj = new GameObject("ActTxt");
                 actObj.transform.SetParent(contentObj.transform, false);
                 Text actTxt = actObj.AddComponent<Text>();
                 actTxt.font = font;
-                actTxt.fontSize = 22;
+                actTxt.fontSize = 24;
                 actTxt.fontStyle = FontStyle.Bold;
                 actTxt.color = textCol;
                 actTxt.text = btnText;
                 actTxt.alignment = TextAnchor.MiddleCenter;
-                actTxt.resizeTextForBestFit = true;
-                actTxt.resizeTextMinSize = 16;
-                actTxt.resizeTextMaxSize = 24;
                 actObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
                 // 2. Altın Sikke Görseli (28x28)
@@ -534,14 +506,11 @@ namespace ZiplaKac.UI
                 priceObj.transform.SetParent(contentObj.transform, false);
                 Text priceTxt = priceObj.AddComponent<Text>();
                 priceTxt.font = font;
-                priceTxt.fontSize = 22;
+                priceTxt.fontSize = 24;
                 priceTxt.fontStyle = FontStyle.Bold;
                 priceTxt.color = textCol;
                 priceTxt.text = price.ToString();
                 priceTxt.alignment = TextAnchor.MiddleCenter;
-                priceTxt.resizeTextForBestFit = true;
-                priceTxt.resizeTextMinSize = 16;
-                priceTxt.resizeTextMaxSize = 24;
                 priceObj.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             }
             else
