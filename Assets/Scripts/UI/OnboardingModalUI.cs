@@ -43,6 +43,22 @@ namespace ZiplaKac.UI
 
         private int currentSlideIndex = 0;
 
+        [System.Serializable]
+        public struct LocalizedBinding
+        {
+            public Text textComponent;
+            public string key;
+        }
+
+        private readonly List<LocalizedBinding> localizedBindings = new List<LocalizedBinding>();
+
+        public void RegisterLocalizedText(Text textComp, string key)
+        {
+            if (textComp == null || string.IsNullOrEmpty(key)) return;
+            localizedBindings.Add(new LocalizedBinding { textComponent = textComp, key = key });
+            textComp.text = LocalizationManager.Get(key);
+        }
+
         private void Awake()
         {
             Instance = this;
@@ -155,22 +171,11 @@ namespace ZiplaKac.UI
             if (closeButtonText != null) closeButtonText.text = LocalizationManager.Get("btn_close");
             if (prevButtonText != null) prevButtonText.text = LocalizationManager.Get("btn_prev");
 
-            if (slideSubTexts != null && currentSlideIndex < slideSubTexts.Length && slideSubTexts[currentSlideIndex] != null)
+            foreach (var b in localizedBindings)
             {
-                switch (currentSlideIndex)
+                if (b.textComponent != null)
                 {
-                    case 0:
-                        slideSubTexts[0].text = isEn ? "Jump, dodge obstacles, and beat your record!" : "Zıpla, engellerden kaç ve rekorunu kır!";
-                        break;
-                    case 1:
-                        slideSubTexts[1].text = isEn ? "Only Classic is unlocked at first! Reach 2500 score to unlock next:" : "İlk başta sadece Klasik açıktır! Sırayla 2500 skor yaparak kilidi aç:";
-                        break;
-                    case 2:
-                        slideSubTexts[2].text = isEn ? "Collect power-ups and upgrade permanent abilities!" : "Güçlendirmeleri topla ve mağazadan kalıcı yetenekler edin!";
-                        break;
-                    case 3:
-                        slideSubTexts[3].text = isEn ? "Log in daily, open the chest and style your runner!" : "Her gün giriş yap, sandığını aç ve altınlarınla tarzını yarat!";
-                        break;
+                    b.textComponent.text = LocalizationManager.Get(b.key);
                 }
             }
 

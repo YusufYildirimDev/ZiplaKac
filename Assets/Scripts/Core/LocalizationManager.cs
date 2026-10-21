@@ -293,7 +293,48 @@ namespace ZiplaKac.Core
             { "reward_ready", "Bugünün sandığı açılmaya hazır!" },
             { "reward_streak", "{0}. GÜN SERİSİ! +{1} ALTIN KAZANDIN!" },
             { "reward_claimed", "Bugünkü ödülünü zaten aldın. Yarın tekrar gel!" },
-            { "reward_btn_claim", "ÖDÜLÜ AL" }
+            { "reward_btn_claim", "ÖDÜLÜ AL" },
+
+            // Nasıl Oynanır (Onboarding)
+            { "onb_s0_sub", "Zıpla, engellerden kaç ve rekorunu kır!" },
+            { "onb_s0_r1_title", "Tek Dokunuşla Zıpla" },
+            { "onb_s0_r1_desc", "Ekrana dokunarak veya Space tuşuna basarak yaklaşan sivri dikenlerin, kaktüs ve kayaların üzerinden atla." },
+            { "onb_s0_r2_title", "Çift Zıplama (Double Jump)" },
+            { "onb_s0_r2_desc", "Havada bir kez daha dokunarak ikinci kez zıpla! Yüksek ve arka arkaya gelen engelleri aşmak için en önemli yeteneğin." },
+            { "onb_s0_r3_title", "Kombo Serisi & Bonus Altın" },
+            { "onb_s0_r3_desc", "Engelleri çarpmadan art arda geç. Her 5 engelde ekstra kombo puanı ve çarpanlı altın ödülleri kazanırsın!" },
+            { "onb_s0_r4_title", "3 Zorluk Aşaması (Gündüz, Akşam, Gece)" },
+            { "onb_s0_r4_desc", "Puanın arttıkça dünya değişir, oyun hızlanır ve reflekslerini sonuna kadar zorlar!" },
+
+            { "onb_s1_sub", "İlk başta sadece Klasik açıktır! Sırayla 2500 skor yaparak kilidi aç:" },
+            { "onb_s1_c0_badge", "BAŞLANGIÇTA AÇIK" },
+            { "onb_s1_c0_desc", "Çayır Diyarı • Kalıcı +%15 ekstra skor yeteneği!" },
+            { "onb_s1_c1_badge", "🔒 Klasik ile 2500 Skor Yap" },
+            { "onb_s1_c1_desc", "Volkan & Lav Diyarı • Ateş topu ve kor alev dünyası!" },
+            { "onb_s1_c2_badge", "🔒 Ateş ile 2500 Skor Yap" },
+            { "onb_s1_c2_desc", "Buzul & Kar Dağları • Dondurucu soğuk ve kutup gecesi!" },
+            { "onb_s1_c3_badge", "🔒 Buz ile 2500 Skor Yap" },
+            { "onb_s1_c3_desc", "Toksik Sis Ormanı • Kombo ödüllerini x1.25 katına çıkarır!" },
+            { "onb_s1_c4_badge", "🔒 Zehir ile 2500 Skor Yap" },
+            { "onb_s1_c4_desc", "Derin Uzay & Nebula • Engellerden %28 otomatik sıyrılma!" },
+
+            { "onb_s2_sub", "Güçlendirmeleri topla ve mağazadan kalıcı yetenekler edin!" },
+            { "onb_s2_r1_title", "Koruyucu Kalkan (Shield)" },
+            { "onb_s2_r1_desc", "Bir engele çarpışmayı tamamen emer, engelleri temizler ve koşunu kurtarır." },
+            { "onb_s2_r2_title", "Zamanı Yavaşlatma (Slow-Mo)" },
+            { "onb_s2_r2_desc", "5 saniye boyunca dünya hızını %40 düşürerek karmaşık engellerden kolayca sıyrılmanı sağlar." },
+            { "onb_s2_r3_title", "x2 Çift Skor & Altın Çarpanı" },
+            { "onb_s2_r3_desc", "Aktif olduğu sürece kazanılan tüm koşu puanlarını ve engellerden gelen altınları 2 katına çıkarır!" },
+            { "onb_s2_r4_title", "İkinci Şans Bileti & Kalıcı Güçler" },
+            { "onb_s2_r4_desc", "Mağaza'dan İkinci Şans Bileti alıp yandığın yerden devam edebilir, zıplama ve kombo süreni geliştirebilirsin." },
+
+            { "onb_s3_sub", "Her gün giriş yap, sandığını aç ve altınlarınla tarzını yarat!" },
+            { "onb_s3_r1_title", "Günlük Ödül Sandığı" },
+            { "onb_s3_r1_desc", "Her gün oyuna girerek sandığını aç! Günlük seri yaptıkça (Streak) kazandığın altın miktarı 20'den 50'ye artar!" },
+            { "onb_s3_r2_title", "Altın Toplama & Yeni Rekorlar" },
+            { "onb_s3_r2_desc", "Engelleri aştıkça, kombo yaptıkça ve rekor kırdıkça altın topla. Her koşu sonunda kasan zenginleşir!" },
+            { "onb_s3_r3_title", "Gardırop & Kostümler" },
+            { "onb_s3_r3_desc", "Topladığın altınlarla kahramanlarına süper kahraman pelerini, havalı güneş gözlükleri ve maskeler satın al!" }
         };
 
         private static readonly Dictionary<string, string> EnglishDictionary = new Dictionary<string, string>
@@ -420,7 +461,48 @@ namespace ZiplaKac.Core
             { "reward_ready", "Today's chest is ready to open!" },
             { "reward_streak", "DAY {0} STREAK! +{1} GOLD EARNED!" },
             { "reward_claimed", "You already claimed today's reward. Come back tomorrow!" },
-            { "reward_btn_claim", "CLAIM REWARD" }
+            { "reward_btn_claim", "CLAIM REWARD" },
+
+            // How to Play (Onboarding)
+            { "onb_s0_sub", "Jump, dodge obstacles, and beat your high score!" },
+            { "onb_s0_r1_title", "One-Tap Jump" },
+            { "onb_s0_r1_desc", "Tap the screen or press Space to jump over upcoming spikes, cacti, and rolling rocks." },
+            { "onb_s0_r2_title", "Double Jump" },
+            { "onb_s0_r2_desc", "Tap again mid-air to double jump! Your essential skill to clear tall and rapid consecutive obstacles." },
+            { "onb_s0_r3_title", "Combo Streak & Bonus Gold" },
+            { "onb_s0_r3_desc", "Clear obstacles consecutively without crashing. Earn extra combo points and multiplied gold every 5 obstacles!" },
+            { "onb_s0_r4_title", "3 Difficulty Cycles (Day, Sunset, Night)" },
+            { "onb_s0_r4_desc", "As your score climbs, the atmosphere changes, the game speeds up, and your reflexes are put to the test!" },
+
+            { "onb_s1_sub", "Only Classic is unlocked at first! Reach 2500 score to unlock next:" },
+            { "onb_s1_c0_badge", "UNLOCKED BY DEFAULT" },
+            { "onb_s1_c0_desc", "Meadow Realm • Permanent +15% bonus score ability!" },
+            { "onb_s1_c1_badge", "🔒 Reach 2500 with Classic" },
+            { "onb_s1_c1_desc", "Volcano Realm • Fiery fireballs and glowing embers!" },
+            { "onb_s1_c2_badge", "🔒 Reach 2500 with Blaze" },
+            { "onb_s1_c2_desc", "Glacier Realm • Freezing blizzards and polar nights!" },
+            { "onb_s1_c3_badge", "🔒 Reach 2500 with Frost" },
+            { "onb_s1_c3_desc", "Toxic Forest • Multiplies combo rewards by x1.25!" },
+            { "onb_s1_c4_badge", "🔒 Reach 2500 with Venom" },
+            { "onb_s1_c4_desc", "Deep Space • 28% chance to automatically dodge obstacles!" },
+
+            { "onb_s2_sub", "Collect power-ups and upgrade permanent abilities!" },
+            { "onb_s2_r1_title", "Protective Shield" },
+            { "onb_s2_r1_desc", "Completely absorbs a collision, destroys nearby obstacles, and saves your run." },
+            { "onb_s2_r2_title", "Slow-Mo Time Warp" },
+            { "onb_s2_r2_desc", "Slows world speed by 40% for 5 seconds, making difficult obstacles effortless to clear." },
+            { "onb_s2_r3_title", "x2 Score & Gold Multiplier" },
+            { "onb_s2_r3_desc", "Doubles all points scored and coins collected while active!" },
+            { "onb_s2_r4_title", "Second Chance Ticket & Upgrades" },
+            { "onb_s2_r4_desc", "Buy tickets in Shop to continue after crashing, or upgrade jump height and combo timers permanently." },
+
+            { "onb_s3_sub", "Log in daily, open the chest and style your runner!" },
+            { "onb_s3_r1_title", "Daily Reward Chest" },
+            { "onb_s3_r1_desc", "Open your chest every day! Keep your daily login streak alive to earn larger gold rewards!" },
+            { "onb_s3_r2_title", "Collect Gold & Break Records" },
+            { "onb_s3_r2_desc", "Earn gold by dodging obstacles, building combos, and setting new personal bests!" },
+            { "onb_s3_r3_title", "Wardrobe & Outfits" },
+            { "onb_s3_r3_desc", "Use your gold to equip superhero capes, stylish sunglasses, and party hats for your runners!" }
         };
 
         #endregion
