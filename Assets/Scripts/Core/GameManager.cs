@@ -61,6 +61,7 @@ namespace ZiplaKac.Core
         [Header("Kombo Sistemi")]
         public int comboCount = 0;
         public int consecutivePassedObstacles = 0;
+        public int maxComboInRun = 0;
 
         // Event'ler
         public event Action<GameState> OnGameStateChanged;
@@ -154,6 +155,7 @@ namespace ZiplaKac.Core
                     }
                     comboCount = 0;
                     consecutivePassedObstacles = 0;
+                    maxComboInRun = 0;
                     ResetPowerUps();
                     Obstacles.Obstacle.ClearAllActiveObstacles();
                     PowerUps.PowerUp.ClearAllActivePowerUps();
@@ -191,6 +193,15 @@ namespace ZiplaKac.Core
                     if (CurrentRunGold > 0)
                     {
                         SaveSystem.AddGold(CurrentRunGold);
+                    }
+
+                    // Apple Game Center Skor ve Başarım Bildirimi
+                    if (GameCenterManager.Instance != null)
+                    {
+                        GameCenterManager.Instance.ReportScore(finalScoreInt);
+                        if (finalScoreInt >= 1000) GameCenterManager.Instance.ReportAchievement("ach_score_1000");
+                        if (finalScoreInt >= 2500) GameCenterManager.Instance.ReportAchievement("ach_score_2500");
+                        if (maxComboInRun >= 20) GameCenterManager.Instance.ReportAchievement("ach_combo_20");
                     }
                     break;
             }
@@ -405,6 +416,7 @@ namespace ZiplaKac.Core
             if (consecutivePassedObstacles % 5 == 0)
             {
                 comboCount++;
+                if (comboCount > maxComboInRun) maxComboInRun = comboCount;
                 int bonusPoints = 10;
                 CurrentScore += bonusPoints;
                 OnComboAchieved?.Invoke(comboCount, obstaclePosition);

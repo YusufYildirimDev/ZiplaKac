@@ -83,21 +83,54 @@ namespace ZiplaKac.Core
         }
         #endregion
 
+        [Header("AdMob iOS Yapılandırması (Canlı & Test ID)")]
+        public string admobAppId = "ca-app-pub-3940256099942544~145869519";
+        public string bannerAdUnitId = "ca-app-pub-3940256099942544/2934735716";
+        public string interstitialAdUnitId = "ca-app-pub-3940256099942544/4411468910";
+        public string rewardedAdUnitId = "ca-app-pub-3940256099942544/1712485313";
+
+        public bool IsNoAdsActive => PlayerPrefs.GetInt("no_ads", 0) == 1;
+
         #region Uygulama İçi Satın Alma (IAP)
         /// <summary>
-        /// Karakter kilidi açma veya reklamsız paket satın alma işlemi.
+        /// Altın paketi, başlangıç paketi veya reklamsız paket satın alma işlemi.
         /// </summary>
         public void BuyProduct(string productId, Action<bool> onComplete)
         {
             Debug.Log($"[MonetizationManager] BuyProduct çağrıldı: {productId}");
 
-            // Prototip simülasyonu: Satın almayı başarılı kabul eder
-            onComplete?.Invoke(true);
-            OnPurchaseSuccess?.Invoke(productId);
+            bool success = true;
 
-            /* Gerçek SDK Mantığı:
-            storeController.InitiatePurchase(productId);
-            */
+            switch (productId)
+            {
+                case "iap_gold_1000":
+                    SaveSystem.AddGold(1000);
+                    break;
+
+                case "iap_gold_5000":
+                    SaveSystem.AddGold(5000);
+                    break;
+
+                case "iap_pack_starter":
+                    SaveSystem.AddGold(10000);
+                    SaveSystem.AddConsumable("second_chance", 5);
+                    break;
+
+                case "iap_no_ads":
+                    PlayerPrefs.SetInt("no_ads", 1);
+                    PlayerPrefs.Save();
+                    break;
+
+                default:
+                    success = false;
+                    break;
+            }
+
+            onComplete?.Invoke(success);
+            if (success)
+            {
+                OnPurchaseSuccess?.Invoke(productId);
+            }
         }
         #endregion
     }

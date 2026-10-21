@@ -127,6 +127,12 @@ namespace ZiplaKac.Utils
                 GameObject wtm = new GameObject("WorldThemeManager");
                 wtm.AddComponent<WorldThemeManager>();
             }
+
+            if (GameCenterManager.Instance == null)
+            {
+                GameObject gcm = new GameObject("GameCenterManager");
+                gcm.AddComponent<GameCenterManager>();
+            }
         }
 
         private static Material s_safeSpriteMat;
@@ -983,6 +989,59 @@ namespace ZiplaKac.Utils
             {
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 412f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
+
+            // 1.4. Sol Üst Lider Tablosu Rozeti (Leaderboard Pill - Apple Game Center)
+            GameObject lbBadge = CreateCardContainer(card.transform, "MainMenuLeaderboardBadge", new Vector2(175f, 66f));
+            RectTransform lbRt = lbBadge.GetComponent<RectTransform>();
+            lbRt.anchoredPosition = new Vector2(-330f, 435f);
+
+            Image lbBg = lbBadge.GetComponent<Image>();
+            lbBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.18f, 0.14f, 0.05f, 0.95f),
+                new Color(1.0f, 0.78f, 0.20f, 0.95f),
+                2.5f, 22, 175, 66);
+
+            // Kupa İkonu
+            GameObject lbIconObj = new GameObject("TrophyIcon");
+            lbIconObj.transform.SetParent(lbBadge.transform, false);
+            RectTransform lbIconRt = lbIconObj.AddComponent<RectTransform>();
+            lbIconRt.anchorMin = new Vector2(0f, 0.5f);
+            lbIconRt.anchorMax = new Vector2(0f, 0.5f);
+            lbIconRt.pivot = new Vector2(0f, 0.5f);
+            lbIconRt.anchoredPosition = new Vector2(14f, 0f);
+            lbIconRt.sizeDelta = new Vector2(38f, 38f);
+            Text lbIconTxt = lbIconObj.AddComponent<Text>();
+            lbIconTxt.font = GetSafeDefaultFont();
+            lbIconTxt.fontSize = 28;
+            lbIconTxt.alignment = TextAnchor.MiddleCenter;
+            lbIconTxt.text = "🏆";
+
+            // Metin (SKORLAR / LEADERBOARD)
+            Text lbText = CreateText(lbBadge.transform, "LeaderboardText", LocalizationManager.Get("menu_leaderboard_label", "SKORLAR"), 20, new Vector2(24f, 0f), new Color(1.0f, 0.92f, 0.65f), false, FontStyle.Bold);
+            lbText.alignment = TextAnchor.MiddleCenter;
+            RectTransform lbTxtRt = lbText.GetComponent<RectTransform>();
+            lbTxtRt.anchorMin = new Vector2(0f, 0f);
+            lbTxtRt.anchorMax = new Vector2(1f, 1f);
+            lbTxtRt.offsetMin = new Vector2(50f, 4f);
+            lbTxtRt.offsetMax = new Vector2(-10f, -4f);
+
+            Button lbBtn = lbBadge.AddComponent<Button>();
+            lbBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
+                if (GameCenterManager.Instance != null)
+                {
+                    GameCenterManager.Instance.ShowLeaderboardUI(() => {
+                        if (Instance != null)
+                        {
+                            Instance.ShowRewardToast(card.transform, LocalizationManager.Get("menu_leaderboard_toast_not_auth", "⚠️ Apple Game Center'a bağlanılamadı."));
+                        }
+                    });
+                }
+            });
+
+            LocalizationManager.OnLanguageChanged += () => {
+                if (lbText != null) lbText.text = LocalizationManager.Get("menu_leaderboard_label", "SKORLAR");
+            };
 
             // 1.5. Sağ Üst Can Rozeti (Extra Life Pill)
             GameObject lifeBadge = CreateCardContainer(card.transform, "MainMenuLifeBadge", new Vector2(175f, 66f));
@@ -2021,21 +2080,27 @@ namespace ZiplaKac.Utils
             modalUI.statusMessageText.alignment = TextAnchor.MiddleLeft;
             modalUI.statusMessageText.GetComponent<RectTransform>().sizeDelta = new Vector2(460f, 36f);
 
-            // 4. Sekmeler Çubuğu (Tabs Bar)
+            // 4. Sekmeler Çubuğu (Tabs Bar - 3 Sekme)
             Color tabActive = new Color(0.55f, 0.36f, 0.96f);
             Color tabInactive = new Color(0.08f, 0.12f, 0.22f, 0.95f);
 
-            GameObject tabUpgradesObj = CreatePillButton(card.transform, "TabUpgradesBtn", "📊  YÜKSELTMELER", new Vector2(-215f, 475f), new Vector2(415f, 80f), tabActive, Color.white, 30);
+            GameObject tabUpgradesObj = CreatePillButton(card.transform, "TabUpgradesBtn", LocalizationManager.Get("shop_tab_upgrades"), new Vector2(-286f, 475f), new Vector2(274f, 76f), tabActive, Color.white, 24);
             modalUI.tabUpgradesButton = tabUpgradesObj.GetComponent<Button>();
             modalUI.tabUpgradesBg = tabUpgradesObj.GetComponent<Image>();
             modalUI.tabUpgradesText = tabUpgradesObj.GetComponentInChildren<Text>();
             modalUI.tabUpgradesButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.Upgrades));
 
-            GameObject tabOutfitsObj = CreatePillButton(card.transform, "TabOutfitsBtn", "👕  GARDIROP", new Vector2(215f, 475f), new Vector2(415f, 80f), tabInactive, new Color(0.58f, 0.64f, 0.72f), 28);
+            GameObject tabOutfitsObj = CreatePillButton(card.transform, "TabOutfitsBtn", LocalizationManager.Get("shop_tab_outfits"), new Vector2(0f, 475f), new Vector2(274f, 76f), tabInactive, new Color(0.58f, 0.64f, 0.72f), 24);
             modalUI.tabOutfitsButton = tabOutfitsObj.GetComponent<Button>();
             modalUI.tabOutfitsBg = tabOutfitsObj.GetComponent<Image>();
             modalUI.tabOutfitsText = tabOutfitsObj.GetComponentInChildren<Text>();
             modalUI.tabOutfitsButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.Outfits));
+
+            GameObject tabGoldPacksObj = CreatePillButton(card.transform, "TabGoldPacksBtn", LocalizationManager.Get("shop_tab_gold_packs"), new Vector2(286f, 475f), new Vector2(274f, 76f), tabInactive, new Color(0.58f, 0.64f, 0.72f), 24);
+            modalUI.tabGoldPacksButton = tabGoldPacksObj.GetComponent<Button>();
+            modalUI.tabGoldPacksBg = tabGoldPacksObj.GetComponent<Image>();
+            modalUI.tabGoldPacksText = tabGoldPacksObj.GetComponentInChildren<Text>();
+            modalUI.tabGoldPacksButton.onClick.AddListener(() => modalUI.SwitchTab(UI.ShopTab.GoldPacks));
 
             // 5. Kaydırılabilir Liste Alanı (ScrollView)
             GameObject scrollViewObj = new GameObject("ScrollView");

@@ -11,7 +11,20 @@ namespace ZiplaKac.UI
     public enum ShopTab
     {
         Upgrades,
-        Outfits
+        Outfits,
+        GoldPacks
+    }
+
+    [System.Serializable]
+    public class GoldPackConfig
+    {
+        public string id;
+        public string displayName;
+        public string description;
+        public string priceDisplay;
+        public int goldAmount;
+        public int extraLives;
+        public bool isNoAds;
     }
 
     [System.Serializable]
@@ -64,16 +77,27 @@ namespace ZiplaKac.UI
         [Header("Sekme Butonları")]
         public Button tabUpgradesButton;
         public Button tabOutfitsButton;
+        public Button tabGoldPacksButton;
         public Image tabUpgradesBg;
         public Image tabOutfitsBg;
+        public Image tabGoldPacksBg;
         public Text tabUpgradesText;
         public Text tabOutfitsText;
+        public Text tabGoldPacksText;
 
         [Header("Eşya Yuvaları ve Kaydırma")]
         public Transform itemsContainer;
         public ScrollRect itemsScrollRect;
 
         public ShopTab currentTab = ShopTab.Upgrades;
+
+        private readonly List<GoldPackConfig> goldPackConfigs = new List<GoldPackConfig>
+        {
+            new GoldPackConfig { id = "iap_gold_1000", displayName = "Küçük Altın Kesesi", description = "+1.000 Altın anında kasanıza eklenir.", priceDisplay = "₺19.99", goldAmount = 1000 },
+            new GoldPackConfig { id = "iap_gold_5000", displayName = "Hazine Sandığı", description = "+5.000 Altın ile güçleri ve kostümleri aç!", priceDisplay = "₺69.99", goldAmount = 5000 },
+            new GoldPackConfig { id = "iap_pack_starter", displayName = "Süper Başlangıç Paketi", description = "+10.000 Altın ve +5 Ekstra Can!", priceDisplay = "₺119.99", goldAmount = 10000, extraLives = 5 },
+            new GoldPackConfig { id = "iap_no_ads", displayName = "Reklamları Kaldır", description = "Tüm reklamları kalıcı olarak kapat.", priceDisplay = "₺49.99", isNoAds = true }
+        };
 
         private readonly List<WardrobeItemConfig> outfitConfigs = new List<WardrobeItemConfig>
         {
@@ -164,7 +188,7 @@ namespace ZiplaKac.UI
                 }
                 BuildUpgradesTab(charKey);
             }
-            else
+            else if (currentTab == ShopTab.Outfits)
             {
                 if (titleText != null) titleText.text = LocalizationManager.Get("shop_title_wardrobe");
                 if (headerIllustration != null)
@@ -173,6 +197,17 @@ namespace ZiplaKac.UI
                     if (wardHdr != null) headerIllustration.sprite = wardHdr;
                 }
                 BuildOutfitsTab(charKey);
+            }
+            else // ShopTab.GoldPacks
+            {
+                if (titleText != null) titleText.text = LocalizationManager.Get("shop_title_gold_packs");
+                if (headerIllustration != null)
+                {
+                    Sprite goldHdr = Resources.Load<Sprite>("Sprites/UI_Shop/header_gold_packs");
+                    if (goldHdr == null) goldHdr = Resources.Load<Sprite>("Sprites/UI_Shop/header_upgrades");
+                    if (goldHdr != null) headerIllustration.sprite = goldHdr;
+                }
+                BuildGoldPacksTab();
             }
         }
 
@@ -185,20 +220,28 @@ namespace ZiplaKac.UI
 
             if (tabUpgradesBg != null) tabUpgradesBg.color = (currentTab == ShopTab.Upgrades) ? activeColor : inactiveColor;
             if (tabOutfitsBg != null) tabOutfitsBg.color = (currentTab == ShopTab.Outfits) ? activeColor : inactiveColor;
+            if (tabGoldPacksBg != null) tabGoldPacksBg.color = (currentTab == ShopTab.GoldPacks) ? activeColor : inactiveColor;
 
             if (tabUpgradesText != null)
             {
                 tabUpgradesText.text = LocalizationManager.Get("shop_tab_upgrades");
                 tabUpgradesText.color = (currentTab == ShopTab.Upgrades) ? activeTextColor : inactiveTextColor;
                 tabUpgradesText.fontStyle = FontStyle.Bold;
-                tabUpgradesText.fontSize = (currentTab == ShopTab.Upgrades) ? 30 : 28;
+                tabUpgradesText.fontSize = (currentTab == ShopTab.Upgrades) ? 26 : 22;
             }
             if (tabOutfitsText != null)
             {
                 tabOutfitsText.text = LocalizationManager.Get("shop_tab_outfits");
                 tabOutfitsText.color = (currentTab == ShopTab.Outfits) ? activeTextColor : inactiveTextColor;
                 tabOutfitsText.fontStyle = FontStyle.Bold;
-                tabOutfitsText.fontSize = (currentTab == ShopTab.Outfits) ? 30 : 28;
+                tabOutfitsText.fontSize = (currentTab == ShopTab.Outfits) ? 26 : 22;
+            }
+            if (tabGoldPacksText != null)
+            {
+                tabGoldPacksText.text = LocalizationManager.Get("shop_tab_gold_packs");
+                tabGoldPacksText.color = (currentTab == ShopTab.GoldPacks) ? activeTextColor : inactiveTextColor;
+                tabGoldPacksText.fontStyle = FontStyle.Bold;
+                tabGoldPacksText.fontSize = (currentTab == ShopTab.GoldPacks) ? 26 : 22;
             }
         }
 
@@ -380,6 +423,77 @@ namespace ZiplaKac.UI
             }
         }
 
+        private void BuildGoldPacksTab()
+        {
+            if (itemsContainer == null) return;
+            ClearSpawnedRows();
+
+            Font font = GetSafeFont();
+            float rowHeight = 175f;
+            float spacing = 16f;
+            float topPadding = 16f;
+            int totalItems = goldPackConfigs.Count;
+            float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
+
+            RectTransform containerRt = itemsContainer.GetComponent<RectTransform>();
+            if (containerRt != null)
+            {
+                containerRt.sizeDelta = new Vector2(0f, totalHeight);
+                containerRt.anchoredPosition = Vector2.zero;
+            }
+
+            for (int i = 0; i < goldPackConfigs.Count; i++)
+            {
+                var cfg = goldPackConfigs[i];
+                float yPos = -topPadding - (i * (rowHeight + spacing)) - (rowHeight / 2f);
+
+                bool isNoAdsPurchased = cfg.isNoAds && (MonetizationManager.Instance != null && MonetizationManager.Instance.IsNoAdsActive);
+
+                string itemName = LocalizationManager.Get($"item_{cfg.id}_name", cfg.displayName);
+                string itemDesc = LocalizationManager.Get($"item_{cfg.id}_desc", cfg.description);
+
+                string subtitle = isNoAdsPurchased 
+                    ? $"<color=#10B981>{LocalizationManager.Get("shop_owned")}</color>" 
+                    : itemDesc;
+
+                string btnText = isNoAdsPurchased ? LocalizationManager.Get("shop_open") : cfg.priceDisplay;
+                Color btnColor = isNoAdsPurchased 
+                    ? new Color(0.12f, 0.55f, 0.88f) 
+                    : new Color(0.98f, 0.75f, 0.14f);
+
+                string emoji = "🪙";
+                if (cfg.id == "iap_gold_5000") emoji = "💰";
+                else if (cfg.id == "iap_pack_starter") emoji = "👑";
+                else if (cfg.id == "iap_no_ads") emoji = "🚫";
+
+                string packId = cfg.id;
+
+                GameObject row = CreateRowObject($"GoldPack_{cfg.id}", yPos, rowHeight, itemName, subtitle, 0, btnText, font, () => {
+                    if (isNoAdsPurchased) return;
+
+                    if (MonetizationManager.Instance != null)
+                    {
+                        MonetizationManager.Instance.BuyProduct(packId, (success) => {
+                            if (success)
+                            {
+                                AudioManager.Instance?.PlayNewRecordSound();
+                                AudioManager.Instance?.TriggerHapticFeedback();
+                                ShowStatus(LocalizationManager.Get("shop_toast_bought_iap"), new Color(0.06f, 0.84f, 0.58f));
+                                RefreshUI();
+                            }
+                            else
+                            {
+                                AudioManager.Instance?.PlayGameOverSound();
+                                ShowStatus(LocalizationManager.Get("shop_toast_error"), new Color(0.95f, 0.35f, 0.40f));
+                            }
+                        });
+                    }
+                }, btnColor, null, null, emoji, cfg.id);
+
+                spawnedRows.Add(row);
+            }
+        }
+
         private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null, string iconEmoji = null, string shopItemId = null)
         {
             GameObject rowObj = new GameObject(name);
@@ -433,7 +547,22 @@ namespace ZiplaKac.UI
             }
             else
             {
-                iconImg.color = new Color(1f, 1f, 1f, 0.25f);
+                iconImg.color = new Color(1f, 1f, 1f, 0.08f);
+                if (!string.IsNullOrEmpty(iconEmoji))
+                {
+                    GameObject emojiObj = new GameObject("Emoji");
+                    emojiObj.transform.SetParent(iconObj.transform, false);
+                    RectTransform emojiRt = emojiObj.AddComponent<RectTransform>();
+                    emojiRt.anchorMin = Vector2.zero;
+                    emojiRt.anchorMax = Vector2.one;
+                    emojiRt.offsetMin = Vector2.zero;
+                    emojiRt.offsetMax = Vector2.zero;
+                    Text emojiText = emojiObj.AddComponent<Text>();
+                    emojiText.font = font;
+                    emojiText.fontSize = 54;
+                    emojiText.alignment = TextAnchor.MiddleCenter;
+                    emojiText.text = iconEmoji;
+                }
             }
 
             // 2. Metin Alanı
