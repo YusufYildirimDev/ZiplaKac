@@ -891,6 +891,17 @@ namespace ZiplaKac.Utils
 
         public static Sprite LoadMainMenuSprite(string spriteName)
         {
+            if (LocalizationManager.CurrentLanguage == LocalizationManager.LANG_EN)
+            {
+                Sprite enSp = Resources.Load<Sprite>("Sprites/UI_MainMenu/" + spriteName + "_en");
+                if (enSp != null) return enSp;
+                Texture2D enTex = Resources.Load<Texture2D>("Sprites/UI_MainMenu/" + spriteName + "_en");
+                if (enTex != null)
+                {
+                    return Sprite.Create(enTex, new Rect(0, 0, enTex.width, enTex.height), new Vector2(0.5f, 0.5f));
+                }
+            }
+
             Sprite sp = Resources.Load<Sprite>("Sprites/UI_MainMenu/" + spriteName);
             if (sp == null)
             {
@@ -961,6 +972,17 @@ namespace ZiplaKac.Utils
             GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(900f, 1020f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
 
+            // 0. Dil Seçici Buton (Sağ Üst - TR / EN Kapsül Buton)
+            Color langBg = new Color(0.12f, 0.18f, 0.32f, 0.95f);
+            Color langBorder = new Color(0.25f, 0.38f, 0.58f, 0.60f);
+            GameObject langBtnObj = CreatePillButton(card.transform, "LanguageButton", LocalizationManager.Get("lang_display"), new Vector2(350f, 448f), new Vector2(130f, 52f), langBg, Color.white, 22, langBorder, 1.5f, 26);
+            Button langBtn = langBtnObj.GetComponent<Button>();
+            Text langBtnText = langBtnObj.GetComponentInChildren<Text>();
+            langBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
+                LocalizationManager.ToggleLanguage();
+            });
+
             // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi)
             Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
             if (titleSp != null)
@@ -974,24 +996,29 @@ namespace ZiplaKac.Utils
 
             // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
+            Image subImg = null;
+            Text subTxt = null;
             if (subSp != null)
             {
-                CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 340f), new Vector2(330f, 30f));
+                GameObject subObj = CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 340f), new Vector2(330f, 30f));
+                subImg = subObj.GetComponent<Image>();
             }
             else
             {
-                CreateText(card.transform, "SubtitleText", "tek dokunuş, sonsuz kaçış", 26, new Vector2(0f, 340f), new Color(0.61f, 0.73f, 0.88f), false);
+                subTxt = CreateText(card.transform, "SubtitleText", LocalizationManager.Get("app_subtitle"), 26, new Vector2(0f, 340f), new Color(0.61f, 0.73f, 0.88f), false);
             }
 
             // 3. Bölücü Çizgi "─── KARAKTER SEÇ ───" (#9DBCE0)
             Sprite divSp = LoadMainMenuSprite("divider_karakter_sec");
+            Image divImg = null;
             if (divSp != null)
             {
-                CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 305f), new Vector2(430f, 28f));
+                GameObject divObj = CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 305f), new Vector2(430f, 28f));
+                divImg = divObj.GetComponent<Image>();
             }
             else
             {
-                CreateSectionDivider(card.transform, "KARAKTER SEÇ", 305f);
+                CreateSectionDivider(card.transform, LocalizationManager.Get("menu_select_character"), 305f);
             }
 
             // 4. Karakter Galerisi UI (5 Karakter Kartı - Seçili olan #27C7FF Neon Mavi Çerçeveli)
@@ -1005,18 +1032,22 @@ namespace ZiplaKac.Utils
 
             // 5. "▶ OYNA" Butonu (Master Referans: 800x114, Birebir Kapsül Tasarım)
             Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
+            Image playImg = null;
+            Text playTxt = null;
             if (oynaSp != null)
             {
-                CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(800f, 114f), () => {
+                GameObject playBtnObj = CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(800f, 114f), () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
+                playImg = playBtnObj.GetComponent<Image>();
             }
             else
             {
                 Color primaryBlue = new Color(0.086f, 0.471f, 1.0f); // #1678FF
                 Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", "▶   OYNA", new Vector2(0f, 20f), new Vector2(800f, 114f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", LocalizationManager.Get("menu_play"), new Vector2(0f, 20f), new Vector2(800f, 114f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                playTxt = btnObj.GetComponentInChildren<Text>();
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
@@ -1035,21 +1066,23 @@ namespace ZiplaKac.Utils
 
             // Buton 1 (Sol Üst): 🛍️ Mağaza & Gardırop (Mor İllüstrasyonlu Buton)
             Sprite wardrobeSp = LoadMainMenuSprite("btn_wardrobe");
+            Image wardrobeImg = null;
             if (wardrobeSp != null)
             {
-                CreateSpriteButton(card.transform, "WardrobeGridButton", wardrobeSp, new Vector2(colLeftX, row1Y), gridSize, () => {
+                GameObject wardObj = CreateSpriteButton(card.transform, "WardrobeGridButton", wardrobeSp, new Vector2(colLeftX, row1Y), gridSize, () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (UI.WardrobeModalUI.Instance != null)
                     {
                         UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
                     }
                 });
+                wardrobeImg = wardObj.GetComponent<Image>();
             }
             else
             {
                 Color purpleBg = new Color(0.45f, 0.22f, 0.88f);
                 Color purpleHighlight = new Color(0.70f, 0.45f, 1.0f, 0.35f);
-                GameObject wardrobeBtnObj = CreateMenuGridButton(card.transform, "WardrobeGridButton", "🛍️", "MAĞAZA &", "GARDIROP", new Vector2(colLeftX, row1Y), gridSize, purpleBg, purpleHighlight);
+                GameObject wardrobeBtnObj = CreateMenuGridButton(card.transform, "WardrobeGridButton", "🛍️", LocalizationManager.Get("menu_shop_line1"), LocalizationManager.Get("menu_shop_line2"), new Vector2(colLeftX, row1Y), gridSize, purpleBg, purpleHighlight);
                 wardrobeBtnObj.GetComponent<Button>().onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (UI.WardrobeModalUI.Instance != null) UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
@@ -1058,21 +1091,23 @@ namespace ZiplaKac.Utils
 
             // Buton 2 (Sağ Üst): 🎁 Günlük Ödül (Kehribar Takvim İllüstrasyonlu Buton)
             Sprite rewardSp = LoadMainMenuSprite("btn_reward");
+            Image rewardImg = null;
             if (rewardSp != null)
             {
-                CreateSpriteButton(card.transform, "DailyRewardGridButton", rewardSp, new Vector2(colRightX, row1Y), gridSize, () => {
+                GameObject rewObj = CreateSpriteButton(card.transform, "DailyRewardGridButton", rewardSp, new Vector2(colRightX, row1Y), gridSize, () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (DailyRewardModalUI.Instance != null)
                     {
                         DailyRewardModalUI.Instance.gameObject.SetActive(true);
                     }
                 });
+                rewardImg = rewObj.GetComponent<Image>();
             }
             else
             {
                 Color goldBg = new Color(0.92f, 0.56f, 0.10f);
                 Color goldHighlight = new Color(1.0f, 0.80f, 0.40f, 0.35f);
-                GameObject rewardBtnObj = CreateMenuGridButton(card.transform, "DailyRewardGridButton", "🎁", "GÜNLÜK", "ÖDÜL", new Vector2(colRightX, row1Y), gridSize, goldBg, goldHighlight);
+                GameObject rewardBtnObj = CreateMenuGridButton(card.transform, "DailyRewardGridButton", "🎁", LocalizationManager.Get("menu_reward_line1"), LocalizationManager.Get("menu_reward_line2"), new Vector2(colRightX, row1Y), gridSize, goldBg, goldHighlight);
                 rewardBtnObj.GetComponent<Button>().onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (DailyRewardModalUI.Instance != null) DailyRewardModalUI.Instance.gameObject.SetActive(true);
@@ -1081,9 +1116,10 @@ namespace ZiplaKac.Utils
 
             // Buton 3 (Sol Alt): 📖 Nasıl Oynanır? (Camgöbeği Kitap İllüstrasyonlu Buton)
             Sprite rulesSp = LoadMainMenuSprite("btn_rules");
+            Image rulesImg = null;
             if (rulesSp != null)
             {
-                CreateSpriteButton(card.transform, "RulesGridButton", rulesSp, new Vector2(colLeftX, row2Y), gridSize, () => {
+                GameObject rulesObj = CreateSpriteButton(card.transform, "RulesGridButton", rulesSp, new Vector2(colLeftX, row2Y), gridSize, () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (UI.OnboardingModalUI.Instance != null)
                     {
@@ -1095,12 +1131,13 @@ namespace ZiplaKac.Utils
                         if (found != null) found.OpenModal();
                     }
                 });
+                rulesImg = rulesObj.GetComponent<Image>();
             }
             else
             {
                 Color tealBg = new Color(0.08f, 0.62f, 0.82f);
                 Color tealHighlight = new Color(0.40f, 0.85f, 1.0f, 0.35f);
-                GameObject rulesBtnObj = CreateMenuGridButton(card.transform, "RulesGridButton", "📖", "NASIL", "OYNANIR?", new Vector2(colLeftX, row2Y), gridSize, tealBg, tealHighlight);
+                GameObject rulesBtnObj = CreateMenuGridButton(card.transform, "RulesGridButton", "📖", LocalizationManager.Get("menu_rules_line1"), LocalizationManager.Get("menu_rules_line2"), new Vector2(colLeftX, row2Y), gridSize, tealBg, tealHighlight);
                 rulesBtnObj.GetComponent<Button>().onClick.AddListener(() => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (UI.OnboardingModalUI.Instance != null) UI.OnboardingModalUI.Instance.OpenModal();
@@ -1121,7 +1158,7 @@ namespace ZiplaKac.Utils
                             AudioManager.Instance?.TriggerHapticFeedback();
                             if (Instance != null)
                             {
-                                Instance.ShowRewardToast(card.transform, "❤️ +1 CAN & +25 ALTIN KAZANDIN!");
+                                Instance.ShowRewardToast(card.transform, LocalizationManager.Get("menu_toast_reward"));
                             }
                             if (UI.WardrobeModalUI.Instance != null && UI.WardrobeModalUI.Instance.gameObject.activeInHierarchy)
                             {
@@ -1131,7 +1168,7 @@ namespace ZiplaKac.Utils
                         () => {
                             if (Instance != null)
                             {
-                                Instance.ShowRewardToast(card.transform, "Reklam henüz hazır değil!");
+                                Instance.ShowRewardToast(card.transform, LocalizationManager.Get("menu_toast_ad_not_ready"));
                             }
                         }
                     );
@@ -1143,23 +1180,39 @@ namespace ZiplaKac.Utils
                     AudioManager.Instance?.PlayNewRecordSound();
                     if (Instance != null)
                     {
-                        Instance.ShowRewardToast(card.transform, "❤️ +1 CAN & +25 ALTIN KAZANDIN!");
+                        Instance.ShowRewardToast(card.transform, LocalizationManager.Get("menu_toast_reward"));
                     }
                 }
             };
 
             Sprite adSp = LoadMainMenuSprite("btn_ad");
+            Image adImg = null;
             if (adSp != null)
             {
-                CreateSpriteButton(card.transform, "AdGridButton", adSp, new Vector2(colRightX, row2Y), gridSize, adRewardAction);
+                GameObject adObj = CreateSpriteButton(card.transform, "AdGridButton", adSp, new Vector2(colRightX, row2Y), gridSize, adRewardAction);
+                adImg = adObj.GetComponent<Image>();
             }
             else
             {
                 Color greenBg = new Color(0.08f, 0.72f, 0.45f);
                 Color greenHighlight = new Color(0.45f, 0.95f, 0.65f, 0.35f);
-                GameObject adBtnObj = CreateMenuGridButton(card.transform, "AdGridButton", "🎬", "REKLAM İZLE", "CAN AL  ❤️", new Vector2(colRightX, row2Y), gridSize, greenBg, greenHighlight);
+                GameObject adBtnObj = CreateMenuGridButton(card.transform, "AdGridButton", "🎬", LocalizationManager.Get("menu_ad_line1"), LocalizationManager.Get("menu_ad_line2"), new Vector2(colRightX, row2Y), gridSize, greenBg, greenHighlight);
                 adBtnObj.GetComponent<Button>().onClick.AddListener(adRewardAction);
             }
+
+            // Anında dil değiştiğinde ana menü görsellerini güncelle
+            LocalizationManager.OnLanguageChanged += () => {
+                if (langBtnText != null) langBtnText.text = LocalizationManager.Get("lang_display");
+                if (subImg != null) subImg.sprite = LoadMainMenuSprite("subtitle_hoppzy");
+                if (subTxt != null) subTxt.text = LocalizationManager.Get("app_subtitle");
+                if (divImg != null) divImg.sprite = LoadMainMenuSprite("divider_karakter_sec");
+                if (playImg != null) playImg.sprite = LoadMainMenuSprite("btn_oyna");
+                if (playTxt != null) playTxt.text = LocalizationManager.Get("menu_play");
+                if (wardrobeImg != null) wardrobeImg.sprite = LoadMainMenuSprite("btn_wardrobe");
+                if (rewardImg != null) rewardImg.sprite = LoadMainMenuSprite("btn_reward");
+                if (rulesImg != null) rulesImg.sprite = LoadMainMenuSprite("btn_rules");
+                if (adImg != null) adImg.sprite = LoadMainMenuSprite("btn_ad");
+            };
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;
         }
@@ -1511,6 +1564,7 @@ namespace ZiplaKac.Utils
             resText.horizontalOverflow = HorizontalWrapMode.Wrap;
             resText.verticalOverflow = VerticalWrapMode.Truncate;
             resText.raycastTarget = false;
+            goUI.restartButtonText = resText;
 
             // SATIR 2: İKİLİ YEŞİL KAPSÜL BUTON (Zümrüt Yeşili #10b580, 820x118 px)
             Color emeraldGreen = new Color(0.06f, 0.71f, 0.50f);
@@ -1736,6 +1790,7 @@ namespace ZiplaKac.Utils
             menuText.horizontalOverflow = HorizontalWrapMode.Wrap;
             menuText.verticalOverflow = VerticalWrapMode.Truncate;
             menuText.raycastTarget = false;
+            goUI.mainMenuButtonText = menuText;
 
             panel.SetActive(false);
             if (UIManager.Instance != null) UIManager.Instance.gameOverPanel = panel;

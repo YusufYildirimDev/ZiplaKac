@@ -45,6 +45,7 @@ namespace ZiplaKac.UI
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += UpdateSlideDisplay;
             transform.SetAsLastSibling();
 
             CanvasGroup cg = GetComponent<CanvasGroup>();
@@ -65,6 +66,7 @@ namespace ZiplaKac.UI
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= UpdateSlideDisplay;
             if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(true);
@@ -139,9 +141,10 @@ namespace ZiplaKac.UI
             }
 
             // 2. Başlık ve Rozet Metinleri
+            bool isEn = LocalizationManager.CurrentLanguage == LocalizationManager.LANG_EN;
             if (stepBadgeText != null)
             {
-                stepBadgeText.text = $"REHBER • ADIM {currentSlideIndex + 1} / {total}";
+                stepBadgeText.text = isEn ? $"GUIDE • STEP {currentSlideIndex + 1} / {total}" : $"REHBER • ADIM {currentSlideIndex + 1} / {total}";
             }
 
             if (titleText != null)
@@ -149,16 +152,16 @@ namespace ZiplaKac.UI
                 switch (currentSlideIndex)
                 {
                     case 0:
-                        titleText.text = "OYUN KURALLARI & KONTROLLER";
+                        titleText.text = isEn ? "GAME RULES & CONTROLS" : "OYUN KURALLARI & KONTROLLER";
                         break;
                     case 1:
-                        titleText.text = "5 KARAKTER & KİLİT ZİNCİRİ";
+                        titleText.text = isEn ? "5 CHARACTERS & UNLOCK CHAIN" : "5 KARAKTER & KİLİT ZİNCİRİ";
                         break;
                     case 2:
-                        titleText.text = "GÜÇLER & YÜKSELTMELER";
+                        titleText.text = isEn ? "POWERS & UPGRADES" : "GÜÇLER & YÜKSELTMELER";
                         break;
                     case 3:
-                        titleText.text = "GÜNLÜK SANDIK & GARDIROP";
+                        titleText.text = isEn ? "DAILY CHEST & WARDROBE" : "GÜNLÜK SANDIK & GARDIROP";
                         break;
                 }
             }
@@ -217,7 +220,9 @@ namespace ZiplaKac.UI
             // 4. Sonraki Butonu Metni (Son slaytta "🚀 HADİ BAŞLAYALIM!" olur)
             if (nextButtonText != null)
             {
-                nextButtonText.text = (currentSlideIndex == total - 1) ? "🚀 HADİ BAŞLAYALIM!" : "SONRAKİ ➔";
+                nextButtonText.text = (currentSlideIndex == total - 1)
+                    ? (isEn ? "🚀 LET'S GO!" : "🚀 HADİ BAŞLAYALIM!")
+                    : (isEn ? "NEXT ➔" : "SONRAKİ ➔");
             }
 
             // 5. Sayfa Göstergeleri (Dots)

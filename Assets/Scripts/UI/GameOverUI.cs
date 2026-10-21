@@ -30,13 +30,17 @@ namespace ZiplaKac.UI
         public Text revivePriceText;
 
         public Button restartButton;
+        public Text restartButtonText;
         public Button mainMenuButton;
+        public Text mainMenuButtonText;
         public Button rewardedAdButton;
         public Text rewardedAdButtonText;
         public GameObject rewardedAdBadge;
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += RefreshGameOverStats;
+
             if (reviveButton != null)
             {
                 reviveButton.onClick.RemoveAllListeners();
@@ -63,11 +67,16 @@ namespace ZiplaKac.UI
                 if (rewardedAdBadge != null) rewardedAdBadge.SetActive(true);
                 if (rewardedAdButtonText != null)
                 {
-                    rewardedAdButtonText.text = "REKLAM İZLE";
+                    rewardedAdButtonText.text = LocalizationManager.Get("go_btn_ad");
                 }
             }
 
             RefreshGameOverStats();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= RefreshGameOverStats;
         }
 
         private void OnRewardedAdButtonClicked()
@@ -82,7 +91,7 @@ namespace ZiplaKac.UI
                     if (rewardedAdBadge != null) rewardedAdBadge.SetActive(false);
                     if (rewardedAdButtonText != null)
                     {
-                        rewardedAdButtonText.text = "✓ +100 ALTIN";
+                        rewardedAdButtonText.text = LocalizationManager.Get("go_btn_ad_claimed");
                     }
                 },
                 () => {
@@ -122,14 +131,14 @@ namespace ZiplaKac.UI
             int highScore = GameManager.Instance.HighScore;
 
             if (finalScoreText != null) finalScoreText.text = $"{finalScore:N0}";
-            if (highScoreText != null) highScoreText.text = $"En İyi Skor: {highScore:N0}";
+            if (highScoreText != null) highScoreText.text = LocalizationManager.GetFormat("go_high_score", highScore.ToString("N0"));
 
             if (goldEarnedText != null)
             {
                 int runGold = GameManager.Instance.CurrentRunGold;
                 int totalGold = SaveSystem.GetTotalGold();
                 goldEarnedText.supportRichText = true;
-                goldEarnedText.text = $"+<color=#f6c445><b>{runGold}</b></color> <color=#cbd5e1><b>ALTIN KAZANDIN</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>KASA:</b></color> <color=#f6c445><b>{totalGold:N0}</b></color> <color=#cbd5e1><b>ALTIN</b></color>";
+                goldEarnedText.text = LocalizationManager.GetFormat("go_gold_earned", runGold, totalGold.ToString("N0"));
                 if (goldEarnedText.transform.parent != null)
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(goldEarnedText.transform.parent.GetComponent<RectTransform>());
@@ -141,6 +150,8 @@ namespace ZiplaKac.UI
             if (newRecordBadge != null)
             {
                 newRecordBadge.SetActive(isNewRecord);
+                Text badgeText = newRecordBadge.GetComponentInChildren<Text>();
+                if (badgeText != null) badgeText.text = LocalizationManager.Get("go_new_record");
             }
 
             if (isNewRecord)
@@ -157,8 +168,12 @@ namespace ZiplaKac.UI
                     newCharacterUnlockedBadge.SetActive(true);
                     if (newCharacterUnlockedText != null)
                     {
-                        string charName = SaveSystem.GetCharacterDisplayName(GameManager.NewlyUnlockedCharacterId);
-                        newCharacterUnlockedText.text = $"🎉 YENİ KARAKTER AÇILDI: {charName.ToUpper()}! 🎉";
+                        string charName = LocalizationManager.Get($"char_{GameManager.NewlyUnlockedCharacterId}_name");
+                        if (string.IsNullOrEmpty(charName) || charName == $"char_{GameManager.NewlyUnlockedCharacterId}_name")
+                        {
+                            charName = SaveSystem.GetCharacterDisplayName(GameManager.NewlyUnlockedCharacterId);
+                        }
+                        newCharacterUnlockedText.text = LocalizationManager.GetFormat("char_unlocked_toast", charName.ToUpper());
                     }
                 }
             }
@@ -177,7 +192,7 @@ namespace ZiplaKac.UI
                 }
                 else
                 {
-                    scoreHistoryListText.text = "Son Skorlar: " + string.Join(" • ", history);
+                    scoreHistoryListText.text = LocalizationManager.GetFormat("go_last_scores", string.Join(" • ", history));
                 }
             }
 
@@ -190,7 +205,7 @@ namespace ZiplaKac.UI
 
                 if (reviveButtonText != null)
                 {
-                    reviveButtonText.text = canAfford ? "CAN AL\nDEVAM ET" : "CAN AL\n(500 ALTIN)";
+                    reviveButtonText.text = canAfford ? LocalizationManager.Get("go_btn_revive_afford") : LocalizationManager.Get("go_btn_revive_cost");
                     reviveButtonText.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
                 }
 
@@ -198,6 +213,15 @@ namespace ZiplaKac.UI
                 {
                     reviveHeartIcon.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
                 }
+            }
+
+            if (restartButtonText != null)
+            {
+                restartButtonText.text = LocalizationManager.Get("go_btn_retry");
+            }
+            if (mainMenuButtonText != null)
+            {
+                mainMenuButtonText.text = LocalizationManager.Get("go_btn_menu");
             }
         }
 

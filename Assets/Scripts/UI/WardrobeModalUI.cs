@@ -112,12 +112,14 @@ namespace ZiplaKac.UI
                 UIManager.Instance.mainMenuPanel.SetActive(false);
             }
 
+            LocalizationManager.OnLanguageChanged += RefreshUI;
             RefreshUI();
             if (itemsScrollRect != null) itemsScrollRect.verticalNormalizedPosition = 1f;
         }
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshUI;
             if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(true);
@@ -135,7 +137,7 @@ namespace ZiplaKac.UI
         public void RefreshUI()
         {
             int gold = SaveSystem.GetTotalGold();
-            if (totalGoldText != null) totalGoldText.text = $"🪙 Toplam Altın: {gold}";
+            if (totalGoldText != null) totalGoldText.text = LocalizationManager.GetFormat("shop_total_gold", gold);
             if (statusMessageText != null) statusMessageText.text = "";
 
             UpdateTabButtonStyles();
@@ -148,7 +150,7 @@ namespace ZiplaKac.UI
 
             if (currentTab == ShopTab.Upgrades)
             {
-                if (titleText != null) titleText.text = "GÜÇLER &\nYÜKSELTMELER";
+                if (titleText != null) titleText.text = LocalizationManager.Get("shop_title_upgrades");
                 if (headerIllustration != null)
                 {
                     Sprite upgHdr = Resources.Load<Sprite>("Sprites/UI_Shop/header_upgrades");
@@ -158,7 +160,7 @@ namespace ZiplaKac.UI
             }
             else
             {
-                if (titleText != null) titleText.text = "GARDIROP\n(KIYAFETLER)";
+                if (titleText != null) titleText.text = LocalizationManager.Get("shop_title_wardrobe");
                 if (headerIllustration != null)
                 {
                     Sprite wardHdr = Resources.Load<Sprite>("Sprites/UI_Shop/header_wardrobe");
@@ -180,14 +182,14 @@ namespace ZiplaKac.UI
 
             if (tabUpgradesText != null)
             {
-                tabUpgradesText.text = "📊  YÜKSELTMELER";
+                tabUpgradesText.text = LocalizationManager.Get("shop_tab_upgrades");
                 tabUpgradesText.color = (currentTab == ShopTab.Upgrades) ? activeTextColor : inactiveTextColor;
                 tabUpgradesText.fontStyle = FontStyle.Bold;
                 tabUpgradesText.fontSize = (currentTab == ShopTab.Upgrades) ? 30 : 28;
             }
             if (tabOutfitsText != null)
             {
-                tabOutfitsText.text = "👕  GARDIROP";
+                tabOutfitsText.text = LocalizationManager.Get("shop_tab_outfits");
                 tabOutfitsText.color = (currentTab == ShopTab.Outfits) ? activeTextColor : inactiveTextColor;
                 tabOutfitsText.fontStyle = FontStyle.Bold;
                 tabOutfitsText.fontSize = (currentTab == ShopTab.Outfits) ? 30 : 28;
@@ -232,22 +234,26 @@ namespace ZiplaKac.UI
                 rowIndex++;
 
                 int count = SaveSystem.GetConsumableCount(cfg.id);
-                string subtitle = $"{cfg.description}\n<color=#10B981>Envanter: {count}</color>";
+                string itemName = LocalizationManager.Get($"item_{cfg.id}_name", cfg.displayName);
+                string itemDesc = LocalizationManager.Get($"item_{cfg.id}_desc", cfg.description);
+                string invText = LocalizationManager.GetFormat("shop_inventory", count);
+                string subtitle = $"{itemDesc}\n<color=#10B981>{invText}</color>";
 
                 Color goldBtnColor = new Color(0.98f, 0.75f, 0.14f); // #FBBF24 Altın Sarı
+                string btnBuy = LocalizationManager.Get("shop_btn_buy");
 
-                GameObject row = CreateRowObject($"Consumable_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, cfg.price, "AL", font, () => {
+                GameObject row = CreateRowObject($"Consumable_{cfg.id}", yPos, rowHeight, itemName, subtitle, cfg.price, btnBuy, font, () => {
                     if (SaveSystem.PurchaseConsumable(cfg.id, cfg.price))
                     {
                         AudioManager.Instance?.PlayNewRecordSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
-                        ShowStatus($"🎉 {cfg.displayName} satın alındı! (+1 Envanter)", new Color(0.06f, 0.84f, 0.58f));
+                        ShowStatus(LocalizationManager.GetFormat("shop_toast_bought_consumable", itemName), new Color(0.06f, 0.84f, 0.58f));
                         RefreshUI();
                     }
                     else
                     {
                         AudioManager.Instance?.PlayGameOverSound();
-                        ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
+                        ShowStatus(LocalizationManager.Get("shop_toast_no_gold"), new Color(0.95f, 0.35f, 0.40f));
                     }
                 }, goldBtnColor, null, null, null, cfg.id);
                 spawnedRows.Add(row);
@@ -263,26 +269,31 @@ namespace ZiplaKac.UI
                 int currentLvl = SaveSystem.GetUpgradeLevel(charKey, cfg.id);
                 bool isMax = currentLvl >= cfg.maxLevel;
 
-                string subtitle = cfg.maxLevel > 1
-                    ? $"{cfg.description}\n<color=#FBBF24>Seviye {currentLvl}/{cfg.maxLevel}</color>"
-                    : (isMax ? $"{cfg.description}\n<color=#10B981>Açık</color>" : cfg.description);
+                string itemName = LocalizationManager.Get($"item_{cfg.id}_name", cfg.displayName);
+                string itemDesc = LocalizationManager.Get($"item_{cfg.id}_desc", cfg.description);
 
-                string btnLabel = isMax ? "MAX" : (cfg.maxLevel > 1 ? "YÜKSELT" : "AÇ");
+                string subtitle = cfg.maxLevel > 1
+                    ? $"{itemDesc}\n<color=#FBBF24>{LocalizationManager.GetFormat("shop_level", currentLvl, cfg.maxLevel)}</color>"
+                    : (isMax ? $"{itemDesc}\n<color=#10B981>{LocalizationManager.Get("shop_open")}</color>" : itemDesc);
+
+                string btnLabel = isMax 
+                    ? LocalizationManager.Get("shop_btn_max") 
+                    : (cfg.maxLevel > 1 ? LocalizationManager.Get("shop_btn_upgrade") : LocalizationManager.Get("shop_btn_unlocked"));
                 Color btnColor = isMax ? new Color(0.20f, 0.25f, 0.35f) : new Color(0.06f, 0.84f, 0.58f);
 
-                GameObject row = CreateRowObject($"Upgrade_{cfg.id}", yPos, rowHeight, cfg.displayName, subtitle, isMax ? 0 : cfg.price, btnLabel, font, () => {
+                GameObject row = CreateRowObject($"Upgrade_{cfg.id}", yPos, rowHeight, itemName, subtitle, isMax ? 0 : cfg.price, btnLabel, font, () => {
                     if (isMax) return;
                     if (SaveSystem.PurchaseUpgrade(charKey, cfg.id, cfg.price, cfg.maxLevel))
                     {
                         AudioManager.Instance?.PlayNewRecordSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
-                        ShowStatus($"🎉 {cfg.displayName} seviye atladı!", new Color(0.06f, 0.84f, 0.58f));
+                        ShowStatus(LocalizationManager.GetFormat("shop_toast_upgraded", itemName), new Color(0.06f, 0.84f, 0.58f));
                         RefreshUI();
                     }
                     else
                     {
                         AudioManager.Instance?.PlayGameOverSound();
-                        ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
+                        ShowStatus(LocalizationManager.Get("shop_toast_no_gold"), new Color(0.95f, 0.35f, 0.40f));
                     }
                 }, btnColor, null, null, null, cfg.id);
                 spawnedRows.Add(row);
@@ -316,8 +327,14 @@ namespace ZiplaKac.UI
                 bool isPurchased = SaveSystem.IsOutfitPurchased(charKey, cfg.outfitType);
                 bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, cfg.outfitType);
 
-                string subtitle = isPurchased ? "<color=#10B981>Sahipsin</color>" : $"Fiyat: {cfg.price} Altın";
-                string btnLabel = !isPurchased ? "AL" : (isEquipped ? "GİYİLDİ" : "GİY");
+                string itemName = LocalizationManager.Get($"outfit_{cfg.outfitType}_name", cfg.displayName);
+                string subtitle = isPurchased 
+                    ? $"<color=#10B981>{LocalizationManager.Get("shop_owned")}</color>" 
+                    : LocalizationManager.GetFormat("shop_price_label", cfg.price);
+
+                string btnLabel = !isPurchased 
+                    ? LocalizationManager.Get("shop_btn_buy") 
+                    : (isEquipped ? LocalizationManager.Get("shop_btn_equipped") : LocalizationManager.Get("shop_btn_equip"));
                 Color btnColor = !isPurchased 
                     ? new Color(0.98f, 0.75f, 0.14f) 
                     : (isEquipped ? new Color(0.12f, 0.55f, 0.88f) : new Color(0.06f, 0.84f, 0.58f));
@@ -325,21 +342,21 @@ namespace ZiplaKac.UI
                 string currentType = cfg.outfitType;
                 int cost = cfg.price;
 
-                GameObject row = CreateRowObject($"Outfit_{cfg.outfitType}", yPos, rowHeight, cfg.displayName, subtitle, isPurchased ? 0 : cfg.price, btnLabel, font, () => {
+                GameObject row = CreateRowObject($"Outfit_{cfg.outfitType}", yPos, rowHeight, itemName, subtitle, isPurchased ? 0 : cfg.price, btnLabel, font, () => {
                     if (!isPurchased)
                     {
                         if (SaveSystem.PurchaseOutfit(charKey, currentType, cost))
                         {
                             AudioManager.Instance?.PlayNewRecordSound();
                             AudioManager.Instance?.TriggerHapticFeedback();
-                            ShowStatus("🎉 Satın alındı ve giyildi!", new Color(0.06f, 0.84f, 0.58f));
+                            ShowStatus(LocalizationManager.Get("shop_toast_bought_outfit"), new Color(0.06f, 0.84f, 0.58f));
                             PlayerController.Instance?.UpdateCharacterAppearance();
                             RefreshUI();
                         }
                         else
                         {
                             AudioManager.Instance?.PlayGameOverSound();
-                            ShowStatus("⚠️ Yetersiz altın! Koşulardan altın topla.", new Color(0.95f, 0.35f, 0.40f));
+                            ShowStatus(LocalizationManager.Get("shop_toast_no_gold"), new Color(0.95f, 0.35f, 0.40f));
                         }
                     }
                     else
@@ -347,7 +364,7 @@ namespace ZiplaKac.UI
                         bool nowEq = SaveSystem.ToggleOutfitEquipped(charKey, currentType);
                         AudioManager.Instance?.PlayJumpSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
-                        ShowStatus(nowEq ? "✅ Kıyafet giyildi!" : "ℹ️ Kıyafet çıkarıldı.", nowEq ? new Color(0.06f, 0.84f, 0.58f) : new Color(0.7f, 0.8f, 0.9f));
+                        ShowStatus(nowEq ? LocalizationManager.Get("shop_toast_equipped") : LocalizationManager.Get("shop_toast_unequipped"), nowEq ? new Color(0.06f, 0.84f, 0.58f) : new Color(0.7f, 0.8f, 0.9f));
                         PlayerController.Instance?.UpdateCharacterAppearance();
                         RefreshUI();
                     }

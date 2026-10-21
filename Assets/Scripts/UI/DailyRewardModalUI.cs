@@ -70,6 +70,7 @@ namespace ZiplaKac.UI
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += RefreshUI;
             if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(false);
@@ -82,6 +83,7 @@ namespace ZiplaKac.UI
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshUI;
             if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(true);
@@ -90,6 +92,9 @@ namespace ZiplaKac.UI
 
         public void RefreshUI()
         {
+            if (titleText != null) titleText.text = LocalizationManager.Get("reward_title");
+            if (descriptionText != null) descriptionText.text = LocalizationManager.Get("reward_desc");
+
             bool canClaim = SaveSystem.CanClaimDailyReward();
             hasClaimed = !canClaim;
 
@@ -103,7 +108,7 @@ namespace ZiplaKac.UI
                 if (coinIconImage != null) coinIconImage.gameObject.SetActive(false);
                 if (statusText != null)
                 {
-                    statusText.text = "Bugünün sandığı açılmaya hazır!";
+                    statusText.text = LocalizationManager.Get("reward_ready");
                     statusText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
                 }
 
@@ -121,7 +126,7 @@ namespace ZiplaKac.UI
                 if (coinIconImage != null) coinIconImage.gameObject.SetActive(true);
                 if (statusText != null)
                 {
-                    statusText.text = $"{streak}. GÜN SERİSİ! +{goldReward} ALTIN KAZANDIN!";
+                    statusText.text = LocalizationManager.GetFormat("reward_streak", streak, goldReward);
                     statusText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
                 }
 
@@ -163,7 +168,7 @@ namespace ZiplaKac.UI
             if (coinIconImage != null) coinIconImage.gameObject.SetActive(true);
             if (statusText != null)
             {
-                statusText.text = $"{streak}. GÜN SERİSİ! +{goldReward} ALTIN KAZANDIN!";
+                statusText.text = LocalizationManager.GetFormat("reward_streak", streak, goldReward);
                 statusText.color = new Color(0.00f, 0.87f, 0.56f); // #00DE8E
             }
 

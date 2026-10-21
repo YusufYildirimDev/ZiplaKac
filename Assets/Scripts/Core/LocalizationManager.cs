@@ -1,0 +1,422 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace ZiplaKac.Core
+{
+    /// <summary>
+    /// Çoklu dil yöneticisi (Türkçe & İngilizce).
+    /// Otomatik cihaz dili tespiti, PlayerPrefs ile kalıcı dil tercihi,
+    /// anlık dil değiştirme ve tüm arayüzlerin dinamik güncellenmesini sağlar.
+    /// </summary>
+    public class LocalizationManager : MonoBehaviour
+    {
+        public static LocalizationManager Instance { get; private set; }
+
+        public const string PREF_KEY_LANGUAGE = "app_language";
+        public const string LANG_TR = "tr";
+        public const string LANG_EN = "en";
+
+        public static event Action OnLanguageChanged;
+
+        private static string currentLanguage = LANG_TR;
+        public static string CurrentLanguage => currentLanguage;
+
+        private static readonly Dictionary<string, string> localizedStrings = new Dictionary<string, string>();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void AutoInitialize()
+        {
+            InitializeLanguage();
+        }
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                InitializeLanguage();
+            }
+            else if (Instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        public static void InitializeLanguage()
+        {
+            if (PlayerPrefs.HasKey(PREF_KEY_LANGUAGE))
+            {
+                currentLanguage = PlayerPrefs.GetString(PREF_KEY_LANGUAGE, LANG_TR);
+            }
+            else
+            {
+                currentLanguage = (Application.systemLanguage == SystemLanguage.Turkish) ? LANG_TR : LANG_EN;
+                PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
+                PlayerPrefs.Save();
+            }
+
+            LoadLanguageStrings(currentLanguage);
+        }
+
+        public static void SetLanguage(string langCode)
+        {
+            if (langCode != LANG_TR && langCode != LANG_EN) langCode = LANG_EN;
+            if (currentLanguage == langCode && localizedStrings.Count > 0) return;
+
+            currentLanguage = langCode;
+            PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
+            PlayerPrefs.Save();
+
+            LoadLanguageStrings(currentLanguage);
+            OnLanguageChanged?.Invoke();
+        }
+
+        public static void ToggleLanguage()
+        {
+            SetLanguage(currentLanguage == LANG_TR ? LANG_EN : LANG_TR);
+        }
+
+        public static string Get(string key, string fallback = null)
+        {
+            if (string.IsNullOrEmpty(key)) return "";
+            if (localizedStrings.TryGetValue(key, out string value))
+            {
+                return value;
+            }
+            return fallback ?? key;
+        }
+
+        public static string GetFormat(string key, params object[] args)
+        {
+            string format = Get(key);
+            try
+            {
+                return string.Format(format, args);
+            }
+            catch
+            {
+                return format;
+            }
+        }
+
+        private static void LoadLanguageStrings(string lang)
+        {
+            localizedStrings.Clear();
+
+            // 1. Önce kod içi dahili sözlüğü yükle (Garanti fallback)
+            var defaults = (lang == LANG_EN) ? EnglishDictionary : TurkishDictionary;
+            foreach (var kvp in defaults)
+            {
+                localizedStrings[kvp.Key] = kvp.Value;
+            }
+
+            // 2. Varsa Resources/Localization/strings_{lang}.json üzerinden üzerine yaz
+            try
+            {
+                TextAsset jsonFile = Resources.Load<TextAsset>($"Localization/strings_{lang}");
+                if (jsonFile != null && !string.IsNullOrEmpty(jsonFile.text))
+                {
+                    ParseJsonIntoDictionary(jsonFile.text, localizedStrings);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LocalizationManager] JSON yüklenirken hata: {ex.Message}");
+            }
+        }
+
+        private static void ParseJsonIntoDictionary(string json, Dictionary<string, string> dict)
+        {
+            // Hafif JSON sözlük ayrıştırıcı ("key": "value")
+            int idx = 0;
+            while (idx < json.Length)
+            {
+                int keyStart = json.IndexOf('"', idx);
+                if (keyStart < 0) break;
+                int keyEnd = json.IndexOf('"', keyStart + 1);
+                if (keyEnd < 0) break;
+                string key = json.Substring(keyStart + 1, keyEnd - keyStart - 1);
+
+                int colon = json.IndexOf(':', keyEnd + 1);
+                if (colon < 0) break;
+
+                int valStart = json.IndexOf('"', colon + 1);
+                if (valStart < 0) break;
+
+                // Handle escaped quotes inside value
+                int valEnd = valStart + 1;
+                while (valEnd < json.Length)
+                {
+                    if (json[valEnd] == '"' && json[valEnd - 1] != '\\')
+                    {
+                        break;
+                    }
+                    valEnd++;
+                }
+                if (valEnd >= json.Length) break;
+
+                string val = json.Substring(valStart + 1, valEnd - valStart - 1)
+                    .Replace("\\\"", "\"")
+                    .Replace("\\n", "\n")
+                    .Replace("\\r", "");
+
+                dict[key] = val;
+                idx = valEnd + 1;
+            }
+        }
+
+        #region Builtin Dictionaries
+
+        private static readonly Dictionary<string, string> TurkishDictionary = new Dictionary<string, string>
+        {
+            // Genel
+            { "lang_code", "TR" },
+            { "lang_display", "🇹🇷 TR" },
+            { "btn_close", "KAPAT" },
+            { "gold", "ALTIN" },
+            { "score", "SKOR" },
+            { "best", "EN İYİ" },
+
+            // Ana Menü
+            { "app_title", "= HOPPZY =" },
+            { "app_subtitle", "tek dokunuş, sonsuz kaçış" },
+            { "menu_select_character", "KARAKTER SEÇ" },
+            { "menu_play", "▶   OYNA" },
+            { "menu_shop_line1", "MAĞAZA &" },
+            { "menu_shop_line2", "GARDIROP" },
+            { "menu_reward_line1", "GÜNLÜK" },
+            { "menu_reward_line2", "ÖDÜL" },
+            { "menu_rules_line1", "NASIL" },
+            { "menu_rules_line2", "OYNANIR?" },
+            { "menu_ad_line1", "REKLAM İZLE" },
+            { "menu_ad_line2", "CAN AL  ❤️" },
+            { "menu_toast_reward", "❤️ +1 CAN & +25 ALTIN KAZANDIN!" },
+            { "menu_toast_ad_not_ready", "Reklam henüz hazır değil!" },
+
+            // HUD
+            { "hud_score_label", "SKOR" },
+            { "hud_gold_label", "ALTIN" },
+            { "hud_best_label", "EN İYİ" },
+            { "hud_badge_shield", "Kalkan" },
+            { "hud_badge_slow", "Yavaş" },
+            { "hud_badge_multi", "x2 Puan" },
+            { "hud_cd_shield", "KALKAN" },
+            { "hud_cd_slow", "YAVAŞ" },
+            { "hud_cd_multi", "X2 PUAN" },
+            { "hud_control_tip", "DOKUN: ZIPLA  •  ÇİFT DOKUN: ÇİFT ZIPLA" },
+            { "hud_combo_banner", "{0}X KOMBO!" },
+
+            // Mağaza & Gardırop
+            { "shop_title_upgrades", "GÜÇLER &\nYÜKSELTMELER" },
+            { "shop_title_wardrobe", "GARDIROP\n(KIYAFETLER)" },
+            { "shop_tab_upgrades", "📊  YÜKSELTMELER" },
+            { "shop_tab_outfits", "👕  GARDIROP" },
+            { "shop_total_gold", "🪙 Toplam Altın: {0}" },
+            { "shop_btn_buy", "AL" },
+            { "shop_btn_upgrade", "YÜKSELT" },
+            { "shop_btn_equip", "GİY" },
+            { "shop_btn_equipped", "GİYİLDİ" },
+            { "shop_btn_unequip", "ÇIKAR" },
+            { "shop_btn_max", "MAX" },
+            { "shop_btn_unlocked", "AÇ" },
+            { "shop_owned", "Sahipsin" },
+            { "shop_open", "Açık" },
+            { "shop_inventory", "Envanter: {0}" },
+            { "shop_level", "Seviye {0}/{1}" },
+            { "shop_price_label", "Fiyat: {0} Altın" },
+            { "shop_toast_bought_consumable", "🎉 {0} satın alındı! (+1 Envanter)" },
+            { "shop_toast_upgraded", "🎉 {0} seviye atladı!" },
+            { "shop_toast_bought_outfit", "🎉 Satın alındı ve giyildi!" },
+            { "shop_toast_equipped", "✅ Kıyafet giyildi!" },
+            { "shop_toast_unequipped", "ℹ️ Kıyafet çıkarıldı." },
+            { "shop_toast_no_gold", "⚠️ Yetersiz altın! Koşulardan altın topla." },
+
+            // Mağaza Eşya İsimleri & Açıklamaları
+            { "item_shield_name", "Başlangıç Kalkanı" },
+            { "item_shield_desc", "Oyuna 1 kalkanla başla." },
+            { "item_slow_start_name", "Yavaş Başlangıç" },
+            { "item_slow_start_desc", "İlk 5 sn engel hızı %30 yavaş." },
+            { "item_lucky_pu_name", "Şanslı Güçlendirme" },
+            { "item_lucky_pu_desc", "İlk küre garantili 3 saniyede." },
+            { "item_second_chance_name", "İkinci Şans Bileti" },
+            { "item_second_chance_desc", "Çarpışınca 1 kez ücretsiz devam et." },
+            { "item_pu_duration_name", "Güçlendirme Süresi" },
+            { "item_pu_duration_desc", "Kalkan/yavaş/x2 süreleri +%20 uzar." },
+            { "item_double_jump_name", "Çift Zıplama Ustası" },
+            { "item_double_jump_desc", "2. zıplama yüksekliği +%15 artar." },
+            { "item_combo_memory_name", "Kombo Hafızası" },
+            { "item_combo_memory_desc", "Çarpışmada kombonun yarısı korunur." },
+            { "item_signature_name", "İmza Yeteneği +1" },
+            { "item_signature_desc", "Karakterin özel yeteneği güçlenir." },
+
+            // Gardırop Kıyafetleri
+            { "outfit_pelerin_name", "Pelerin" },
+            { "outfit_gunes_gozlugu_name", "Güneş Gözlüğü" },
+            { "outfit_parti_sapkasi_name", "Parti Şapkası" },
+            { "outfit_ozel_aksesuar_name", "Özel Aksesuar" },
+
+            // Karakterler
+            { "char_classic_name", "Klasik" },
+            { "char_classic_ability", "Dengeli Koşucu" },
+            { "char_fire_name", "Ateş" },
+            { "char_fire_ability", "Alev İzi & Hız" },
+            { "char_ice_name", "Buz" },
+            { "char_ice_ability", "Kayma & Yavaş Düşüş" },
+            { "char_poison_name", "Zehir" },
+            { "char_poison_ability", "Zehir Kalkanı" },
+            { "char_night_name", "Gece" },
+            { "char_night_ability", "Gölge Adımı & Çift Zıplama" },
+            { "char_unlock_hint", "{0} Skora Ulaşarak Aç" },
+            { "char_unlocked_toast", "🎉 YENİ KARAKTER AÇILDI: {0}! 🎉" },
+
+            // Oyun Sonu (Game Over)
+            { "go_title", "OYUN BİTTİ" },
+            { "go_new_record", "★ YENİ REKOR! ★" },
+            { "go_high_score", "En İyi Skor: {0}" },
+            { "go_gold_earned", "+<color=#f6c445><b>{0}</b></color> <color=#cbd5e1><b>ALTIN KAZANDIN</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>KASA:</b></color> <color=#f6c445><b>{1}</b></color> <color=#cbd5e1><b>ALTIN</b></color>" },
+            { "go_last_scores", "Son Skorlar: {0}" },
+            { "go_btn_revive_afford", "CAN AL\nDEVAM ET" },
+            { "go_btn_revive_cost", "CAN AL\n(500 ALTIN)" },
+            { "go_btn_retry", "TEKRAR DENE" },
+            { "go_btn_menu", "ANA MENÜ" },
+            { "go_btn_ad", "REKLAM İZLE" },
+            { "go_btn_ad_claimed", "✓ +100 ALTIN" },
+
+            // Günlük Ödül
+            { "reward_title", "GÜNLÜK ÖDÜL" },
+            { "reward_desc", "Her gün giriş yap, sandığı aç ve artan altın ödüllerini topla!" },
+            { "reward_ready", "Bugünün sandığı açılmaya hazır!" },
+            { "reward_streak", "{0}. GÜN SERİSİ! +{1} ALTIN KAZANDIN!" },
+            { "reward_claimed", "Bugünkü ödülünü zaten aldın. Yarın tekrar gel!" },
+            { "reward_btn_claim", "ÖDÜLÜ AL" }
+        };
+
+        private static readonly Dictionary<string, string> EnglishDictionary = new Dictionary<string, string>
+        {
+            // General
+            { "lang_code", "EN" },
+            { "lang_display", "🇬🇧 EN" },
+            { "btn_close", "CLOSE" },
+            { "gold", "GOLD" },
+            { "score", "SCORE" },
+            { "best", "BEST" },
+
+            // Main Menu
+            { "app_title", "= HOPPZY =" },
+            { "app_subtitle", "one tap, endless escape" },
+            { "menu_select_character", "SELECT CHARACTER" },
+            { "menu_play", "▶   PLAY" },
+            { "menu_shop_line1", "SHOP &" },
+            { "menu_shop_line2", "WARDROBE" },
+            { "menu_reward_line1", "DAILY" },
+            { "menu_reward_line2", "REWARD" },
+            { "menu_rules_line1", "HOW TO" },
+            { "menu_rules_line2", "PLAY?" },
+            { "menu_ad_line1", "WATCH AD" },
+            { "menu_ad_line2", "GET LIFE  ❤️" },
+            { "menu_toast_reward", "❤️ +1 LIFE & +25 GOLD EARNED!" },
+            { "menu_toast_ad_not_ready", "Ad is not ready yet!" },
+
+            // HUD
+            { "hud_score_label", "SCORE" },
+            { "hud_gold_label", "GOLD" },
+            { "hud_best_label", "BEST" },
+            { "hud_badge_shield", "Shield" },
+            { "hud_badge_slow", "Slow" },
+            { "hud_badge_multi", "x2 Score" },
+            { "hud_cd_shield", "SHIELD" },
+            { "hud_cd_slow", "SLOW" },
+            { "hud_cd_multi", "X2 SCORE" },
+            { "hud_control_tip", "TAP: JUMP  •  DOUBLE TAP: DOUBLE JUMP" },
+            { "hud_combo_banner", "{0}X COMBO!" },
+
+            // Shop & Wardrobe
+            { "shop_title_upgrades", "POWERS &\nUPGRADES" },
+            { "shop_title_wardrobe", "WARDROBE\n(OUTFITS)" },
+            { "shop_tab_upgrades", "📊  UPGRADES" },
+            { "shop_tab_outfits", "👕  WARDROBE" },
+            { "shop_total_gold", "🪙 Total Gold: {0}" },
+            { "shop_btn_buy", "BUY" },
+            { "shop_btn_upgrade", "UPGRADE" },
+            { "shop_btn_equip", "EQUIP" },
+            { "shop_btn_equipped", "EQUIPPED" },
+            { "shop_btn_unequip", "UNEQUIP" },
+            { "shop_btn_max", "MAX" },
+            { "shop_btn_unlocked", "UNLOCK" },
+            { "shop_owned", "Owned" },
+            { "shop_open", "Active" },
+            { "shop_inventory", "Inventory: {0}" },
+            { "shop_level", "Level {0}/{1}" },
+            { "shop_price_label", "Price: {0} Gold" },
+            { "shop_toast_bought_consumable", "🎉 {0} purchased! (+1 Inventory)" },
+            { "shop_toast_upgraded", "🎉 {0} upgraded!" },
+            { "shop_toast_bought_outfit", "🎉 Purchased & equipped!" },
+            { "shop_toast_equipped", "✅ Outfit equipped!" },
+            { "shop_toast_unequipped", "ℹ️ Outfit removed." },
+            { "shop_toast_no_gold", "⚠️ Not enough gold! Collect gold in runs." },
+
+            // Shop Items & Upgrades
+            { "item_shield_name", "Starter Shield" },
+            { "item_shield_desc", "Start the run with 1 shield." },
+            { "item_slow_start_name", "Slow Start" },
+            { "item_slow_start_desc", "Obstacles 30% slower for first 5s." },
+            { "item_lucky_pu_name", "Lucky Power-Up" },
+            { "item_lucky_pu_desc", "First power-up orb within 3s." },
+            { "item_second_chance_name", "Second Chance Ticket" },
+            { "item_second_chance_desc", "Continue once for free upon crash." },
+            { "item_pu_duration_name", "Power Duration" },
+            { "item_pu_duration_desc", "Shield/slow/x2 timers +20% longer." },
+            { "item_double_jump_name", "Double Jump Master" },
+            { "item_double_jump_desc", "2nd jump height increased +15%." },
+            { "item_combo_memory_name", "Combo Memory" },
+            { "item_combo_memory_desc", "Retain 50% combo upon crashing." },
+            { "item_signature_name", "Signature Ability +1" },
+            { "item_signature_desc", "Boosts character unique skill." },
+
+            // Wardrobe Outfits
+            { "outfit_pelerin_name", "Cape" },
+            { "outfit_gunes_gozlugu_name", "Sunglasses" },
+            { "outfit_parti_sapkasi_name", "Party Hat" },
+            { "outfit_ozel_aksesuar_name", "Royal Crown" },
+
+            // Characters
+            { "char_classic_name", "Classic" },
+            { "char_classic_ability", "Balanced Runner" },
+            { "char_fire_name", "Blaze" },
+            { "char_fire_ability", "Fire Trail & Speed" },
+            { "char_ice_name", "Frost" },
+            { "char_ice_ability", "Glide & Slow Fall" },
+            { "char_poison_name", "Venom" },
+            { "char_poison_ability", "Poison Shield" },
+            { "char_night_name", "Shadow" },
+            { "char_night_ability", "Shadow Step & Double Jump" },
+            { "char_unlock_hint", "Reach {0} Score to Unlock" },
+            { "char_unlocked_toast", "🎉 NEW CHARACTER UNLOCKED: {0}! 🎉" },
+
+            // Game Over
+            { "go_title", "GAME OVER" },
+            { "go_new_record", "★ NEW RECORD! ★" },
+            { "go_high_score", "Best Score: {0}" },
+            { "go_gold_earned", "+<color=#f6c445><b>{0}</b></color> <color=#cbd5e1><b>GOLD EARNED</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>VAULT:</b></color> <color=#f6c445><b>{1}</b></color> <color=#cbd5e1><b>GOLD</b></color>" },
+            { "go_last_scores", "Recent Scores: {0}" },
+            { "go_btn_revive_afford", "REVIVE &\nCONTINUE" },
+            { "go_btn_revive_cost", "REVIVE\n(500 GOLD)" },
+            { "go_btn_retry", "TRY AGAIN" },
+            { "go_btn_menu", "MAIN MENU" },
+            { "go_btn_ad", "WATCH AD" },
+            { "go_btn_ad_claimed", "✓ +100 GOLD" },
+
+            // Daily Reward
+            { "reward_title", "DAILY REWARD" },
+            { "reward_desc", "Log in every day, open the chest and collect increasing gold rewards!" },
+            { "reward_ready", "Today's chest is ready to open!" },
+            { "reward_streak", "DAY {0} STREAK! +{1} GOLD EARNED!" },
+            { "reward_claimed", "You already claimed today's reward. Come back tomorrow!" },
+            { "reward_btn_claim", "CLAIM REWARD" }
+        };
+
+        #endregion
+    }
+}

@@ -53,6 +53,7 @@ namespace ZiplaKac.UI
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += RefreshSelectionVisuals;
             SaveSystem.EnsureAvatarChainInitialized();
             currentSelectedId = SaveSystem.GetSelectedCharacterId("classic");
             if (!SaveSystem.IsCharacterUnlocked(currentSelectedId))
@@ -63,6 +64,11 @@ namespace ZiplaKac.UI
 
             RefreshSelectionVisuals();
             WorldThemeManager.Instance?.SetCharacter(currentSelectedId);
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= RefreshSelectionVisuals;
         }
 
         private static Font GetSafeFont()
@@ -416,8 +422,12 @@ namespace ZiplaKac.UI
             {
                 AudioManager.Instance?.PlayShieldHitSound();
                 AudioManager.Instance?.TriggerHapticFeedback();
-                string req = SaveSystem.GetUnlockRequirementText(characterId);
-                ShowLockNotice(req);
+                string prev = SaveSystem.GetPreviousCharacterInChain(characterId);
+                string prevName = LocalizationManager.Get($"char_{prev}_name", SaveSystem.GetCharacterDisplayName(prev));
+                string msg = LocalizationManager.CurrentLanguage == LocalizationManager.LANG_EN
+                    ? $"🔒 LOCKED: Reach 2500 score with {prevName} to unlock!"
+                    : $"🔒 KİLİTLİ: Bu karakteri açmak için {prevName} ile 2500 skor yap!";
+                ShowLockNotice(msg);
                 return;
             }
 
@@ -446,12 +456,12 @@ namespace ZiplaKac.UI
             WorldThemeManager.Instance?.SetCharacter(characterId);
         }
 
-        private void ShowLockNotice(string requirementText)
+        private void ShowLockNotice(string message)
         {
             if (lockNoticeObj == null) CreateLockNoticeBanner();
             if (lockNoticeObj == null || lockNoticeText == null) return;
 
-            lockNoticeText.text = $"🔒 KİLİTLİ: Bu karakteri açmak için {requirementText}!";
+            lockNoticeText.text = message;
             lockNoticeObj.SetActive(true);
 
             if (lockNoticeCoroutine != null) StopCoroutine(lockNoticeCoroutine);
@@ -497,6 +507,7 @@ namespace ZiplaKac.UI
 
                 if (card.nameText != null)
                 {
+                    card.nameText.text = LocalizationManager.Get($"char_{card.characterId}_name", card.characterName);
                     if (isSelected)
                     {
                         card.nameText.color = Color.white;

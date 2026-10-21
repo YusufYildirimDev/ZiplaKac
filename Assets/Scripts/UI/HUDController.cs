@@ -65,18 +65,22 @@ namespace ZiplaKac.UI
                 RectTransform rt = comboBannerObject.GetComponent<RectTransform>();
                 if (rt != null) comboBasePosition = rt.anchoredPosition;
             }
+            RefreshHUDLanguage();
         }
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += RefreshHUDLanguage;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnComboAchieved += HandleComboAchieved;
             }
+            RefreshHUDLanguage();
         }
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshHUDLanguage;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnComboAchieved -= HandleComboAchieved;
@@ -90,6 +94,14 @@ namespace ZiplaKac.UI
             {
                 StopCoroutine(pulseCoroutine);
                 pulseCoroutine = null;
+            }
+        }
+
+        private void RefreshHUDLanguage()
+        {
+            if (controlTipText != null)
+            {
+                controlTipText.text = LocalizationManager.Get("hud_control_tip", "DOKUN: ZIPLA  •  ÇİFT DOKUN: ÇİFT ZIPLA");
             }
         }
 
@@ -110,7 +122,7 @@ namespace ZiplaKac.UI
 
         private IEnumerator AnimateComboBanner(int comboCount)
         {
-            comboBannerText.text = $"KOMBO x{comboCount}! +10";
+            comboBannerText.text = $"{LocalizationManager.GetFormat("hud_combo_banner", comboCount)} +10";
             comboBannerObject.SetActive(true);
 
             RectTransform rt = comboBannerObject.GetComponent<RectTransform>();
@@ -190,9 +202,13 @@ namespace ZiplaKac.UI
 
             // 1. Skor ve Altın Güncellemeleri (Büyük ve Belirgin Arcade Formatı)
             int scoreInt = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
-            if (currentScoreText != null) currentScoreText.text = $"<size=20><color=#8da4c4>SKOR</color></size>\n<size=42><color=#ffffff><b>{scoreInt}</b></color></size>";
-            if (highScoreText != null) highScoreText.text = $"<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>{GameManager.Instance.HighScore}</b></color></size>";
-            if (goldText != null) goldText.text = $"<size=18><color=#ffd166>ALTIN</color></size>\n<size=38><color=#ffea79><b>{GameManager.Instance.CurrentRunGold}</b></color></size>";
+            string scoreLbl = LocalizationManager.Get("hud_score_label", "SKOR");
+            string bestLbl = LocalizationManager.Get("hud_best_label", "EN İYİ");
+            string goldLbl = LocalizationManager.Get("hud_gold_label", "ALTIN");
+
+            if (currentScoreText != null) currentScoreText.text = $"<size=20><color=#8da4c4>{scoreLbl}</color></size>\n<size=42><color=#ffffff><b>{scoreInt}</b></color></size>";
+            if (highScoreText != null) highScoreText.text = $"<size=20><color=#ffd166>{bestLbl}</color></size>\n<size=42><color=#ffffff><b>{GameManager.Instance.HighScore}</b></color></size>";
+            if (goldText != null) goldText.text = $"<size=18><color=#ffd166>{goldLbl}</color></size>\n<size=38><color=#ffea79><b>{GameManager.Instance.CurrentRunGold}</b></color></size>";
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler
             UpdatePowerUpBadges();
@@ -206,7 +222,7 @@ namespace ZiplaKac.UI
             // Kalkan Rozeti
             bool shield = GameManager.Instance.isShieldActive;
             if (shieldBadgeObject != null) shieldBadgeObject.SetActive(shield);
-            if (shieldBadgeText != null && shield) shieldBadgeText.text = "Kalkan";
+            if (shieldBadgeText != null && shield) shieldBadgeText.text = LocalizationManager.Get("hud_badge_shield", "Kalkan");
 
             // Yavaşlatma Rozeti
             bool slow = GameManager.Instance.isSlowActive;
@@ -214,7 +230,7 @@ namespace ZiplaKac.UI
             if (slowBadgeText != null && slow)
             {
                 int sec = Mathf.CeilToInt(GameManager.Instance.slowTimer);
-                slowBadgeText.text = $"Yavaş {sec}s";
+                slowBadgeText.text = $"{LocalizationManager.Get("hud_badge_slow", "Yavaş")} {sec}s";
             }
 
             // x2 Skor Rozeti
@@ -223,7 +239,7 @@ namespace ZiplaKac.UI
             if (multiBadgeText != null && multi)
             {
                 int sec = Mathf.CeilToInt(GameManager.Instance.doubleScoreTimer);
-                multiBadgeText.text = $"x2 Puan {sec}s";
+                multiBadgeText.text = $"{LocalizationManager.Get("hud_badge_multi", "x2 Puan")} {sec}s";
             }
         }
 
@@ -261,7 +277,7 @@ namespace ZiplaKac.UI
                 Color ringColor = current == PowerupType.Multi ? multiColor : slowColor;
                 if (countdownRingImage != null) countdownRingImage.color = ringColor;
                 if (countdownLabelText != null)
-                    countdownLabelText.text = current == PowerupType.Multi ? "X2 PUAN" : "YAVAŞ";
+                    countdownLabelText.text = current == PowerupType.Multi ? LocalizationManager.Get("hud_cd_multi", "X2 PUAN") : LocalizationManager.Get("hud_cd_slow", "YAVAŞ");
 
                 // Pulse animasyonu başlat
                 if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
