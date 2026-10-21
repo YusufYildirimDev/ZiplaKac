@@ -207,6 +207,8 @@ namespace ZiplaKac.Core
         private const string KEY_DAILY_STREAK = "ZiplaKac_DailyStreak";
         private const string KEY_LAST_STREAK_DATE = "ZiplaKac_LastStreakDate";
 
+        public static event System.Action OnConsumablesChanged;
+
         // Consumables: "shield", "slow_start", "lucky_pu", "second_chance"
         public static int GetConsumableCount(string consumableId)
         {
@@ -218,6 +220,7 @@ namespace ZiplaKac.Core
             int current = GetConsumableCount(consumableId);
             PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + consumableId, current + count);
             PlayerPrefs.Save();
+            OnConsumablesChanged?.Invoke();
         }
 
         public static bool UseConsumable(string consumableId)
@@ -227,6 +230,7 @@ namespace ZiplaKac.Core
             {
                 PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + consumableId, current - 1);
                 PlayerPrefs.Save();
+                OnConsumablesChanged?.Invoke();
                 return true;
             }
             return false;

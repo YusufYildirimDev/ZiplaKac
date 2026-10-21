@@ -115,6 +115,7 @@ namespace ZiplaKac.UI
             }
 
             LocalizationManager.OnLanguageChanged += RefreshUI;
+            SaveSystem.OnConsumablesChanged += RefreshUI;
             RefreshUI();
             if (itemsScrollRect != null) itemsScrollRect.verticalNormalizedPosition = 1f;
         }
@@ -122,6 +123,7 @@ namespace ZiplaKac.UI
         private void OnDisable()
         {
             LocalizationManager.OnLanguageChanged -= RefreshUI;
+            SaveSystem.OnConsumablesChanged -= RefreshUI;
             if (UIManager.Instance != null && UIManager.Instance.mainMenuPanel != null && GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
             {
                 UIManager.Instance.mainMenuPanel.SetActive(true);

@@ -984,6 +984,68 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 412f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
+            // 1.5. Sağ Üst Can Rozeti (Extra Life Pill)
+            GameObject lifeBadge = CreateCardContainer(card.transform, "MainMenuLifeBadge", new Vector2(175f, 66f));
+            RectTransform lifeRt = lifeBadge.GetComponent<RectTransform>();
+            lifeRt.anchoredPosition = new Vector2(330f, 435f);
+
+            Image lifeBg = lifeBadge.GetComponent<Image>();
+            lifeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.14f, 0.06f, 0.10f, 0.95f),
+                new Color(1.0f, 0.35f, 0.45f, 0.95f),
+                2.5f, 22, 175, 66);
+
+            // Kalp İkonu
+            GameObject lifeIconObj = new GameObject("HeartIcon");
+            lifeIconObj.transform.SetParent(lifeBadge.transform, false);
+            RectTransform lifeIconRt = lifeIconObj.AddComponent<RectTransform>();
+            lifeIconRt.anchorMin = new Vector2(0f, 0.5f);
+            lifeIconRt.anchorMax = new Vector2(0f, 0.5f);
+            lifeIconRt.pivot = new Vector2(0f, 0.5f);
+            lifeIconRt.anchoredPosition = new Vector2(14f, 0f);
+            lifeIconRt.sizeDelta = new Vector2(38f, 38f);
+            Image lifeIconImg = lifeIconObj.AddComponent<Image>();
+            lifeIconImg.sprite = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
+            lifeIconImg.preserveAspect = true;
+            lifeIconImg.raycastTarget = false;
+
+            // Metin (CAN / LIVES + Sayı)
+            Text menuLifeText = CreateText(lifeBadge.transform, "LifeText", "", 24, new Vector2(24f, 0f), Color.white, false, FontStyle.Bold);
+            menuLifeText.alignment = TextAnchor.MiddleCenter;
+            RectTransform lifeTxtRt = menuLifeText.GetComponent<RectTransform>();
+            lifeTxtRt.anchorMin = new Vector2(0f, 0f);
+            lifeTxtRt.anchorMax = new Vector2(1f, 1f);
+            lifeTxtRt.offsetMin = new Vector2(56f, 4f);
+            lifeTxtRt.offsetMax = new Vector2(-10f, -4f);
+
+            CanvasGroup lifeCg = lifeBadge.AddComponent<CanvasGroup>();
+
+            System.Action updateMenuLifeBadge = () => {
+                if (menuLifeText == null) return;
+                int lives = SaveSystem.GetConsumableCount("second_chance");
+                string lbl = LocalizationManager.Get("menu_life_label", "CAN");
+                menuLifeText.text = $"<size=15><color=#ff7d90>{lbl}</color></size>  <size=28><color=#ffffff><b>{lives}</b></color></size>";
+                if (lifeCg != null)
+                {
+                    lifeCg.alpha = lives > 0 ? 1f : 0.55f;
+                }
+            };
+
+            Button lifeBtn = lifeBadge.AddComponent<Button>();
+            lifeBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
+                int currentLives = SaveSystem.GetConsumableCount("second_chance");
+                string info = LocalizationManager.GetFormat("menu_life_toast_info", currentLives);
+                if (Instance != null)
+                {
+                    Instance.ShowRewardToast(card.transform, info);
+                }
+            });
+
+            SaveSystem.OnConsumablesChanged += updateMenuLifeBadge;
+            LocalizationManager.OnLanguageChanged += updateMenuLifeBadge;
+            updateMenuLifeBadge();
+
             // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
             Image subImg = null;
@@ -1239,6 +1301,14 @@ namespace ZiplaKac.Utils
                 new Color(0.08f, 0.07f, 0.16f, 0.94f), new Color(0.98f, 0.75f, 0.18f, 0.95f), 3.0f,
                 trophyIcon, "<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
                 Color.white, 24, out hud.highScoreText, new Vector2(1f, 1f), new Vector2(1f, 1f));
+
+            // 4. Can Rozeti (Sağ Üst En İyi Skorun altında — Pembe/Kırmızı Kalp Rozeti)
+            Sprite heartIcon = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
+            GameObject lifeBadgeObj = CreateHUDBadge(safeArea.transform, "LifePill", new Vector2(280f, 86f), new Vector2(-30f, -136f),
+                new Color(0.14f, 0.06f, 0.09f, 0.94f), new Color(1.0f, 0.35f, 0.45f, 0.95f), 3.0f,
+                heartIcon, "<size=18><color=#ff6b81>CAN</color></size>\n<size=38><color=#ffffff><b>0</b></color></size>",
+                new Color(1.0f, 0.85f, 0.90f), 22, out hud.lifeText, new Vector2(1f, 1f), new Vector2(1f, 1f));
+            hud.lifeBadgeObject = lifeBadgeObj;
 
             // Active PowerUp Badges Bar (Üst Orta - İki rozet arası)
             GameObject badgeBar = new GameObject("PowerUpBadgeBar");

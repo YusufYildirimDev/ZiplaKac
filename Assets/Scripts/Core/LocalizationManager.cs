@@ -232,7 +232,9 @@ namespace ZiplaKac.Core
             // HUD
             { "hud_score_label", "SKOR" },
             { "hud_gold_label", "ALTIN" },
+            { "hud_life_label", "CAN" },
             { "hud_best_label", "EN İYİ" },
+            { "hud_life_used", "❤️ CAN KURTARDI! (-1)" },
             { "hud_badge_shield", "Kalkan" },
             { "hud_badge_slow", "Yavaş" },
             { "hud_badge_multi", "x2 Puan" },
@@ -241,6 +243,8 @@ namespace ZiplaKac.Core
             { "hud_cd_multi", "X2 PUAN" },
             { "hud_control_tip", "DOKUN: ZIPLA  •  ÇİFT DOKUN: ÇİFT ZIPLA" },
             { "hud_combo_banner", "{0}X KOMBO!" },
+            { "menu_life_label", "CAN" },
+            { "menu_life_toast_info", "❤️ Ekstra Can ({0}): Bir engele çarptığında koşunu kurtarır ve devam etmeni sağlar!" },
 
             // Mağaza & Gardırop
             { "shop_title_upgrades", "GÜÇLER &\nYÜKSELTMELER" },
@@ -405,7 +409,9 @@ namespace ZiplaKac.Core
             // HUD
             { "hud_score_label", "SCORE" },
             { "hud_gold_label", "GOLD" },
+            { "hud_life_label", "LIFE" },
             { "hud_best_label", "BEST" },
+            { "hud_life_used", "❤️ EXTRA LIFE SAVED! (-1)" },
             { "hud_badge_shield", "Shield" },
             { "hud_badge_slow", "Slow" },
             { "hud_badge_multi", "x2 Score" },
@@ -414,6 +420,8 @@ namespace ZiplaKac.Core
             { "hud_cd_multi", "X2 SCORE" },
             { "hud_control_tip", "TAP: JUMP  •  DOUBLE TAP: DOUBLE JUMP" },
             { "hud_combo_banner", "{0}X COMBO!" },
+            { "menu_life_label", "LIVES" },
+            { "menu_life_toast_info", "❤️ Extra Life ({0}): Saves your run and lets you keep running after a crash!" },
 
             // Shop & Wardrobe
             { "shop_title_upgrades", "POWERS &\nUPGRADES" },

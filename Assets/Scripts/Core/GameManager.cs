@@ -66,6 +66,7 @@ namespace ZiplaKac.Core
         public event Action<int> OnTierChanged;
         public event Action<int, Vector3> OnComboAchieved; // comboCount, position
         public event Action OnShieldStatusChanged;
+        public event Action OnSecondChanceUsed;
 
         private void Awake()
         {
@@ -301,7 +302,7 @@ namespace ZiplaKac.Core
             // İkinci Şans Bileti Kontrolü
             if (hasSecondChance && SaveSystem.UseConsumable("second_chance"))
             {
-                hasSecondChance = false;
+                hasSecondChance = SaveSystem.GetConsumableCount("second_chance") > 0;
                 TriggerTemporaryInvulnerability(1.6f);
                 Obstacles.Obstacle.ClearAllActiveObstacles();
                 if (hasComboMemory)
@@ -316,6 +317,7 @@ namespace ZiplaKac.Core
                 }
                 AudioManager.Instance?.PlayPowerUpSound();
                 AudioManager.Instance?.TriggerHapticFeedback();
+                OnSecondChanceUsed?.Invoke();
                 return;
             }
 

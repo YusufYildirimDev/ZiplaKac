@@ -18,6 +18,11 @@ namespace ZiplaKac.UI
         public Text goldText;
         public Text controlTipText;
 
+        [Header("Can Rozeti")]
+        public GameObject lifeBadgeObject;
+        public Text lifeText;
+        private CanvasGroup lifeCanvasGroup;
+
         [Header("Güçlendirme Rozetleri (Badges)")]
         public GameObject shieldBadgeObject;
         public Text shieldBadgeText;
@@ -74,6 +79,7 @@ namespace ZiplaKac.UI
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnComboAchieved += HandleComboAchieved;
+                GameManager.Instance.OnSecondChanceUsed += HandleSecondChanceUsed;
             }
             RefreshHUDLanguage();
         }
@@ -84,6 +90,7 @@ namespace ZiplaKac.UI
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnComboAchieved -= HandleComboAchieved;
+                GameManager.Instance.OnSecondChanceUsed -= HandleSecondChanceUsed;
             }
             if (comboCoroutine != null)
             {
@@ -108,6 +115,88 @@ namespace ZiplaKac.UI
         private void HandleComboAchieved(int comboCount, Vector3 worldPosition)
         {
             ShowCombo(comboCount);
+        }
+
+        private void HandleSecondChanceUsed()
+        {
+            ShowNotification(LocalizationManager.Get("hud_life_used", "❤️ CAN KURTARDI! (-1)"));
+            if (lifeBadgeObject != null)
+            {
+                StartCoroutine(PunchScale(lifeBadgeObject.transform));
+            }
+        }
+
+        public void ShowNotification(string text)
+        {
+            if (comboBannerObject == null || comboBannerText == null) return;
+            if (comboCoroutine != null)
+            {
+                StopCoroutine(comboCoroutine);
+            }
+            comboCoroutine = StartCoroutine(AnimateNotificationBanner(text));
+        }
+
+        private IEnumerator AnimateNotificationBanner(string text)
+        {
+            comboBannerText.text = text;
+            comboBannerObject.SetActive(true);
+
+            RectTransform rt = comboBannerObject.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                rt.anchoredPosition = comboBasePosition;
+                rt.localScale = Vector3.one * 0.5f;
+            }
+
+            if (comboCanvasGroup != null)
+            {
+                comboCanvasGroup.alpha = 1f;
+            }
+
+            float duration = 1.4f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                float scale = (elapsed < 0.15f) ? Mathf.Lerp(0.5f, 1.15f, elapsed / 0.15f) : (elapsed < 0.25f ? Mathf.Lerp(1.15f, 1.0f, (elapsed - 0.15f) / 0.10f) : 1f);
+
+                if (rt != null)
+                {
+                    rt.localScale = Vector3.one * scale;
+                    rt.anchoredPosition = comboBasePosition + new Vector2(0f, Mathf.Lerp(0f, 50f, t));
+                }
+
+                if (comboCanvasGroup != null)
+                {
+                    comboCanvasGroup.alpha = (t > 0.60f) ? Mathf.Lerp(1f, 0f, (t - 0.60f) / 0.40f) : 1f;
+                }
+
+                yield return null;
+            }
+
+            if (comboCanvasGroup != null)
+            {
+                comboCanvasGroup.alpha = 0f;
+            }
+            comboBannerObject.SetActive(false);
+            comboCoroutine = null;
+        }
+
+        private IEnumerator PunchScale(Transform target)
+        {
+            if (target == null) yield break;
+            float elapsed = 0f;
+            while (elapsed < 0.35f)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float s = 1f + 0.25f * Mathf.Sin((elapsed / 0.35f) * Mathf.PI);
+                target.localScale = Vector3.one * s;
+                yield return null;
+            }
+            target.localScale = Vector3.one;
         }
 
         public void ShowCombo(int comboCount)
@@ -209,6 +298,18 @@ namespace ZiplaKac.UI
             if (currentScoreText != null) currentScoreText.text = $"<size=20><color=#8da4c4>{scoreLbl}</color></size>\n<size=42><color=#ffffff><b>{scoreInt}</b></color></size>";
             if (highScoreText != null) highScoreText.text = $"<size=20><color=#ffd166>{bestLbl}</color></size>\n<size=42><color=#ffffff><b>{GameManager.Instance.HighScore}</b></color></size>";
             if (goldText != null) goldText.text = $"<size=18><color=#ffd166>{goldLbl}</color></size>\n<size=38><color=#ffea79><b>{GameManager.Instance.CurrentRunGold}</b></color></size>";
+
+            int lives = SaveSystem.GetConsumableCount("second_chance");
+            string lifeLbl = LocalizationManager.Get("hud_life_label", "CAN");
+            if (lifeText != null)
+            {
+                lifeText.text = $"<size=18><color=#ff6b81>{lifeLbl}</color></size>\n<size=38><color=#ffffff><b>{lives}</b></color></size>";
+            }
+            if (lifeBadgeObject != null)
+            {
+                if (lifeCanvasGroup == null) lifeCanvasGroup = lifeBadgeObject.GetComponent<CanvasGroup>() ?? lifeBadgeObject.AddComponent<CanvasGroup>();
+                lifeCanvasGroup.alpha = lives > 0 ? 1f : 0.40f;
+            }
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler
             UpdatePowerUpBadges();
