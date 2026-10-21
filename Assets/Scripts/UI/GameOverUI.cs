@@ -12,6 +12,11 @@ namespace ZiplaKac.UI
     /// </summary>
     public class GameOverUI : MonoBehaviour
     {
+        [Header("Başlık ve Etiket Metinleri")]
+        public Text gameOverTitleText;
+        public Text gameOverSubText;
+        public Text gameOverScoreLabelText;
+
         [Header("Skor Metinleri")]
         public Text finalScoreText;
         public Text highScoreText;
@@ -126,6 +131,10 @@ namespace ZiplaKac.UI
         public void RefreshGameOverStats()
         {
             if (GameManager.Instance == null) return;
+
+            if (gameOverTitleText != null) gameOverTitleText.text = LocalizationManager.Get("go_title");
+            if (gameOverSubText != null) gameOverSubText.text = LocalizationManager.Get("go_sub");
+            if (gameOverScoreLabelText != null) gameOverScoreLabelText.text = LocalizationManager.Get("go_score_label");
 
             int finalScore = Mathf.FloorToInt(GameManager.Instance.CurrentScore);
             int highScore = GameManager.Instance.HighScore;

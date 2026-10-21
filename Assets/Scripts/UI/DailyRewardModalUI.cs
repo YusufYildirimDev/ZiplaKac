@@ -58,13 +58,24 @@ namespace ZiplaKac.UI
                     openChestSprite = ProceduralSpriteGenerator.GetSpriteOrGenerate("Sprites/treasure_chest_open", () => closedChestSprite);
                 }
             }
+            string langSuffix = (LocalizationManager.CurrentLanguage == LocalizationManager.LANG_EN) ? "_en" : "";
+            claimOpenSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_sandigi_ac" + langSuffix);
             if (claimOpenSprite == null)
             {
                 claimOpenSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_sandigi_ac");
             }
+
+            claimClaimedSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_harika" + langSuffix);
             if (claimClaimedSprite == null)
             {
                 claimClaimedSprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_harika");
+            }
+
+            if (closeButtonImage != null)
+            {
+                Sprite closeSp = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_kapat" + langSuffix);
+                if (closeSp != null) closeButtonImage.sprite = closeSp;
+                else closeButtonImage.sprite = Resources.Load<Sprite>("Sprites/UI_DailyReward/btn_kapat");
             }
         }
 
@@ -92,6 +103,7 @@ namespace ZiplaKac.UI
 
         public void RefreshUI()
         {
+            LoadSprites();
             if (titleText != null) titleText.text = LocalizationManager.Get("reward_title");
             if (descriptionText != null) descriptionText.text = LocalizationManager.Get("reward_desc");
 

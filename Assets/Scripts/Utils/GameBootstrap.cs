@@ -1379,7 +1379,7 @@ namespace ZiplaKac.Utils
 
             // 1. BAŞLIK VE AKSANLAR
             // Orta Başlık: "OYUN BİTTİ" (64pt Bold)
-            CreateText(card.transform, "GameOverTitle", "OYUN BİTTİ", 64, new Vector2(0f, 420f), Color.white, false, FontStyle.Bold);
+            goUI.gameOverTitleText = CreateText(card.transform, "GameOverTitle", LocalizationManager.Get("go_title"), 64, new Vector2(0f, 420f), Color.white, false, FontStyle.Bold);
 
             // Sarı Çizgisel Aksanlar (Title Decor - Sol ve Sağ)
             GameObject accentL = new GameObject("AccentLeft");
@@ -1403,7 +1403,7 @@ namespace ZiplaKac.Utils
             aRImg.raycastTarget = false;
 
             // Alt Yazı: "Bir engele çarptın" (32pt)
-            CreateText(card.transform, "GameOverSub", "Bir engele çarptın", 32, new Vector2(0f, 355f), new Color(0.49f, 0.62f, 0.74f), false);
+            goUI.gameOverSubText = CreateText(card.transform, "GameOverSub", LocalizationManager.Get("go_sub"), 32, new Vector2(0f, 355f), new Color(0.49f, 0.62f, 0.74f), false);
 
             // 2. SKOR KUTUSU (Recessed Dark Blue Box: 820x260 px, #111b2b)
             GameObject scoreBox = new GameObject("ScoreBox");
@@ -1422,7 +1422,7 @@ namespace ZiplaKac.Utils
             sbBg.raycastTarget = false;
 
             // Skor Kutusu İçi - Üst Etiket (28pt)
-            CreateText(scoreBox.transform, "ScoreLabel", "BU KOŞUDAKİ SKORUN", 28, new Vector2(0f, 80f), new Color(0.45f, 0.57f, 0.70f), false, FontStyle.Bold);
+            goUI.gameOverScoreLabelText = CreateText(scoreBox.transform, "ScoreLabel", LocalizationManager.Get("go_score_label"), 28, new Vector2(0f, 80f), new Color(0.45f, 0.57f, 0.70f), false, FontStyle.Bold);
 
             // Skor Kutusu İçi - Büyük Beyaz Skor Rakamı (128pt Bold)
             goUI.finalScoreText = CreateText(scoreBox.transform, "FinalScoreText", "0", 128, new Vector2(0f, 4f), Color.white, false, FontStyle.Bold);
@@ -1922,10 +1922,11 @@ namespace ZiplaKac.Utils
                 2f, 32, 128, 128);
 
             // 1. Üst Sağ KAPAT Butonu (130x54 Kapsül)
-            GameObject topCloseObj = CreatePillButton(card.transform, "TopCloseButton", "KAPAT", new Vector2(370f, 700f), new Vector2(130f, 54f), new Color(0.11f, 0.17f, 0.29f, 0.95f), Color.white, 22, new Color(0.20f, 0.30f, 0.45f, 0.5f), 1f, 27);
+            GameObject topCloseObj = CreatePillButton(card.transform, "TopCloseButton", LocalizationManager.Get("btn_close"), new Vector2(370f, 700f), new Vector2(130f, 54f), new Color(0.11f, 0.17f, 0.29f, 0.95f), Color.white, 22, new Color(0.20f, 0.30f, 0.45f, 0.5f), 1f, 27);
             Button topCloseBtn = topCloseObj.GetComponent<Button>();
             topCloseBtn.onClick.AddListener(modalUI.CloseModal);
             modalUI.topCloseButton = topCloseBtn;
+            modalUI.topCloseButtonText = topCloseObj.GetComponentInChildren<Text>();
 
             // 2. Header Görseli (Sol Taraf: Gardırop / Güçler 3D İllüstrasyonu)
             GameObject hdrObj = new GameObject("HeaderIllustration");
@@ -2004,8 +2005,9 @@ namespace ZiplaKac.Utils
             modalUI.itemsScrollRect = scrollRect;
 
             // 6. Alt Kapat Butonu (500x88)
-            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", "KAPAT", new Vector2(0f, -675f), new Vector2(500f, 88f), new Color(0.11f, 0.18f, 0.30f, 0.95f), Color.white, 30, new Color(0.18f, 0.28f, 0.45f, 0.6f), 1.5f, 32);
+            GameObject closeBtnObj = CreatePillButton(card.transform, "CloseButton", LocalizationManager.Get("btn_close"), new Vector2(0f, -675f), new Vector2(500f, 88f), new Color(0.11f, 0.18f, 0.30f, 0.95f), Color.white, 30, new Color(0.18f, 0.28f, 0.45f, 0.6f), 1.5f, 32);
             modalUI.closeButton = closeBtnObj.GetComponent<Button>();
+            modalUI.closeButtonText = closeBtnObj.GetComponentInChildren<Text>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
             modal.SetActive(false);
@@ -2042,16 +2044,18 @@ namespace ZiplaKac.Utils
             modalUI.titleText.resizeTextMaxSize = 44;
 
             // Sağ Üst "KAPAT" Butonu
-            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", "KAPAT", Vector2.zero, new Vector2(136f, 48f), new Color(0.12f, 0.17f, 0.28f, 0.95f), Color.white, 22, new Color(0.24f, 0.36f, 0.55f, 0.6f), 1.5f, 24);
+            GameObject skipBtnObj = CreatePillButton(card.transform, "SkipButton", LocalizationManager.Get("btn_close"), Vector2.zero, new Vector2(136f, 48f), new Color(0.12f, 0.17f, 0.28f, 0.95f), Color.white, 22, new Color(0.24f, 0.36f, 0.55f, 0.6f), 1.5f, 24);
             RectTransform skipRt = skipBtnObj.GetComponent<RectTransform>();
             skipRt.anchorMin = new Vector2(1f, 1f);
             skipRt.anchorMax = new Vector2(1f, 1f);
             skipRt.pivot = new Vector2(1f, 1f);
             skipRt.anchoredPosition = new Vector2(-36f, -36f);
             modalUI.closeButton = skipBtnObj.GetComponent<Button>();
+            modalUI.closeButtonText = skipBtnObj.GetComponentInChildren<Text>();
             modalUI.closeButton.onClick.AddListener(modalUI.CloseModal);
 
             modalUI.slides = new GameObject[4];
+            modalUI.slideSubTexts = new Text[4];
 
             // -------------------------------------------------------------
             // SLIDE 0: OYUN KURALLARI & TEMEL MEKANİKLER
@@ -2063,7 +2067,7 @@ namespace ZiplaKac.Utils
             s0Rt.offsetMin = Vector2.zero; s0Rt.offsetMax = Vector2.zero;
             modalUI.slides[0] = slide0;
 
-            CreateText(slide0.transform, "Sub0", "Zıpla, engellerden kaç ve rekorunu kır!", 30, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
+            modalUI.slideSubTexts[0] = CreateText(slide0.transform, "Sub0", "Zıpla, engellerden kaç ve rekorunu kır!", 30, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
 
             CreateOnboardingRow(slide0.transform, "Row0_1", 285f, 168f, "Sprites/UI_Onboarding/s0_jump", "Tek Dokunuşla Zıpla", "Ekrana dokunarak veya Space tuşuna basarak yaklaşan sivri dikenlerin, kaktüs ve kayaların üzerinden atla.", new Color(0.00f, 0.875f, 0.627f));
             CreateOnboardingRow(slide0.transform, "Row0_2", 98f, 168f, "Sprites/UI_Onboarding/s0_double_jump", "Çift Zıplama (Double Jump)", "Havada bir kez daha dokunarak ikinci kez zıpla! Yüksek ve arka arkaya gelen engelleri aşmak için en önemli yeteneğin.", new Color(0.22f, 0.74f, 0.97f));
@@ -2080,7 +2084,7 @@ namespace ZiplaKac.Utils
             s1Rt.offsetMin = Vector2.zero; s1Rt.offsetMax = Vector2.zero;
             modalUI.slides[1] = slide1;
 
-            CreateText(slide1.transform, "Sub1", "İlk başta sadece Klasik açıktır! Sırayla 2500 skor yaparak kilidi aç:", 29, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
+            modalUI.slideSubTexts[1] = CreateText(slide1.transform, "Sub1", "İlk başta sadece Klasik açıktır! Sırayla 2500 skor yaparak kilidi aç:", 29, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
 
             CreateOnboardingCharacterRow(slide1.transform, "Char_classic", 310f, "Sprites/UI_Onboarding/s1_char_classic", "Klasik", new Color(1f, 0.82f, 0.26f), "BAŞLANGIÇTA AÇIK", new Color(0.02f, 0.16f, 0.14f, 0.95f), new Color(0.00f, 0.87f, 0.56f, 0.85f), new Color(0.00f, 0.87f, 0.56f), 260f, "Çayır Diyarı • Kalıcı +%15 ekstra skor yeteneği!", new Color(0.18f, 0.28f, 0.44f, 0.55f));
             CreateOnboardingCharacterRow(slide1.transform, "Char_fire", 155f, "Sprites/UI_Onboarding/s1_char_fire", "Ateş", new Color(1f, 0.45f, 0.20f), "🔒 Klasik ile 2500 Skor Yap", new Color(0.24f, 0.11f, 0.02f, 0.95f), new Color(0.85f, 0.48f, 0.05f, 0.85f), new Color(1f, 0.78f, 0.25f), 350f, "Volkan & Lav Diyarı • Ateş topu ve kor alev dünyası!", new Color(0.40f, 0.18f, 0.10f, 0.55f));
@@ -2098,7 +2102,7 @@ namespace ZiplaKac.Utils
             s2Rt.offsetMin = Vector2.zero; s2Rt.offsetMax = Vector2.zero;
             modalUI.slides[2] = slide2;
 
-            CreateText(slide2.transform, "Sub2", "Güçlendirmeleri topla ve mağazadan kalıcı yetenekler edin!", 29, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
+            modalUI.slideSubTexts[2] = CreateText(slide2.transform, "Sub2", "Güçlendirmeleri topla ve mağazadan kalıcı yetenekler edin!", 29, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
 
             CreateOnboardingRow(slide2.transform, "Power_Shield", 285f, 168f, "Sprites/UI_Onboarding/s2_shield", "Koruyucu Kalkan (Shield)", "Bir engele çarpışmayı tamamen emer, engelleri temizler ve koşunu kurtarır.", new Color(0.22f, 0.74f, 0.97f));
             CreateOnboardingRow(slide2.transform, "Power_Slow", 98f, 168f, "Sprites/UI_Onboarding/s2_slow", "Zamanı Yavaşlatma (Slow-Mo)", "5 saniye boyunca dünya hızını %40 düşürerek karmaşık engellerden kolayca sıyrılmanı sağlar.", new Color(0.22f, 0.74f, 0.97f));
@@ -2115,7 +2119,7 @@ namespace ZiplaKac.Utils
             s3Rt.offsetMin = Vector2.zero; s3Rt.offsetMax = Vector2.zero;
             modalUI.slides[3] = slide3;
 
-            CreateText(slide3.transform, "Sub3", "Her gün giriş yap, sandığını aç ve altınlarınla tarzını yarat!", 29, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
+            modalUI.slideSubTexts[3] = CreateText(slide3.transform, "Sub3", "Her gün giriş yap, sandığını aç ve altınlarınla tarzını yarat!", 29, new Vector2(0f, 498f), new Color(0.68f, 0.80f, 0.96f), false, FontStyle.Bold);
 
             CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Chest", 215f, 210f, "Sprites/UI_Onboarding/s3_chest", "Günlük Ödül Sandığı", "Her gün oyuna girerek sandığını aç! Günlük seri yaptıkça (Streak) kazandığın altın miktarı 20'den 50'ye artar!", new Color(0.98f, 0.75f, 0.14f));
             CreateOnboardingShowcaseRow(slide3.transform, "Showcase_Gold", -10f, 210f, "Sprites/UI_Onboarding/s3_coin", "Altın Toplama & Yeni Rekorlar", "Engelleri aştıkça, kombo yaptıkça ve rekor kırdıkça altın topla. Her koşu sonunda kasan zenginleşir!", new Color(0.22f, 0.74f, 0.97f));
@@ -2148,8 +2152,9 @@ namespace ZiplaKac.Utils
             }
 
             // Önceki Butonu (Sol Alt - Standart 360x96)
-            GameObject prevBtnObj = CreatePillButton(card.transform, "PrevButton", "◀ ÖNCEKİ", new Vector2(-215f, -575f), new Vector2(360f, 96f), new Color(0.10f, 0.14f, 0.24f, 0.95f), Color.white, 30, new Color(0.20f, 0.32f, 0.50f, 0.7f), 1.5f, 32);
+            GameObject prevBtnObj = CreatePillButton(card.transform, "PrevButton", LocalizationManager.Get("btn_prev"), new Vector2(-215f, -575f), new Vector2(360f, 96f), new Color(0.10f, 0.14f, 0.24f, 0.95f), Color.white, 30, new Color(0.20f, 0.32f, 0.50f, 0.7f), 1.5f, 32);
             modalUI.prevButton = prevBtnObj.GetComponent<Button>();
+            modalUI.prevButtonText = prevBtnObj.GetComponentInChildren<Text>();
             modalUI.prevButton.onClick.AddListener(modalUI.PreviousSlide);
 
             // Sonraki Butonu (Sağ Alt / Mint Yeşili - Standart 360x96)

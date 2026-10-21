@@ -175,6 +175,7 @@ namespace ZiplaKac.Core
             { "lang_code", "TR" },
             { "lang_display", "🇹🇷 TR" },
             { "btn_close", "KAPAT" },
+            { "btn_prev", "◀ ÖNCEKİ" },
             { "gold", "ALTIN" },
             { "score", "SKOR" },
             { "best", "EN İYİ" },
@@ -273,6 +274,8 @@ namespace ZiplaKac.Core
 
             // Oyun Sonu (Game Over)
             { "go_title", "OYUN BİTTİ" },
+            { "go_sub", "Bir engele çarptın" },
+            { "go_score_label", "BU KOŞUDAKİ SKORUN" },
             { "go_new_record", "★ YENİ REKOR! ★" },
             { "go_high_score", "En İyi Skor: {0}" },
             { "go_gold_earned", "+<color=#f6c445><b>{0}</b></color> <color=#cbd5e1><b>ALTIN KAZANDIN</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>KASA:</b></color> <color=#f6c445><b>{1}</b></color> <color=#cbd5e1><b>ALTIN</b></color>" },
@@ -299,6 +302,7 @@ namespace ZiplaKac.Core
             { "lang_code", "EN" },
             { "lang_display", "🇬🇧 EN" },
             { "btn_close", "CLOSE" },
+            { "btn_prev", "◀ BACK" },
             { "gold", "GOLD" },
             { "score", "SCORE" },
             { "best", "BEST" },
@@ -397,6 +401,8 @@ namespace ZiplaKac.Core
 
             // Game Over
             { "go_title", "GAME OVER" },
+            { "go_sub", "You hit an obstacle" },
+            { "go_score_label", "SCORE THIS RUN" },
             { "go_new_record", "★ NEW RECORD! ★" },
             { "go_high_score", "Best Score: {0}" },
             { "go_gold_earned", "+<color=#f6c445><b>{0}</b></color> <color=#cbd5e1><b>GOLD EARNED</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>VAULT:</b></color> <color=#f6c445><b>{1}</b></color> <color=#cbd5e1><b>GOLD</b></color>" },

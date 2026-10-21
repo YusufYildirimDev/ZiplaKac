@@ -57,7 +57,9 @@ namespace ZiplaKac.UI
         public Text totalGoldText;
         public Text statusMessageText;
         public Button closeButton;
+        public Text closeButtonText;
         public Button topCloseButton;
+        public Text topCloseButtonText;
 
         [Header("Sekme Butonları")]
         public Button tabUpgradesButton;
@@ -137,7 +139,9 @@ namespace ZiplaKac.UI
         public void RefreshUI()
         {
             int gold = SaveSystem.GetTotalGold();
-            if (totalGoldText != null) totalGoldText.text = LocalizationManager.GetFormat("shop_total_gold", gold);
+            if (totalGoldText != null) totalGoldText.text = LocalizationManager.GetFormat("shop_total_gold", gold.ToString("N0"));
+            if (closeButtonText != null) closeButtonText.text = LocalizationManager.Get("btn_close");
+            if (topCloseButtonText != null) topCloseButtonText.text = LocalizationManager.Get("btn_close");
             if (statusMessageText != null) statusMessageText.text = "";
 
             UpdateTabButtonStyles();
