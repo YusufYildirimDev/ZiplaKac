@@ -544,6 +544,7 @@ namespace ZiplaKac.UI
             if (itemSprite != null)
             {
                 iconImg.sprite = itemSprite;
+                iconImg.color = Color.white;
             }
             else
             {
