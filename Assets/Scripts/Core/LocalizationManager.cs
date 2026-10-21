@@ -267,10 +267,15 @@ namespace ZiplaKac.Core
             { "char_ice_ability", "Kayma & Yavaş Düşüş" },
             { "char_poison_name", "Zehir" },
             { "char_poison_ability", "Zehir Kalkanı" },
+            { "char_toxic_name", "Zehir" },
+            { "char_toxic_ability", "Zehir Kalkanı" },
             { "char_night_name", "Gece" },
             { "char_night_ability", "Gölge Adımı & Çift Zıplama" },
+            { "char_shadow_name", "Gece" },
+            { "char_shadow_ability", "Gölge Adımı & Çift Zıplama" },
             { "char_unlock_hint", "{0} Skora Ulaşarak Aç" },
             { "char_unlocked_toast", "🎉 YENİ KARAKTER AÇILDI: {0}! 🎉" },
+            { "char_lock_badge", "{0} Skor" },
 
             // Oyun Sonu (Game Over)
             { "go_title", "OYUN BİTTİ" },
@@ -435,10 +440,15 @@ namespace ZiplaKac.Core
             { "char_ice_ability", "Glide & Slow Fall" },
             { "char_poison_name", "Venom" },
             { "char_poison_ability", "Poison Shield" },
+            { "char_toxic_name", "Venom" },
+            { "char_toxic_ability", "Poison Shield" },
             { "char_night_name", "Shadow" },
             { "char_night_ability", "Shadow Step & Double Jump" },
+            { "char_shadow_name", "Shadow" },
+            { "char_shadow_ability", "Shadow Step & Double Jump" },
             { "char_unlock_hint", "Reach {0} Score to Unlock" },
             { "char_unlocked_toast", "🎉 NEW CHARACTER UNLOCKED: {0}! 🎉" },
+            { "char_lock_badge", "{0} Score" },
 
             // Game Over
             { "go_title", "GAME OVER" },

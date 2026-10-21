@@ -105,7 +105,17 @@ namespace ZiplaKac.UI
         {
             LoadSprites();
             if (titleText != null) titleText.text = LocalizationManager.Get("reward_title");
-            if (descriptionText != null) descriptionText.text = LocalizationManager.Get("reward_desc");
+            if (descriptionText != null)
+            {
+                descriptionText.text = LocalizationManager.Get("reward_desc");
+                descriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
+                descriptionText.verticalOverflow = VerticalWrapMode.Truncate;
+                descriptionText.resizeTextForBestFit = true;
+                descriptionText.resizeTextMinSize = 18;
+                descriptionText.resizeTextMaxSize = 28;
+                RectTransform dRt = descriptionText.rectTransform;
+                if (dRt != null) dRt.sizeDelta = new Vector2(800f, 85f);
+            }
 
             bool canClaim = SaveSystem.CanClaimDailyReward();
             hasClaimed = !canClaim;

@@ -18,6 +18,7 @@ namespace ZiplaKac.UI
         public Text nameText;
         public Image namePillBg;
         public GameObject lockOverlay;
+        public Text lockText;
     }
 
     /// <summary>
@@ -341,7 +342,7 @@ namespace ZiplaKac.UI
 
                         Text lockTxt = lockTextObj.AddComponent<Text>();
                         lockTxt.font = GetSafeFont();
-                        lockTxt.text = "2500 Skor";
+                        lockTxt.text = LocalizationManager.GetFormat("char_lock_badge", 2500);
                         lockTxt.fontSize = 15;
                         lockTxt.fontStyle = FontStyle.Bold;
                         lockTxt.alignment = TextAnchor.MiddleCenter;
@@ -352,6 +353,7 @@ namespace ZiplaKac.UI
                         lockTxt.verticalOverflow = VerticalWrapMode.Truncate;
                         lockTxt.color = new Color(1f, 0.85f, 0.35f, 0.95f);
                         lockTxt.raycastTarget = false;
+                        card.lockText = lockTxt;
                     }
                     pillBg.raycastTarget = false;
 
@@ -488,6 +490,11 @@ namespace ZiplaKac.UI
                 if (card.lockOverlay != null)
                 {
                     card.lockOverlay.SetActive(!isUnlocked);
+                }
+
+                if (card.lockText != null)
+                {
+                    card.lockText.text = LocalizationManager.GetFormat("char_lock_badge", 2500);
                 }
 
                 if (card.iconImage != null)

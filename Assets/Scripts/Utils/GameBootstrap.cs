@@ -1842,7 +1842,16 @@ namespace ZiplaKac.Utils
             modalUI.chestImage = chestImg;
 
             // Açıklama Metni: "Her gün oyuna gir, sandığını aç ve bonus altınları topla!"
-            modalUI.descriptionText = CreateText(card.transform, "Desc", "Her gün oyuna gir, sandığını aç ve bonus altınları topla!", 32, new Vector2(0f, -115f), new Color(0.62f, 0.72f, 0.84f), false);
+            modalUI.descriptionText = CreateText(card.transform, "Desc", LocalizationManager.Get("reward_desc"), 30, new Vector2(0f, -115f), new Color(0.62f, 0.72f, 0.84f), false);
+            RectTransform descRt = modalUI.descriptionText.GetComponent<RectTransform>();
+            descRt.sizeDelta = new Vector2(800f, 85f);
+            modalUI.descriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            modalUI.descriptionText.verticalOverflow = VerticalWrapMode.Truncate;
+            modalUI.descriptionText.resizeTextForBestFit = true;
+            modalUI.descriptionText.resizeTextMinSize = 18;
+            modalUI.descriptionText.resizeTextMaxSize = 28;
+            modalUI.descriptionText.lineSpacing = 1.15f;
+            modalUI.descriptionText.alignment = TextAnchor.MiddleCenter;
 
             // Durum / Seri Satırı Konteyneri (İkon + Metin hizalama)
             GameObject statusContainer = new GameObject("StatusContainer");
