@@ -205,22 +205,31 @@ namespace ZiplaKac.UI
                 }
             }
 
-            // Can Alma (Revive) Butonu Durumu
+            // Can Alma (Revive) Butonu Durumu (Her oyunda SADECE BİR KERE can kullanılabilir)
             int currentGold = SaveSystem.GetTotalGold();
             if (reviveButton != null)
             {
-                bool canAfford = currentGold >= 500;
+                bool alreadyUsedLife = GameManager.Instance != null && GameManager.Instance.hasUsedLifeThisRun;
+                bool canAfford = currentGold >= 500 && !alreadyUsedLife;
                 reviveButton.interactable = canAfford;
 
                 if (reviveButtonText != null)
                 {
-                    reviveButtonText.text = canAfford ? LocalizationManager.Get("go_btn_revive_afford") : LocalizationManager.Get("go_btn_revive_cost");
-                    reviveButtonText.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
+                    if (alreadyUsedLife)
+                    {
+                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_used", "CAN\nKULLANILDI");
+                        reviveButtonText.color = new Color(1f, 1f, 1f, 0.40f);
+                    }
+                    else
+                    {
+                        reviveButtonText.text = canAfford ? LocalizationManager.Get("go_btn_revive_afford") : LocalizationManager.Get("go_btn_revive_cost");
+                        reviveButtonText.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
+                    }
                 }
 
                 if (reviveHeartIcon != null)
                 {
-                    reviveHeartIcon.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
+                    reviveHeartIcon.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.40f);
                 }
             }
 

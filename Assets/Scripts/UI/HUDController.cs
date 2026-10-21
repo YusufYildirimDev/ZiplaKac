@@ -299,16 +299,25 @@ namespace ZiplaKac.UI
             if (highScoreText != null) highScoreText.text = $"<size=20><color=#ffd166>{bestLbl}</color></size>\n<size=42><color=#ffffff><b>{GameManager.Instance.HighScore}</b></color></size>";
             if (goldText != null) goldText.text = $"<size=18><color=#ffd166>{goldLbl}</color></size>\n<size=38><color=#ffea79><b>{GameManager.Instance.CurrentRunGold}</b></color></size>";
 
-            int lives = SaveSystem.GetConsumableCount("second_chance");
+            int totalInventory = SaveSystem.GetConsumableCount("second_chance");
+            bool canUseLifeInThisRun = GameManager.Instance != null && GameManager.Instance.hasSecondChance && !GameManager.Instance.hasUsedLifeThisRun;
+            int runLifeCount = canUseLifeInThisRun ? 1 : 0;
             string lifeLbl = LocalizationManager.Get("hud_life_label", "CAN");
             if (lifeText != null)
             {
-                lifeText.text = $"<size=18><color=#ff6b81>{lifeLbl}</color></size>\n<size=38><color=#ffffff><b>{lives}</b></color></size>";
+                if (totalInventory > 1)
+                {
+                    lifeText.text = $"<size=18><color=#ff6b81>{lifeLbl}</color></size>\n<size=38><color=#ffffff><b>{runLifeCount}</b></color></size><size=20><color=#94a3b8>/{totalInventory}</color></size>";
+                }
+                else
+                {
+                    lifeText.text = $"<size=18><color=#ff6b81>{lifeLbl}</color></size>\n<size=38><color=#ffffff><b>{runLifeCount}</b></color></size>";
+                }
             }
             if (lifeBadgeObject != null)
             {
                 if (lifeCanvasGroup == null) lifeCanvasGroup = lifeBadgeObject.GetComponent<CanvasGroup>() ?? lifeBadgeObject.AddComponent<CanvasGroup>();
-                lifeCanvasGroup.alpha = lives > 0 ? 1f : 0.40f;
+                lifeCanvasGroup.alpha = canUseLifeInThisRun ? 1f : 0.38f;
             }
 
             // 2. Aktif Güçlendirme Rozetleri & Kalan Süreler

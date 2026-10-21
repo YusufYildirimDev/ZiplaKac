@@ -51,6 +51,7 @@ namespace ZiplaKac.Core
         public bool isSlowActive = false;
         public bool isDoubleScoreActive = false;
         public bool hasSecondChance = false;
+        public bool hasUsedLifeThisRun = false;
         public bool isTemporaryInvulnerable = false;
         private float invulnerabilityTimer = 0f;
 
@@ -156,6 +157,7 @@ namespace ZiplaKac.Core
                     ResetPowerUps();
                     Obstacles.Obstacle.ClearAllActiveObstacles();
                     PowerUps.PowerUp.ClearAllActivePowerUps();
+                    hasUsedLifeThisRun = false;
 
                     // --- Tek Kullanımlık (Consumable) Güçlendirmeleri Uygula ---
                     ApplyConsumablesAtStart();
@@ -235,9 +237,13 @@ namespace ZiplaKac.Core
         public bool ReviveWithGold(int cost = 500)
         {
             if (State != GameState.GameOver) return false;
+            if (hasUsedLifeThisRun) return false; // Her oyunda sadece bir kere can kullanılabilir!
 
             if (SaveSystem.SpendGold(cost))
             {
+                hasUsedLifeThisRun = true;
+                hasSecondChance = false;
+
                 // Önceki GameOver aşamasında eklenen tur içi altını sıfırla ki sonraki ölümde tekrar toplanmasın
                 CurrentRunGold = 0;
                 RunObstacleGold = 0;
@@ -299,10 +305,11 @@ namespace ZiplaKac.Core
                 return;
             }
 
-            // İkinci Şans Bileti Kontrolü
-            if (hasSecondChance && SaveSystem.UseConsumable("second_chance"))
+            // İkinci Şans Bileti Kontrolü (Her oyunda SADECE BİR KERE can kullanılabilir)
+            if (!hasUsedLifeThisRun && hasSecondChance && SaveSystem.UseConsumable("second_chance"))
             {
-                hasSecondChance = SaveSystem.GetConsumableCount("second_chance") > 0;
+                hasUsedLifeThisRun = true;
+                hasSecondChance = false;
                 TriggerTemporaryInvulnerability(1.6f);
                 Obstacles.Obstacle.ClearAllActiveObstacles();
                 if (hasComboMemory)
