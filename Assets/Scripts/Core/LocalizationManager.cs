@@ -110,6 +110,10 @@ namespace ZiplaKac.Core
         public static string Get(string key, string fallback = null)
         {
             if (string.IsNullOrEmpty(key)) return "";
+            if (localizedStrings.Count == 0)
+            {
+                InitializeLanguage();
+            }
             if (localizedStrings.TryGetValue(key, out string value))
             {
                 return value;

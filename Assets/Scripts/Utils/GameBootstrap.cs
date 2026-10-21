@@ -52,6 +52,7 @@ namespace ZiplaKac.Utils
         private void Awake()
         {
             Instance = this;
+            LocalizationManager.InitializeLanguage();
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             SetupCamera();
             SetupManagers();
@@ -972,17 +973,6 @@ namespace ZiplaKac.Utils
             GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(900f, 1020f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
 
-            // 0. Dil Seçici Buton (Sağ Üst - TR / EN Kapsül Buton)
-            Color langBg = new Color(0.12f, 0.18f, 0.32f, 0.95f);
-            Color langBorder = new Color(0.25f, 0.38f, 0.58f, 0.60f);
-            GameObject langBtnObj = CreatePillButton(card.transform, "LanguageButton", LocalizationManager.Get("lang_display"), new Vector2(350f, 448f), new Vector2(130f, 52f), langBg, Color.white, 22, langBorder, 1.5f, 26);
-            Button langBtn = langBtnObj.GetComponent<Button>();
-            Text langBtnText = langBtnObj.GetComponentInChildren<Text>();
-            langBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
-                LocalizationManager.ToggleLanguage();
-            });
-
             // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi)
             Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
             if (titleSp != null)
@@ -1202,7 +1192,6 @@ namespace ZiplaKac.Utils
 
             // Anında dil değiştiğinde ana menü görsellerini güncelle
             LocalizationManager.OnLanguageChanged += () => {
-                if (langBtnText != null) langBtnText.text = LocalizationManager.Get("lang_display");
                 if (subImg != null) subImg.sprite = LoadMainMenuSprite("subtitle_hoppzy");
                 if (subTxt != null) subTxt.text = LocalizationManager.Get("app_subtitle");
                 if (divImg != null) divImg.sprite = LoadMainMenuSprite("divider_karakter_sec");
