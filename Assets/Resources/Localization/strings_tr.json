@@ -35,6 +35,8 @@
   "shop_btn_unequip": "ÇIKAR",
   "go_title": "OYUN BİTTİ",
   "go_new_record": "★ YENİ REKOR! ★",
+  "go_btn_revive_life": "CAN KULLAN\nDEVAM ET",
+  "go_btn_revive_afford": "CAN AL\nDEVAM ET",
   "go_btn_revive_used": "CAN\nKULLANILDI",
   "go_btn_retry": "TEKRAR DENE",
   "go_btn_menu": "ANA MENÜ"

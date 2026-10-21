@@ -234,46 +234,63 @@ namespace ZiplaKac.Core
             invulnerabilityTimer = duration;
         }
 
-        public bool ReviveWithGold(int cost = 500)
+        public bool RevivePlayer(int goldCost = 500)
         {
             if (State != GameState.GameOver) return false;
-            if (hasUsedLifeThisRun) return false; // Her oyunda sadece bir kere can kullanılabilir!
 
-            if (SaveSystem.SpendGold(cost))
+            // 1. Envanterde ekstra can varsa doğrudan kullan ve diril
+            if (SaveSystem.GetConsumableCount("second_chance") > 0)
             {
-                hasUsedLifeThisRun = true;
-                hasSecondChance = false;
-
-                // Önceki GameOver aşamasında eklenen tur içi altını sıfırla ki sonraki ölümde tekrar toplanmasın
-                CurrentRunGold = 0;
-                RunObstacleGold = 0;
-                RunComboGold = 0;
-                RunScoreGold = 0;
-                RunRecordGold = 0;
-
-                // Sahadaki engelleri temizle
-                Obstacles.Obstacle.ClearAllActiveObstacles();
-
-                // 2.5 saniye geçici dokunulmazlık sağla
-                TriggerTemporaryInvulnerability(2.5f);
-
-                // Karakteri zemine al ve fizik simülasyonunu aç
-                if (Player.PlayerController.Instance != null)
+                if (SaveSystem.UseConsumable("second_chance"))
                 {
-                    Player.PlayerController.Instance.ResetToGround();
+                    ExecuteRevive();
+                    return true;
                 }
+            }
 
-                // Oynanış durumuna devam et (skor korunur)
-                State = GameState.Playing;
-                Time.timeScale = 1.0f;
-                OnGameStateChanged?.Invoke(State);
-
-                AudioManager.Instance?.PlayPowerUpSound();
-                AudioManager.Instance?.TriggerHapticFeedback();
+            // 2. Ekstra can yoksa altın ile can alıp diril
+            if (SaveSystem.SpendGold(goldCost))
+            {
+                ExecuteRevive();
                 return true;
             }
 
             return false;
+        }
+
+        public bool ReviveWithGold(int cost = 500)
+        {
+            return RevivePlayer(cost);
+        }
+
+        private void ExecuteRevive()
+        {
+            // Önceki GameOver aşamasında eklenen tur içi altını sıfırla ki sonraki ölümde tekrar toplanmasın
+            CurrentRunGold = 0;
+            RunObstacleGold = 0;
+            RunComboGold = 0;
+            RunScoreGold = 0;
+            RunRecordGold = 0;
+
+            // Sahadaki engelleri temizle
+            Obstacles.Obstacle.ClearAllActiveObstacles();
+
+            // 2.5 saniye geçici dokunulmazlık sağla
+            TriggerTemporaryInvulnerability(2.5f);
+
+            // Karakteri zemine al ve fizik simülasyonunu aç
+            if (Player.PlayerController.Instance != null)
+            {
+                Player.PlayerController.Instance.ResetToGround();
+            }
+
+            // Oynanış durumuna devam et (skor korunur)
+            State = GameState.Playing;
+            Time.timeScale = 1.0f;
+            OnGameStateChanged?.Invoke(State);
+
+            AudioManager.Instance?.PlayPowerUpSound();
+            AudioManager.Instance?.TriggerHapticFeedback();
         }
 
         public void GameOver()

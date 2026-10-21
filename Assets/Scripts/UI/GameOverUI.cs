@@ -86,23 +86,39 @@ namespace ZiplaKac.UI
 
         private void OnRewardedAdButtonClicked()
         {
-            MonetizationManager.Instance?.ShowRewardedAd(
-                () => {
-                    SaveSystem.AddGold(100);
-                    RefreshGameOverStats();
-                    AudioManager.Instance?.PlayNewRecordSound();
-                    AudioManager.Instance?.TriggerHapticFeedback();
-                    if (rewardedAdButton != null) rewardedAdButton.interactable = false;
-                    if (rewardedAdBadge != null) rewardedAdBadge.SetActive(false);
-                    if (rewardedAdButtonText != null)
-                    {
-                        rewardedAdButtonText.text = LocalizationManager.Get("go_btn_ad_claimed");
+            if (MonetizationManager.Instance != null)
+            {
+                MonetizationManager.Instance.ShowRewardedAd(
+                    () => {
+                        SaveSystem.AddGold(100);
+                        RefreshGameOverStats();
+                        AudioManager.Instance?.PlayNewRecordSound();
+                        AudioManager.Instance?.TriggerHapticFeedback();
+                        if (rewardedAdButton != null) rewardedAdButton.interactable = false;
+                        if (rewardedAdBadge != null) rewardedAdBadge.SetActive(false);
+                        if (rewardedAdButtonText != null)
+                        {
+                            rewardedAdButtonText.text = LocalizationManager.Get("go_btn_ad_claimed");
+                        }
+                    },
+                    () => {
+                        Debug.Log("Reklam gösterilemedi.");
                     }
-                },
-                () => {
-                    Debug.Log("Reklam gösterilemedi.");
+                );
+            }
+            else
+            {
+                SaveSystem.AddGold(100);
+                RefreshGameOverStats();
+                AudioManager.Instance?.PlayNewRecordSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                if (rewardedAdButton != null) rewardedAdButton.interactable = false;
+                if (rewardedAdBadge != null) rewardedAdBadge.SetActive(false);
+                if (rewardedAdButtonText != null)
+                {
+                    rewardedAdButtonText.text = LocalizationManager.Get("go_btn_ad_claimed");
                 }
-            );
+            }
         }
 
         private void Update()
@@ -205,31 +221,39 @@ namespace ZiplaKac.UI
                 }
             }
 
-            // Can Alma (Revive) Butonu Durumu (Her oyunda SADECE BİR KERE can kullanılabilir)
+            // Can Alma (Revive) Butonu Durumu
+            int extraLives = SaveSystem.GetConsumableCount("second_chance");
             int currentGold = SaveSystem.GetTotalGold();
+            bool canReviveWithLife = extraLives > 0;
+            bool canReviveWithGold = currentGold >= 500;
+            bool canRevive = canReviveWithLife || canReviveWithGold;
+
             if (reviveButton != null)
             {
-                bool alreadyUsedLife = GameManager.Instance != null && GameManager.Instance.hasUsedLifeThisRun;
-                bool canAfford = currentGold >= 500 && !alreadyUsedLife;
-                reviveButton.interactable = canAfford;
+                reviveButton.interactable = canRevive;
 
                 if (reviveButtonText != null)
                 {
-                    if (alreadyUsedLife)
+                    if (canReviveWithLife)
                     {
-                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_used", "CAN\nKULLANILDI");
-                        reviveButtonText.color = new Color(1f, 1f, 1f, 0.40f);
+                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_life", "CAN KULLAN\nDEVAM ET");
+                        reviveButtonText.color = Color.white;
+                    }
+                    else if (canReviveWithGold)
+                    {
+                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_afford", "CAN AL\nDEVAM ET");
+                        reviveButtonText.color = Color.white;
                     }
                     else
                     {
-                        reviveButtonText.text = canAfford ? LocalizationManager.Get("go_btn_revive_afford") : LocalizationManager.Get("go_btn_revive_cost");
-                        reviveButtonText.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.45f);
+                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_cost", "CAN AL\n(500 ALTIN)");
+                        reviveButtonText.color = new Color(1f, 1f, 1f, 0.45f);
                     }
                 }
 
                 if (reviveHeartIcon != null)
                 {
-                    reviveHeartIcon.color = canAfford ? Color.white : new Color(1f, 1f, 1f, 0.40f);
+                    reviveHeartIcon.color = canRevive ? Color.white : new Color(1f, 1f, 1f, 0.40f);
                 }
             }
 
@@ -292,7 +316,7 @@ namespace ZiplaKac.UI
 
         private void OnReviveButtonClicked()
         {
-            if (GameManager.Instance != null && GameManager.Instance.ReviveWithGold(500))
+            if (GameManager.Instance != null && GameManager.Instance.RevivePlayer(500))
             {
                 gameObject.SetActive(false);
             }

@@ -35,6 +35,8 @@
   "shop_btn_unequip": "UNEQUIP",
   "go_title": "GAME OVER",
   "go_new_record": "★ NEW RECORD! ★",
+  "go_btn_revive_life": "USE LIFE\nCONTINUE",
+  "go_btn_revive_afford": "REVIVE &\nCONTINUE",
   "go_btn_revive_used": "LIFE\nUSED",
   "go_btn_retry": "TRY AGAIN",
   "go_btn_menu": "MAIN MENU"
