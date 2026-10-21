@@ -44,19 +44,51 @@ namespace ZiplaKac.Core
             }
         }
 
-        public static void InitializeLanguage()
+        public static string GetDeviceSystemLanguage()
         {
-            if (PlayerPrefs.HasKey(PREF_KEY_LANGUAGE))
+            try
             {
-                currentLanguage = PlayerPrefs.GetString(PREF_KEY_LANGUAGE, LANG_TR);
+                if (Application.systemLanguage == SystemLanguage.Turkish)
+                {
+                    return LANG_TR;
+                }
+
+                string sysLangStr = Application.systemLanguage.ToString();
+                if (sysLangStr.IndexOf("turk", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return LANG_TR;
+                }
+
+                if (System.Globalization.CultureInfo.CurrentUICulture != null &&
+                    System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.Equals("tr", StringComparison.OrdinalIgnoreCase))
+                {
+                    return LANG_TR;
+                }
+
+                if (System.Globalization.CultureInfo.CurrentCulture != null &&
+                    System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName.Equals("tr", StringComparison.OrdinalIgnoreCase))
+                {
+                    return LANG_TR;
+                }
+
+                if (System.Globalization.CultureInfo.InstalledUICulture != null &&
+                    System.Globalization.CultureInfo.InstalledUICulture.TwoLetterISOLanguageName.Equals("tr", StringComparison.OrdinalIgnoreCase))
+                {
+                    return LANG_TR;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                currentLanguage = (Application.systemLanguage == SystemLanguage.Turkish) ? LANG_TR : LANG_EN;
-                PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
-                PlayerPrefs.Save();
+                Debug.LogWarning($"[LocalizationManager] Sistem dili algılanırken hata: {ex.Message}");
             }
 
+            return LANG_EN;
+        }
+
+        public static void InitializeLanguage()
+        {
+            // Cihazın sistem dilinden otomatik olarak çek ve oyunu o dilde aç
+            currentLanguage = GetDeviceSystemLanguage();
             LoadLanguageStrings(currentLanguage);
         }
 
@@ -66,9 +98,6 @@ namespace ZiplaKac.Core
             if (currentLanguage == langCode && localizedStrings.Count > 0) return;
 
             currentLanguage = langCode;
-            PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
-            PlayerPrefs.Save();
-
             LoadLanguageStrings(currentLanguage);
             OnLanguageChanged?.Invoke();
         }
