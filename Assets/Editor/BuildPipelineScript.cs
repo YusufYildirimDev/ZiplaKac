@@ -55,6 +55,55 @@ namespace ZiplaKac.Editor
             }
         }
 
+        public static void BuildAndroidAAB()
+        {
+            EnsureWorldSpritesImported();
+
+            string[] scenes = new string[] { "Assets/Scenes/SampleScene.unity" };
+            string buildPath = "Builds/Android/Hoppzy.aab";
+            string dir = System.IO.Path.GetDirectoryName(buildPath);
+            if (!System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+
+            Debug.Log($"[BuildPipelineScript] Starting Android AAB build to '{buildPath}'...");
+
+            PlayerSettings.companyName = "YusufYildirim";
+            PlayerSettings.productName = "Hoppzy";
+            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.yusufyldrm.ziplakac");
+            PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
+            EditorUserBuildSettings.buildAppBundle = true;
+
+            ConfigureAppIcons();
+
+            BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+            {
+                scenes = scenes,
+                locationPathName = buildPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.None
+            };
+
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
+
+            Debug.Log($"[BuildPipelineScript] Android Result: {summary.result}, Errors: {summary.totalErrors}");
+
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("[BuildPipelineScript] Android AAB Build succeeded!");
+                EditorApplication.Exit(0);
+            }
+            else
+            {
+                Debug.LogError($"[BuildPipelineScript] Android Build failed with {summary.totalErrors} errors!");
+                EditorApplication.Exit(1);
+            }
+        }
+
         private static void ConfigureAppIcons()
         {
             string masterIconPath = "Assets/Art/AppIcon/app_icon_1024.png";
@@ -80,8 +129,9 @@ namespace ZiplaKac.Editor
             if (iconTex != null)
             {
                 PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.iOS, new Texture2D[] { iconTex });
+                PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Android, new Texture2D[] { iconTex });
                 PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown, new Texture2D[] { iconTex });
-                Debug.Log("[BuildPipelineScript] Assigned app icon to iOS and Unknown target groups.");
+                Debug.Log("[BuildPipelineScript] Assigned app icon to iOS, Android and Unknown target groups.");
             }
             else
             {
