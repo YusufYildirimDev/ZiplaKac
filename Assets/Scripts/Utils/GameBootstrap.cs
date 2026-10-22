@@ -979,27 +979,42 @@ namespace ZiplaKac.Utils
             GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(900f, 1020f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
 
-            // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi)
+            // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi - Üstte Bağımsız ve Geniş)
             Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
             if (titleSp != null)
             {
-                CreateSpriteImage(card.transform, "TitleImage", titleSp, new Vector2(0f, 412f), new Vector2(500f, 119f));
+                CreateSpriteImage(card.transform, "TitleImage", titleSp, new Vector2(0f, 432f), new Vector2(500f, 119f));
             }
             else
             {
-                CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 412f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
+                CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
-            // 1.4. Sol Üst Lider Tablosu Rozeti (Leaderboard Pill - Apple Game Center)
-            GameObject lbBadge = CreateCardContainer(card.transform, "MainMenuLeaderboardBadge", new Vector2(175f, 66f));
+            // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
+            Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
+            Image subImg = null;
+            Text subTxt = null;
+            if (subSp != null)
+            {
+                GameObject subObj = CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 365f), new Vector2(330f, 30f));
+                subImg = subObj.GetComponent<Image>();
+            }
+            else
+            {
+                subTxt = CreateText(card.transform, "SubtitleText", LocalizationManager.Get("app_subtitle"), 26, new Vector2(0f, 365f), new Color(0.61f, 0.73f, 0.88f), false);
+            }
+
+            // 2.5. Rozetler Satırı (Skor & Can - Yazının yanından alınıp aşağıda yan yana estetik rozet barı yapıldı)
+            // Sol Rozet: 🏆 SKORLAR (Apple Game Center)
+            GameObject lbBadge = CreateCardContainer(card.transform, "MainMenuLeaderboardBadge", new Vector2(230f, 62f));
             RectTransform lbRt = lbBadge.GetComponent<RectTransform>();
-            lbRt.anchoredPosition = new Vector2(-330f, 435f);
+            lbRt.anchoredPosition = new Vector2(-135f, 308f);
 
             Image lbBg = lbBadge.GetComponent<Image>();
             lbBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 new Color(0.18f, 0.14f, 0.05f, 0.95f),
                 new Color(1.0f, 0.78f, 0.20f, 0.95f),
-                2.5f, 22, 175, 66);
+                2.5f, 22, 230, 62);
 
             // Kupa İkonu
             GameObject lbIconObj = new GameObject("TrophyIcon");
@@ -1008,8 +1023,8 @@ namespace ZiplaKac.Utils
             lbIconRt.anchorMin = new Vector2(0f, 0.5f);
             lbIconRt.anchorMax = new Vector2(0f, 0.5f);
             lbIconRt.pivot = new Vector2(0f, 0.5f);
-            lbIconRt.anchoredPosition = new Vector2(14f, 0f);
-            lbIconRt.sizeDelta = new Vector2(38f, 38f);
+            lbIconRt.anchoredPosition = new Vector2(16f, 0f);
+            lbIconRt.sizeDelta = new Vector2(36f, 36f);
             Text lbIconTxt = lbIconObj.AddComponent<Text>();
             lbIconTxt.font = GetSafeDefaultFont();
             lbIconTxt.fontSize = 28;
@@ -1017,12 +1032,12 @@ namespace ZiplaKac.Utils
             lbIconTxt.text = "🏆";
 
             // Metin (SKORLAR / LEADERBOARD)
-            Text lbText = CreateText(lbBadge.transform, "LeaderboardText", LocalizationManager.Get("menu_leaderboard_label", "SKORLAR"), 20, new Vector2(24f, 0f), new Color(1.0f, 0.92f, 0.65f), false, FontStyle.Bold);
+            Text lbText = CreateText(lbBadge.transform, "LeaderboardText", LocalizationManager.Get("menu_leaderboard_label", "SKORLAR"), 22, new Vector2(24f, 0f), new Color(1.0f, 0.92f, 0.65f), false, FontStyle.Bold);
             lbText.alignment = TextAnchor.MiddleCenter;
             RectTransform lbTxtRt = lbText.GetComponent<RectTransform>();
             lbTxtRt.anchorMin = new Vector2(0f, 0f);
             lbTxtRt.anchorMax = new Vector2(1f, 1f);
-            lbTxtRt.offsetMin = new Vector2(50f, 4f);
+            lbTxtRt.offsetMin = new Vector2(52f, 4f);
             lbTxtRt.offsetMax = new Vector2(-10f, -4f);
 
             Button lbBtn = lbBadge.AddComponent<Button>();
@@ -1043,16 +1058,16 @@ namespace ZiplaKac.Utils
                 if (lbText != null) lbText.text = LocalizationManager.Get("menu_leaderboard_label", "SKORLAR");
             };
 
-            // 1.5. Sağ Üst Can Rozeti (Extra Life Pill)
-            GameObject lifeBadge = CreateCardContainer(card.transform, "MainMenuLifeBadge", new Vector2(175f, 66f));
+            // Sağ Rozet: ❤️ CAN ROZETİ (Extra Life Pill)
+            GameObject lifeBadge = CreateCardContainer(card.transform, "MainMenuLifeBadge", new Vector2(230f, 62f));
             RectTransform lifeRt = lifeBadge.GetComponent<RectTransform>();
-            lifeRt.anchoredPosition = new Vector2(330f, 435f);
+            lifeRt.anchoredPosition = new Vector2(135f, 308f);
 
             Image lifeBg = lifeBadge.GetComponent<Image>();
             lifeBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 new Color(0.14f, 0.06f, 0.10f, 0.95f),
                 new Color(1.0f, 0.35f, 0.45f, 0.95f),
-                2.5f, 22, 175, 66);
+                2.5f, 22, 230, 62);
 
             // Kalp İkonu
             GameObject lifeIconObj = new GameObject("HeartIcon");
@@ -1061,8 +1076,8 @@ namespace ZiplaKac.Utils
             lifeIconRt.anchorMin = new Vector2(0f, 0.5f);
             lifeIconRt.anchorMax = new Vector2(0f, 0.5f);
             lifeIconRt.pivot = new Vector2(0f, 0.5f);
-            lifeIconRt.anchoredPosition = new Vector2(14f, 0f);
-            lifeIconRt.sizeDelta = new Vector2(38f, 38f);
+            lifeIconRt.anchoredPosition = new Vector2(16f, 0f);
+            lifeIconRt.sizeDelta = new Vector2(36f, 36f);
             Image lifeIconImg = lifeIconObj.AddComponent<Image>();
             lifeIconImg.sprite = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
             lifeIconImg.preserveAspect = true;
@@ -1074,7 +1089,7 @@ namespace ZiplaKac.Utils
             RectTransform lifeTxtRt = menuLifeText.GetComponent<RectTransform>();
             lifeTxtRt.anchorMin = new Vector2(0f, 0f);
             lifeTxtRt.anchorMax = new Vector2(1f, 1f);
-            lifeTxtRt.offsetMin = new Vector2(56f, 4f);
+            lifeTxtRt.offsetMin = new Vector2(52f, 4f);
             lifeTxtRt.offsetMax = new Vector2(-10f, -4f);
 
             CanvasGroup lifeCg = lifeBadge.AddComponent<CanvasGroup>();
@@ -1083,7 +1098,7 @@ namespace ZiplaKac.Utils
                 if (menuLifeText == null) return;
                 int lives = SaveSystem.GetConsumableCount("second_chance");
                 string lbl = LocalizationManager.Get("menu_life_label", "CAN");
-                menuLifeText.text = $"<size=15><color=#ff7d90>{lbl}</color></size>  <size=28><color=#ffffff><b>{lives}</b></color></size>";
+                menuLifeText.text = $"<size=16><color=#ff7d90>{lbl}</color></size>  <size=28><color=#ffffff><b>{lives}</b></color></size>";
                 if (lifeCg != null)
                 {
                     lifeCg.alpha = lives > 0 ? 1f : 0.55f;
@@ -1105,49 +1120,35 @@ namespace ZiplaKac.Utils
             LocalizationManager.OnLanguageChanged += updateMenuLifeBadge;
             updateMenuLifeBadge();
 
-            // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
-            Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
-            Image subImg = null;
-            Text subTxt = null;
-            if (subSp != null)
-            {
-                GameObject subObj = CreateSpriteImage(card.transform, "SubtitleImage", subSp, new Vector2(0f, 340f), new Vector2(330f, 30f));
-                subImg = subObj.GetComponent<Image>();
-            }
-            else
-            {
-                subTxt = CreateText(card.transform, "SubtitleText", LocalizationManager.Get("app_subtitle"), 26, new Vector2(0f, 340f), new Color(0.61f, 0.73f, 0.88f), false);
-            }
-
             // 3. Bölücü Çizgi "─── KARAKTER SEÇ ───" (#9DBCE0)
             Sprite divSp = LoadMainMenuSprite("divider_karakter_sec");
             Image divImg = null;
             if (divSp != null)
             {
-                GameObject divObj = CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 305f), new Vector2(430f, 28f));
+                GameObject divObj = CreateSpriteImage(card.transform, "DividerImage", divSp, new Vector2(0f, 252f), new Vector2(430f, 28f));
                 divImg = divObj.GetComponent<Image>();
             }
             else
             {
-                CreateSectionDivider(card.transform, LocalizationManager.Get("menu_select_character"), 305f);
+                CreateSectionDivider(card.transform, LocalizationManager.Get("menu_select_character"), 252f);
             }
 
             // 4. Karakter Galerisi UI (5 Karakter Kartı - Seçili olan #27C7FF Neon Mavi Çerçeveli)
             GameObject galleryObj = new GameObject("CharacterGallery");
             galleryObj.transform.SetParent(card.transform, false);
             RectTransform galleryRt = galleryObj.AddComponent<RectTransform>();
-            galleryRt.anchoredPosition = new Vector2(0f, 185f);
-            galleryRt.sizeDelta = new Vector2(840f, 185f);
+            galleryRt.anchoredPosition = new Vector2(0f, 150f);
+            galleryRt.sizeDelta = new Vector2(840f, 170f);
 
             galleryObj.AddComponent<CharacterSelectorUI>();
 
-            // 5. "▶ OYNA" Butonu (Master Referans: 800x114, Birebir Kapsül Tasarım)
+            // 5. "▶ OYNA" Butonu (Master Referans: 800x110, Birebir Kapsül Tasarım)
             Sprite oynaSp = LoadMainMenuSprite("btn_oyna");
             Image playImg = null;
             Text playTxt = null;
             if (oynaSp != null)
             {
-                GameObject playBtnObj = CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, 20f), new Vector2(800f, 114f), () => {
+                GameObject playBtnObj = CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, -5f), new Vector2(800f, 110f), () => {
                     AudioManager.Instance?.PlayJumpSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
@@ -1157,7 +1158,7 @@ namespace ZiplaKac.Utils
             {
                 Color primaryBlue = new Color(0.086f, 0.471f, 1.0f); // #1678FF
                 Color blueBorder = new Color(0.40f, 0.75f, 1.0f, 0.50f);
-                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", LocalizationManager.Get("menu_play"), new Vector2(0f, 20f), new Vector2(800f, 114f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
+                GameObject btnObj = CreatePillButton(card.transform, "PlayButton", LocalizationManager.Get("menu_play"), new Vector2(0f, -5f), new Vector2(800f, 110f), primaryBlue, Color.white, 44, blueBorder, 2.5f, 58);
                 playTxt = btnObj.GetComponentInChildren<Text>();
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
@@ -1166,12 +1167,12 @@ namespace ZiplaKac.Utils
                 });
             }
 
-            // 6. 2x2 Grid Özellik Kartları (Master Referans, Boyut: 390x134, 924x318 HD Varlıklar):
-            // Row 1 (y = -129f): [MAĞAZA & GARDIROP (Mor)]   [GÜNLÜK ÖDÜL (Turuncu)]
-            // Row 2 (y = -285f): [NASIL OYNANIR? (Camgöbeği)] [REKLAM İZLE / CAN AL (Yeşil)]
-            Vector2 gridSize = new Vector2(390f, 134f);
-            float row1Y = -129f;
-            float row2Y = -285f;
+            // 6. 2x2 Grid Özellik Kartları (Master Referans, Boyut: 390x130, 924x318 HD Varlıklar):
+            // Row 1 (y = -155f): [MAĞAZA & GARDIROP (Mor)]   [GÜNLÜK ÖDÜL (Turuncu)]
+            // Row 2 (y = -305f): [NASIL OYNANIR? (Camgöbeği)] [REKLAM İZLE / CAN AL (Yeşil)]
+            Vector2 gridSize = new Vector2(390f, 130f);
+            float row1Y = -155f;
+            float row2Y = -305f;
             float colLeftX = -205f;
             float colRightX = 205f;
 
