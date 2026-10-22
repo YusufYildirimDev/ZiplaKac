@@ -581,54 +581,69 @@ namespace ZiplaKac.Utils
 
         public static Sprite CreateTrophyIconSprite(int resolution = 128)
         {
+            Sprite loaded = Resources.Load<Sprite>("Sprites/UI/icon_trophy");
+            if (loaded != null) return loaded;
+
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            Vector2 center = new Vector2(resolution * 0.5f, resolution * 0.5f);
-            Color goldTop = new Color(1.0f, 0.92f, 0.45f, 1f);
-            Color goldMid = new Color(0.96f, 0.72f, 0.12f, 1f);
-            Color goldDark = new Color(0.70f, 0.45f, 0.05f, 1f);
+            Color goldLight = new Color(1.0f, 0.93f, 0.51f, 1f);
+            Color goldMid = new Color(1.0f, 0.76f, 0.12f, 1f);
+            Color goldDark = new Color(0.82f, 0.51f, 0.04f, 1f);
+            Color goldDeep = new Color(0.67f, 0.37f, 0.02f, 1f);
+            Color shine = new Color(1.0f, 1.0f, 0.90f, 1f);
 
-            float r = resolution * 0.45f;
+            float invR = 1f / (resolution * 0.44f);
+            float hResolution = resolution * 0.5f;
+
             for (int y = 0; y < resolution; y++)
             {
+                float ny = -((y + 0.5f - hResolution) * invR);
                 for (int x = 0; x < resolution; x++)
                 {
-                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
-                    float d = Vector2.Distance(pt, center);
-                    if (d <= r)
-                    {
-                        float vertT = Mathf.Clamp01((y - (center.y - r)) / (r * 2f));
-                        Color c = Color.Lerp(new Color(0.18f, 0.12f, 0.32f, 0.95f), new Color(0.28f, 0.18f, 0.48f, 0.95f), vertT);
-                        if (d > r - 4f) c = Color.Lerp(c, goldTop, 0.9f);
-                        tex.SetPixel(x, y, c);
-                    }
-                    else if (d <= r + 1.5f)
-                    {
-                        float a = 1f - (d - r) / 1.5f;
-                        tex.SetPixel(x, y, new Color(goldTop.r, goldTop.g, goldTop.b, a * 0.6f));
-                    }
-                }
-            }
+                    float nx = (x + 0.5f - hResolution) * invR;
+                    float absNx = Mathf.Abs(nx);
 
-            for (int y = 24; y <= 98; y++)
-            {
-                for (int x = 24; x <= 104; x++)
-                {
-                    float relX = x - center.x;
-                    float relY = y - center.y;
+                    // Taban
+                    bool inBaseBottom = (ny >= -0.90f && ny <= -0.74f) && (absNx <= 0.55f - (ny + 0.90f) * 0.25f);
+                    bool inBaseTop = (ny >= -0.74f && ny <= -0.58f) && (absNx <= 0.36f);
+                    bool inBase = inBaseBottom || inBaseTop;
 
-                    bool inCup = (relY >= -6f && relY <= 30f && Mathf.Abs(relX) <= (14f + (relY + 6f) * 0.45f));
-                    bool inStem = (relY >= -22f && relY < -6f && Mathf.Abs(relX) <= 6f);
-                    bool inBase = (relY >= -32f && relY < -22f && Mathf.Abs(relX) <= (22f - (relY + 32f) * 0.6f));
-                    bool inHandleL = (relY >= 4f && relY <= 26f && relX >= -34f && relX <= -16f && (Mathf.Abs(relX - (-25f)) > 3f || relY > 23f || relY < 7f));
-                    bool inHandleR = (relY >= 4f && relY <= 26f && relX >= 16f && relX <= 34f && (Mathf.Abs(relX - 25f) > 3f || relY > 23f || relY < 7f));
+                    // Gövde (Stem)
+                    bool inStem = (ny >= -0.58f && ny <= -0.12f) && (absNx <= 0.11f + 0.08f * Mathf.Pow(ny + 0.35f, 2f));
 
-                    if (inCup || inStem || inBase || inHandleL || inHandleR)
+                    // Kupa Haznesi
+                    float cupT = Mathf.Clamp01((ny + 0.12f) / 0.82f);
+                    float cupWidth = 0.20f + 0.46f * Mathf.Sqrt(cupT);
+                    bool inCup = (ny >= -0.12f && ny <= 0.70f) && (absNx <= cupWidth);
+
+                    // Kulplar
+                    float hDy = ny - 0.28f;
+                    float hDx = absNx - 0.48f;
+                    float hDist = Mathf.Sqrt(hDx * hDx * 1.5f + hDy * hDy * 2.2f);
+                    bool inHandle = (ny >= -0.02f && ny <= 0.58f) && (absNx >= 0.28f) && (hDist >= 0.10f && hDist <= 0.24f);
+
+                    // Ağız Çerçevesi (Rim)
+                    bool inRim = (ny >= 0.64f && ny <= 0.74f) && (absNx <= 0.68f);
+
+                    if (inCup || inStem || inBase || inHandle || inRim)
                     {
-                        float cupT = Mathf.Clamp01((y - 24f) / 74f);
-                        Color c = Color.Lerp(goldDark, goldTop, cupT);
-                        if (relX < -2f && inCup) c = Color.Lerp(c, Color.white, 0.35f);
+                        float t = Mathf.Clamp01((ny + 0.9f) / 1.64f);
+                        Color c = Color.Lerp(goldDeep, goldLight, Mathf.Pow(t, 0.85f));
+
+                        if (nx >= -0.42f && nx <= -0.08f && ny >= -0.05f && ny <= 0.65f)
+                        {
+                            float sAmt = Mathf.Clamp01(1.0f - Mathf.Abs(nx - (-0.22f)) / 0.16f) * 0.50f;
+                            c = Color.Lerp(c, shine, sAmt);
+                        }
+
+                        if (inHandle)
+                        {
+                            float edgeT = Mathf.Abs(hDist - 0.17f) / 0.07f;
+                            c *= (1.0f - 0.25f * edgeT);
+                            c.a = 1f;
+                        }
+
                         tex.SetPixel(x, y, c);
                     }
                 }
