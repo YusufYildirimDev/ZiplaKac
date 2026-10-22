@@ -998,6 +998,27 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
+            // 1.5. Dil Değiştirici Butonu (Sağ Üst Rozet - 🇹🇷 TR / 🇬🇧 EN)
+            Color langBg = new Color(0.12f, 0.17f, 0.30f, 0.95f);
+            Color langBorder = new Color(0.24f, 0.38f, 0.60f, 0.70f);
+            string initialLangDisplay = LocalizationManager.Get("lang_display", "🇹🇷 TR");
+            GameObject langBtnObj = CreatePillButton(card.transform, "LanguageSwitchButton", initialLangDisplay, new Vector2(365f, 440f), new Vector2(116f, 50f), langBg, Color.white, 20, langBorder, 1.5f, 25);
+            Text langTxt = langBtnObj.GetComponentInChildren<Text>();
+            Button langBtn = langBtnObj.GetComponent<Button>();
+            langBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                LocalizationManager.ToggleLanguage();
+                SaveSystem.BackupToKeychain();
+            });
+
+            LocalizationManager.OnLanguageChanged += () => {
+                if (langTxt != null)
+                {
+                    langTxt.text = LocalizationManager.Get("lang_display", "🇹🇷 TR");
+                }
+            };
+
             // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");
             Image subImg = null;
@@ -2358,7 +2379,7 @@ namespace ZiplaKac.Utils
             // Sonraki Butonu (Sağ Alt / Mint Yeşili - Standart 360x96)
             Color mintColor = new Color(0.00f, 0.875f, 0.56f);
             Color darkNavy = new Color(0.03f, 0.05f, 0.10f);
-            GameObject nextBtnObj = CreatePillButton(card.transform, "NextButton", "SONRAKİ ➔", new Vector2(215f, -575f), new Vector2(360f, 96f), mintColor, darkNavy, 32, null, 0f, 32);
+            GameObject nextBtnObj = CreatePillButton(card.transform, "NextButton", LocalizationManager.Get("onb_btn_next", "SONRAKİ ➔"), new Vector2(215f, -575f), new Vector2(360f, 96f), mintColor, darkNavy, 32, null, 0f, 32);
             modalUI.nextButton = nextBtnObj.GetComponent<Button>();
             modalUI.nextButtonText = nextBtnObj.GetComponentInChildren<Text>();
             modalUI.nextButton.onClick.AddListener(modalUI.NextSlide);

@@ -426,9 +426,7 @@ namespace ZiplaKac.UI
                 AudioManager.Instance?.TriggerHapticFeedback();
                 string prev = SaveSystem.GetPreviousCharacterInChain(characterId);
                 string prevName = LocalizationManager.Get($"char_{prev}_name", SaveSystem.GetCharacterDisplayName(prev));
-                string msg = LocalizationManager.CurrentLanguage == LocalizationManager.LANG_EN
-                    ? $"🔒 LOCKED: Reach 2500 score with {prevName} to unlock!"
-                    : $"🔒 KİLİTLİ: Bu karakteri açmak için {prevName} ile 2500 skor yap!";
+                string msg = LocalizationManager.GetFormat("char_lock_msg", prevName);
                 ShowLockNotice(msg);
                 return;
             }

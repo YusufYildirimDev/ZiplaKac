@@ -162,10 +162,9 @@ namespace ZiplaKac.UI
             }
 
             // 2. Başlık ve Rozet Metinleri
-            bool isEn = LocalizationManager.CurrentLanguage == LocalizationManager.LANG_EN;
             if (stepBadgeText != null)
             {
-                stepBadgeText.text = isEn ? $"GUIDE • STEP {currentSlideIndex + 1} / {total}" : $"REHBER • ADIM {currentSlideIndex + 1} / {total}";
+                stepBadgeText.text = LocalizationManager.GetFormat("onb_step_badge", currentSlideIndex + 1, total);
             }
 
             if (closeButtonText != null) closeButtonText.text = LocalizationManager.Get("btn_close");
@@ -181,21 +180,7 @@ namespace ZiplaKac.UI
 
             if (titleText != null)
             {
-                switch (currentSlideIndex)
-                {
-                    case 0:
-                        titleText.text = isEn ? "GAME RULES & CONTROLS" : "OYUN KURALLARI & KONTROLLER";
-                        break;
-                    case 1:
-                        titleText.text = isEn ? "5 CHARACTERS & UNLOCK CHAIN" : "5 KARAKTER & KİLİT ZİNCİRİ";
-                        break;
-                    case 2:
-                        titleText.text = isEn ? "POWERS & UPGRADES" : "GÜÇLER & YÜKSELTMELER";
-                        break;
-                    case 3:
-                        titleText.text = isEn ? "DAILY CHEST & WARDROBE" : "GÜNLÜK SANDIK & GARDIROP";
-                        break;
-                }
+                titleText.text = LocalizationManager.Get($"onb_step{currentSlideIndex}_title");
             }
 
             // 3. Buton Yerleşimleri ve Standart Boyutları (Referans mockupa birebir)
@@ -253,8 +238,8 @@ namespace ZiplaKac.UI
             if (nextButtonText != null)
             {
                 nextButtonText.text = (currentSlideIndex == total - 1)
-                    ? (isEn ? "🚀 LET'S GO!" : "🚀 HADİ BAŞLAYALIM!")
-                    : (isEn ? "NEXT ➔" : "SONRAKİ ➔");
+                    ? LocalizationManager.Get("onb_btn_start", "🚀 HADİ BAŞLAYALIM!")
+                    : LocalizationManager.Get("onb_btn_next", "SONRAKİ ➔");
             }
 
             // 5. Sayfa Göstergeleri (Dots)

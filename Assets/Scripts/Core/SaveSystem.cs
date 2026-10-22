@@ -24,6 +24,7 @@ namespace ZiplaKac.Core
         public string lastStreakDate;
         public string lastDailyRewardDate;
         public int noAds;
+        public string language = "";
 
         public int consumableShield;
         public int consumableSlowStart;
@@ -73,6 +74,7 @@ namespace ZiplaKac.Core
                             if (!string.IsNullOrEmpty(data.lastStreakDate)) PlayerPrefs.SetString(KEY_LAST_STREAK_DATE, data.lastStreakDate);
                             if (!string.IsNullOrEmpty(data.lastDailyRewardDate)) PlayerPrefs.SetString(KEY_LAST_DAILY_REWARD, data.lastDailyRewardDate);
                             PlayerPrefs.SetInt("no_ads", data.noAds);
+                            if (!string.IsNullOrEmpty(data.language)) PlayerPrefs.SetString(LocalizationManager.PREF_KEY_LANGUAGE, data.language);
 
                             PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + "shield", data.consumableShield);
                             PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + "slow_start", data.consumableSlowStart);
@@ -130,6 +132,7 @@ namespace ZiplaKac.Core
                     lastStreakDate = PlayerPrefs.GetString(KEY_LAST_STREAK_DATE, ""),
                     lastDailyRewardDate = PlayerPrefs.GetString(KEY_LAST_DAILY_REWARD, ""),
                     noAds = PlayerPrefs.GetInt("no_ads", 0),
+                    language = PlayerPrefs.GetString(LocalizationManager.PREF_KEY_LANGUAGE, ""),
 
                     consumableShield = GetConsumableCount("shield"),
                     consumableSlowStart = GetConsumableCount("slow_start"),

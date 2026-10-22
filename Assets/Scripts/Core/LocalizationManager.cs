@@ -87,8 +87,17 @@ namespace ZiplaKac.Core
 
         public static void InitializeLanguage()
         {
-            // Cihazın sistem dilinden otomatik olarak çek ve oyunu o dilde aç
-            currentLanguage = GetDeviceSystemLanguage();
+            // Önce kayıtlı dil tercihine bak (Türkçe veya İngilizce)
+            string saved = PlayerPrefs.GetString(PREF_KEY_LANGUAGE, null);
+            if (!string.IsNullOrEmpty(saved) && (saved == LANG_TR || saved == LANG_EN))
+            {
+                currentLanguage = saved;
+            }
+            else
+            {
+                // Tercih yoksa cihazın sistem dilinden otomatik olarak çek
+                currentLanguage = GetDeviceSystemLanguage();
+            }
             LoadLanguageStrings(currentLanguage);
         }
 
@@ -98,6 +107,8 @@ namespace ZiplaKac.Core
             if (currentLanguage == langCode && localizedStrings.Count > 0) return;
 
             currentLanguage = langCode;
+            PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
+            PlayerPrefs.Save();
             LoadLanguageStrings(currentLanguage);
             OnLanguageChanged?.Invoke();
         }
@@ -327,6 +338,7 @@ namespace ZiplaKac.Core
             { "char_unlock_hint", "{0} Skora Ulaşarak Aç" },
             { "char_unlocked_toast", "🎉 YENİ KARAKTER AÇILDI: {0}! 🎉" },
             { "char_lock_badge", "{0} Skor" },
+            { "char_lock_msg", "🔒 KİLİTLİ: Bu karakteri açmak için {0} ile 2500 skor yap!" },
 
             // Oyun Sonu (Game Over)
             { "go_title", "OYUN BİTTİ" },
@@ -354,6 +366,13 @@ namespace ZiplaKac.Core
             { "reward_btn_claim", "ÖDÜLÜ AL" },
 
             // Nasıl Oynanır (Onboarding)
+            { "onb_step_badge", "REHBER • ADIM {0} / {1}" },
+            { "onb_step0_title", "OYUN KURALLARI & KONTROLLER" },
+            { "onb_step1_title", "5 KARAKTER & KİLİT ZİNCİRİ" },
+            { "onb_step2_title", "GÜÇLER & YÜKSELTMELER" },
+            { "onb_step3_title", "GÜNLÜK SANDIK & GARDIROP" },
+            { "onb_btn_next", "SONRAKİ ➔" },
+            { "onb_btn_start", "🚀 HADİ BAŞLAYALIM!" },
             { "onb_s0_sub", "Zıpla, engellerden kaç ve rekorunu kır!" },
             { "onb_s0_r1_title", "Tek Dokunuşla Zıpla" },
             { "onb_s0_r1_desc", "Ekrana dokunarak veya Space tuşuna basarak yaklaşan sivri dikenlerin, kaktüs ve kayaların üzerinden atla." },
@@ -520,6 +539,7 @@ namespace ZiplaKac.Core
             { "char_unlock_hint", "Reach {0} Score to Unlock" },
             { "char_unlocked_toast", "🎉 NEW CHARACTER UNLOCKED: {0}! 🎉" },
             { "char_lock_badge", "{0} Score" },
+            { "char_lock_msg", "🔒 LOCKED: Reach 2500 score with {0} to unlock!" },
 
             // Game Over
             { "go_title", "GAME OVER" },
@@ -547,6 +567,13 @@ namespace ZiplaKac.Core
             { "reward_btn_claim", "CLAIM REWARD" },
 
             // How to Play (Onboarding)
+            { "onb_step_badge", "GUIDE • STEP {0} / {1}" },
+            { "onb_step0_title", "GAME RULES & CONTROLS" },
+            { "onb_step1_title", "5 CHARACTERS & UNLOCK CHAIN" },
+            { "onb_step2_title", "POWERS & UPGRADES" },
+            { "onb_step3_title", "DAILY CHEST & WARDROBE" },
+            { "onb_btn_next", "NEXT ➔" },
+            { "onb_btn_start", "🚀 LET'S GO!" },
             { "onb_s0_sub", "Jump, dodge obstacles, and beat your high score!" },
             { "onb_s0_r1_title", "One-Tap Jump" },
             { "onb_s0_r1_desc", "Tap the screen or press Space to jump over upcoming spikes, cacti, and rolling rocks." },
