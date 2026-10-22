@@ -50,11 +50,21 @@ namespace ZiplaKac.UI
             canvasScaler.referenceResolution = new Vector2(REFERENCE_WIDTH, REFERENCE_HEIGHT);
             canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
 
-            // Ekran 9:16'dan daha genişse (örn. iPad 4:3, tabletler):
-            // Dikeyde taşma olmaması için yüksekliğe eşitle (Match Height = 1.0)
-            // Ekran 9:16 veya daha darsa (örn. iPhone 14 Pro Max 9:19.5, modern telefonlar):
-            // Yatayda taşma olmaması için genişliğe eşitle (Match Width = 0.0)
-            canvasScaler.matchWidthOrHeight = currentAspect > TARGET_ASPECT ? 1.0f : 0.0f;
+            // 9:16 ve daha dar telefonlar (iPhone 14/15/16 Pro Max, modern Android: aspect <= 0.57): Match Width = 0.0f
+            // Geniş ekranlar ve tabletler (iPad 3:4 / 4:3, tabletler: aspect >= 0.72): Match Height = 1.0f
+            // Ara oranlar (örn. katlanabilir telefonlar veya 16:10 ekranlar): orantılı yumuşak geçiş
+            if (currentAspect <= 0.57f)
+            {
+                canvasScaler.matchWidthOrHeight = 0.0f;
+            }
+            else if (currentAspect >= 0.72f)
+            {
+                canvasScaler.matchWidthOrHeight = 1.0f;
+            }
+            else
+            {
+                canvasScaler.matchWidthOrHeight = Mathf.InverseLerp(0.57f, 0.72f, currentAspect);
+            }
         }
     }
 }

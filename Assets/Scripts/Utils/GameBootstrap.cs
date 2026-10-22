@@ -54,6 +54,11 @@ namespace ZiplaKac.Utils
             Instance = this;
             LocalizationManager.InitializeLanguage();
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            Screen.orientation = ScreenOrientation.AutoRotation;
+            Screen.autorotateToPortrait = true;
+            Screen.autorotateToPortraitUpsideDown = true;
+            Screen.autorotateToLandscapeLeft = false;
+            Screen.autorotateToLandscapeRight = false;
             SetupCamera();
             SetupManagers();
             SetupBackground();
@@ -227,7 +232,7 @@ namespace ZiplaKac.Utils
                 }
                 sg.tileWidth = tileW;
 
-                int tileCount = 4;
+                int tileCount = 5;
                 sg.tiles = new Transform[tileCount];
                 sg.renderers = new SpriteRenderer[tileCount];
                 Material safeMat = GetSafeSpriteMaterial();
@@ -257,7 +262,7 @@ namespace ZiplaKac.Utils
 
                 // Sabit Zemin Çarpışma Kutusu (Karakter fiziği için)
                 BoxCollider2D col = ground.AddComponent<BoxCollider2D>();
-                col.size = new Vector2(50f, 4f);
+                col.size = new Vector2(60f, 4f);
                 col.offset = new Vector2(0f, -2.0f); // Üst yüzey Y = -3.20f
 
                 int groundLayer = LayerMask.NameToLayer("Ground");
@@ -276,7 +281,7 @@ namespace ZiplaKac.Utils
                 player = new GameObject("Player");
                 try { player.tag = "Player"; } catch { }
 
-                player.transform.position = new Vector3(PlayerController.FIXED_PLAYER_X, PlayerController.GROUND_FLOOR_Y, 0f);
+                player.transform.position = new Vector3(PlayerController.GetResponsivePlayerX(), PlayerController.GROUND_FLOOR_Y, 0f);
 
                 Material safeMat = GetSafeSpriteMaterial();
 
@@ -978,6 +983,9 @@ namespace ZiplaKac.Utils
             // Dark Cinematic + Playful 3D Ana Panel (#101F38 Koyu Lacivert, 900x1020)
             GameObject card = CreateCardContainer(panel.transform, "MenuCard", new Vector2(900f, 1020f));
             card.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 110f);
+            var menuFitter = card.AddComponent<UI.ResponsiveCardFitter>();
+            menuFitter.adjustVerticalPosition = true;
+            menuFitter.verticalOffset = 110f;
 
             // 1. "= HOPPZY =" Logo Başlığı (Altın-Turuncu 3D Tipografi - Üstte Bağımsız ve Geniş)
             Sprite titleSp = LoadMainMenuSprite("title_hoppzy");
@@ -1488,6 +1496,7 @@ namespace ZiplaKac.Utils
             cardRt.pivot = new Vector2(0.5f, 0.5f);
             cardRt.sizeDelta = new Vector2(920f, 1340f);
             cardRt.anchoredPosition = Vector2.zero;
+            card.AddComponent<UI.ResponsiveCardFitter>();
 
             Color cardBg = new Color(0.094f, 0.149f, 0.231f, 0.98f);
             Color cardBorder = new Color(0.18f, 0.28f, 0.40f, 0.55f);
@@ -1931,6 +1940,7 @@ namespace ZiplaKac.Utils
             // Modal Card (940x1320) - Referans tasarıma birebir uygun modern koyu kart
             GameObject card = CreateCardContainer(modal.transform, "RewardCard", new Vector2(940f, 1320f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            card.AddComponent<UI.ResponsiveCardFitter>();
             Image cardImg = card.GetComponent<Image>();
             cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 new Color(0.051f, 0.106f, 0.196f, 0.98f), // #0D1B32
@@ -2043,6 +2053,7 @@ namespace ZiplaKac.Utils
             // Modal Card (940x1520) - Modern Koyu Lacivert Kart (#0B1426)
             GameObject card = CreateCardContainer(modal.transform, "WardrobeCard", new Vector2(940f, 1520f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            card.AddComponent<UI.ResponsiveCardFitter>();
             Image cardImg = card.GetComponent<Image>();
             cardImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
                 new Color(0.05f, 0.08f, 0.16f, 0.98f),
@@ -2163,6 +2174,7 @@ namespace ZiplaKac.Utils
             // Onboarding Card (940x1400)
             GameObject card = CreateCardContainer(modal.transform, "OnboardingCard", new Vector2(940f, 1400f));
             card.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            card.AddComponent<UI.ResponsiveCardFitter>();
             modalUI.modalCard = card;
 
             // 1. Üst Rozet & Başlık

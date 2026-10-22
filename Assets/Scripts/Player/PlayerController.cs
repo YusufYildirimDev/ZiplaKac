@@ -51,6 +51,18 @@ namespace ZiplaKac.Player
         public const float FIXED_PLAYER_X = -1.35f;
         public const float GROUND_FLOOR_Y = -2.96f;
 
+        public static float GetResponsivePlayerX()
+        {
+            Camera cam = Camera.main;
+            if (cam != null && cam.orthographic)
+            {
+                float halfWidth = cam.orthographicSize * cam.aspect;
+                // Telefonlarda (-1.35f), tabletlerde ekran oranına göre orantılı konum
+                return Mathf.Clamp(-halfWidth * 0.587f, -2.5f, -1.35f);
+            }
+            return FIXED_PLAYER_X;
+        }
+
         public static PlayerController Instance { get; private set; }
 
         private void Awake()
@@ -62,7 +74,7 @@ namespace ZiplaKac.Player
             rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
             rb.interpolation = RigidbodyInterpolation2D.Interpolate;
 
-            transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
+            transform.position = new Vector3(GetResponsivePlayerX(), GROUND_FLOOR_Y, 0f);
             rb.simulated = false;
 
             try
@@ -532,7 +544,7 @@ namespace ZiplaKac.Player
 
         private void HandleGameStateChanged(GameState newState)
         {
-            transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
+            transform.position = new Vector3(GetResponsivePlayerX(), GROUND_FLOOR_Y, 0f);
             rb.linearVelocity = Vector2.zero;
             jumpsUsed = 0;
             isGrounded = true;
@@ -554,7 +566,7 @@ namespace ZiplaKac.Player
 
         public void ResetToGround()
         {
-            transform.position = new Vector3(FIXED_PLAYER_X, GROUND_FLOOR_Y, 0f);
+            transform.position = new Vector3(GetResponsivePlayerX(), GROUND_FLOOR_Y, 0f);
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;

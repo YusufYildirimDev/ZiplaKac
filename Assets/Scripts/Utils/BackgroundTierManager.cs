@@ -82,6 +82,45 @@ namespace ZiplaKac.Utils
             {
                 SetInitialTier(0);
             }
+            UpdateBackgroundScaling();
+        }
+
+        private void LateUpdate()
+        {
+            UpdateBackgroundScaling();
+        }
+
+        private void UpdateBackgroundScaling()
+        {
+            Camera cam = Camera.main;
+            if (cam == null || !cam.orthographic) return;
+
+            float camHeight = 2.0f * cam.orthographicSize;
+            float camWidth = camHeight * cam.aspect;
+
+            float bgDefaultWidth = 5.333f;
+            float bgDefaultHeight = 10.0f;
+
+            if (primaryRenderer != null && primaryRenderer.sprite != null)
+            {
+                bgDefaultWidth = primaryRenderer.sprite.rect.width / primaryRenderer.sprite.pixelsPerUnit;
+                bgDefaultHeight = primaryRenderer.sprite.rect.height / primaryRenderer.sprite.pixelsPerUnit;
+            }
+
+            // Ekranı hem yatayda hem dikeyde %6 pay ile tamamen kaplamasını sağla
+            float scaleX = (camWidth / Mathf.Max(0.1f, bgDefaultWidth)) * 1.06f;
+            float scaleY = (camHeight / Mathf.Max(0.1f, bgDefaultHeight)) * 1.06f;
+            float uniformScale = Mathf.Max(scaleX, scaleY);
+
+            Vector3 targetScale = new Vector3(uniformScale, uniformScale, 1.0f);
+            if (primaryRenderer != null && primaryRenderer.transform.localScale != targetScale)
+            {
+                primaryRenderer.transform.localScale = targetScale;
+            }
+            if (fadeRenderer != null && fadeRenderer.transform.localScale != targetScale)
+            {
+                fadeRenderer.transform.localScale = targetScale;
+            }
         }
 
         public void HandleWorldThemeChanged(string characterKey, int stageIndex)
