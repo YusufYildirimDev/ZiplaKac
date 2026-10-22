@@ -39,6 +39,15 @@ namespace ZiplaKac.Core
             InitializeMonetization();
         }
 
+        private void Start()
+        {
+            // Apple App Store kuralı (iOS 14.5+): Açılışta kullanıcıdan takip/kişiselleştirilmiş reklam izni istenir
+            Utils.IOSATTBridge.RequestTrackingAuthorization(status =>
+            {
+                Debug.Log($"[MonetizationManager] iOS ATT İzin Durumu: {status}");
+            });
+        }
+
         private void InitializeMonetization()
         {
             // SDK Başlatma taklidi

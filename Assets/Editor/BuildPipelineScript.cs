@@ -21,6 +21,12 @@ namespace ZiplaKac.Editor
             PlayerSettings.iOS.appleDeveloperTeamID = "5A4A2VUMDM";
             PlayerSettings.iOS.appleEnableAutomaticSigning = true;
 
+            PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
+            PlayerSettings.allowedAutorotateToPortrait = true;
+            PlayerSettings.allowedAutorotateToPortraitUpsideDown = true;
+            PlayerSettings.allowedAutorotateToLandscapeLeft = false;
+            PlayerSettings.allowedAutorotateToLandscapeRight = false;
+
             ConfigureAppIcons();
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
