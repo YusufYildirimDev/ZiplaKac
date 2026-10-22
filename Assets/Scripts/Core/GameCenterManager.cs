@@ -56,6 +56,7 @@ namespace ZiplaKac.Core
                     if (success)
                     {
                         Debug.Log($"[GameCenter] Başarıyla bağlandı: {Social.localUser.userName} (ID: {Social.localUser.id})");
+                        SyncHighScoreWithGameCenter();
                     }
                     else
                     {
@@ -112,6 +113,36 @@ namespace ZiplaKac.Core
             catch (Exception ex)
             {
                 Debug.LogWarning($"[GameCenter] ReportScore istisnası: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Buluttaki Game Center skorunu yerel skor ile senkronize eder (Uygulama silinip yüklense dahi skoru kurtarır).
+        /// </summary>
+        public void SyncHighScoreWithGameCenter()
+        {
+            try
+            {
+                ILeaderboard lb = Social.CreateLeaderboard();
+                lb.id = leaderboardId;
+                lb.userScope = UserScope.FriendsOnly;
+                lb.timeScope = TimeScope.AllTime;
+                lb.LoadScores((bool success) => {
+                    if (success && lb.localUserScore != null && lb.localUserScore.value > 0)
+                    {
+                        long cloudScore = lb.localUserScore.value;
+                        int localHigh = SaveSystem.GetHighScore();
+                        if (cloudScore > localHigh)
+                        {
+                            Debug.Log($"[GameCenter] Buluttaki Game Center skoru ({cloudScore}) yerel skordan ({localHigh}) yüksek, geri yükleniyor...");
+                            SaveSystem.SaveScore((int)cloudScore);
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[GameCenter] SyncHighScoreWithGameCenter hatası: {ex.Message}");
             }
         }
 

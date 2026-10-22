@@ -28,15 +28,17 @@ namespace ZiplaKac.Editor
 
                 proj.AddFrameworkToProject(targetGuid, "AppTrackingTransparency.framework", false);
                 proj.AddFrameworkToProject(targetGuid, "AdSupport.framework", false);
+                proj.AddFrameworkToProject(targetGuid, "Security.framework", false);
 
                 if (!string.IsNullOrEmpty(frameworkTargetGuid))
                 {
                     proj.AddFrameworkToProject(frameworkTargetGuid, "AppTrackingTransparency.framework", false);
                     proj.AddFrameworkToProject(frameworkTargetGuid, "AdSupport.framework", false);
+                    proj.AddFrameworkToProject(frameworkTargetGuid, "Security.framework", false);
                 }
 
                 proj.WriteToFile(projPath);
-                Debug.Log("[IOSPostProcessBuild] AppTrackingTransparency & AdSupport frameworkleri bağlandı.");
+                Debug.Log("[IOSPostProcessBuild] AppTrackingTransparency, AdSupport & Security frameworkleri bağlandı.");
 
                 // 2. Info.plist Güncellemesi
                 string plistPath = Path.Combine(pathToBuiltProject, "Info.plist");

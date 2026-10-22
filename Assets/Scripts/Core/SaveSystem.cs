@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ZiplaKac.Utils;
 
 namespace ZiplaKac.Core
 {
@@ -10,12 +11,177 @@ namespace ZiplaKac.Core
         public List<int> scores = new List<int>();
     }
 
+    [System.Serializable]
+    public class PersistentSaveData
+    {
+        public int highScore;
+        public int totalGold;
+        public string selectedCharacter = "classic";
+        public string purchasedOutfits = "klasik_pelerin";
+        public string equippedOutfits = "klasik_pelerin";
+        public string unlockedCharacters = "classic";
+        public int dailyStreak;
+        public string lastStreakDate;
+        public string lastDailyRewardDate;
+        public int noAds;
+
+        public int consumableShield;
+        public int consumableSlowStart;
+        public int consumableLuckyPu;
+        public int consumableSecondChance;
+
+        public List<string> customKeys = new List<string>();
+        public List<int> customValues = new List<int>();
+    }
+
     /// <summary>
     /// PlayerPrefs tabanlı kalıcı veri saklama sistemi.
-    /// En yüksek skor, seçili karakter ID'si ve son 5 oyun skor geçmişi saklanır.
+    /// iOS Keychain köprüsü ile uygulama silinip yeniden yüklense dahi altınlar,
+    /// rekorlar, kostümler ve envanter verileri güvenle korunur ve geri yüklenir.
     /// </summary>
     public static class SaveSystem
     {
+        private const string KEY_INITIALIZED = "ZiplaKac_SaveInitialized";
+        private const string KEYCHAIN_SAVE_KEY = "hoppzy_persistent_save";
+
+        static SaveSystem()
+        {
+            InitializePersistence();
+        }
+
+        public static void InitializePersistence()
+        {
+            bool isLocalEmpty = PlayerPrefs.GetInt(KEY_INITIALIZED, 0) == 0;
+
+            string kcJson = IOSKeychainBridge.GetString(KEYCHAIN_SAVE_KEY, "");
+            if (!string.IsNullOrEmpty(kcJson))
+            {
+                try
+                {
+                    PersistentSaveData data = JsonUtility.FromJson<PersistentSaveData>(kcJson);
+                    if (data != null)
+                    {
+                        if (isLocalEmpty)
+                        {
+                            PlayerPrefs.SetInt(KEY_HIGH_SCORE, data.highScore);
+                            PlayerPrefs.SetInt(KEY_TOTAL_GOLD, data.totalGold);
+                            if (!string.IsNullOrEmpty(data.selectedCharacter)) PlayerPrefs.SetString(KEY_SELECTED_CHARACTER, data.selectedCharacter);
+                            if (!string.IsNullOrEmpty(data.purchasedOutfits)) PlayerPrefs.SetString(KEY_PURCHASED_OUTFITS, data.purchasedOutfits);
+                            if (!string.IsNullOrEmpty(data.equippedOutfits)) PlayerPrefs.SetString(KEY_EQUIPPED_OUTFITS, data.equippedOutfits);
+                            if (!string.IsNullOrEmpty(data.unlockedCharacters)) PlayerPrefs.SetString(KEY_UNLOCKED_CHARACTERS, data.unlockedCharacters);
+                            PlayerPrefs.SetInt(KEY_DAILY_STREAK, data.dailyStreak);
+                            if (!string.IsNullOrEmpty(data.lastStreakDate)) PlayerPrefs.SetString(KEY_LAST_STREAK_DATE, data.lastStreakDate);
+                            if (!string.IsNullOrEmpty(data.lastDailyRewardDate)) PlayerPrefs.SetString(KEY_LAST_DAILY_REWARD, data.lastDailyRewardDate);
+                            PlayerPrefs.SetInt("no_ads", data.noAds);
+
+                            PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + "shield", data.consumableShield);
+                            PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + "slow_start", data.consumableSlowStart);
+                            PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + "lucky_pu", data.consumableLuckyPu);
+                            PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + "second_chance", data.consumableSecondChance);
+
+                            if (data.customKeys != null && data.customValues != null)
+                            {
+                                for (int i = 0; i < data.customKeys.Count && i < data.customValues.Count; i++)
+                                {
+                                    PlayerPrefs.SetInt(data.customKeys[i], data.customValues[i]);
+                                }
+                            }
+
+                            PlayerPrefs.SetInt(KEY_INITIALIZED, 1);
+                            PlayerPrefs.Save();
+                            Debug.Log($"[SaveSystem] iOS Keychain üzerinden silinen uygulama verileri başarıyla geri yüklendi! Altın: {data.totalGold}, Rekor: {data.highScore}");
+                            return;
+                        }
+                        else
+                        {
+                            int localGold = PlayerPrefs.GetInt(KEY_TOTAL_GOLD, 150);
+                            if (data.totalGold > localGold) PlayerPrefs.SetInt(KEY_TOTAL_GOLD, data.totalGold);
+
+                            int localHigh = PlayerPrefs.GetInt(KEY_HIGH_SCORE, 0);
+                            if (data.highScore > localHigh) PlayerPrefs.SetInt(KEY_HIGH_SCORE, data.highScore);
+
+                            PlayerPrefs.Save();
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"[SaveSystem] Keychain okuma istisnası: {ex.Message}");
+                }
+            }
+
+            PlayerPrefs.SetInt(KEY_INITIALIZED, 1);
+            BackupToKeychain();
+        }
+
+        public static void BackupToKeychain()
+        {
+            try
+            {
+                PersistentSaveData data = new PersistentSaveData
+                {
+                    highScore = GetHighScore(),
+                    totalGold = GetTotalGold(),
+                    selectedCharacter = GetSelectedCharacterId("classic"),
+                    purchasedOutfits = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "klasik_pelerin"),
+                    equippedOutfits = PlayerPrefs.GetString(KEY_EQUIPPED_OUTFITS, "klasik_pelerin"),
+                    unlockedCharacters = PlayerPrefs.GetString(KEY_UNLOCKED_CHARACTERS, "classic"),
+                    dailyStreak = GetDailyStreak(),
+                    lastStreakDate = PlayerPrefs.GetString(KEY_LAST_STREAK_DATE, ""),
+                    lastDailyRewardDate = PlayerPrefs.GetString(KEY_LAST_DAILY_REWARD, ""),
+                    noAds = PlayerPrefs.GetInt("no_ads", 0),
+
+                    consumableShield = GetConsumableCount("shield"),
+                    consumableSlowStart = GetConsumableCount("slow_start"),
+                    consumableLuckyPu = GetConsumableCount("lucky_pu"),
+                    consumableSecondChance = GetConsumableCount("second_chance")
+                };
+
+                string[] chars = new string[] { "classic", "fire", "ice", "poison", "night" };
+                string[] upgrades = new string[] { "pu_duration", "double_jump", "combo_memory", "signature" };
+
+                foreach (var c in chars)
+                {
+                    string scoreKey = $"ZiplaKac_CharHighScore_{c}";
+                    if (PlayerPrefs.HasKey(scoreKey))
+                    {
+                        data.customKeys.Add(scoreKey);
+                        data.customValues.Add(PlayerPrefs.GetInt(scoreKey, 0));
+                    }
+
+                    string unlockKey = $"ZiplaKac_Unlocked_{c}";
+                    if (PlayerPrefs.HasKey(unlockKey))
+                    {
+                        data.customKeys.Add(unlockKey);
+                        data.customValues.Add(PlayerPrefs.GetInt(unlockKey, 0));
+                    }
+
+                    foreach (var u in upgrades)
+                    {
+                        string upKey = $"{KEY_UPGRADE_PREFIX}{c}_{u}";
+                        if (PlayerPrefs.HasKey(upKey))
+                        {
+                            data.customKeys.Add(upKey);
+                            data.customValues.Add(PlayerPrefs.GetInt(upKey, 0));
+                        }
+                    }
+                }
+
+                string json = JsonUtility.ToJson(data);
+                IOSKeychainBridge.SaveString(KEYCHAIN_SAVE_KEY, json);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[SaveSystem] Keychain yedekleme istisnası: {ex.Message}");
+            }
+        }
+
+        private static void SaveAll()
+        {
+            PlayerPrefs.Save();
+            BackupToKeychain();
+        }
+
         private const string KEY_HIGH_SCORE = "ZiplaKac_HighScore";
         private const string KEY_SELECTED_CHARACTER = "ZiplaKac_SelectedCharacter";
         private const string KEY_SCORE_HISTORY = "ZiplaKac_ScoreHistory";
@@ -41,7 +207,7 @@ namespace ZiplaKac.Core
             }
 
             AddScoreToHistory(score);
-            PlayerPrefs.Save();
+            SaveAll();
 
             return isNewRecord;
         }
@@ -54,7 +220,7 @@ namespace ZiplaKac.Core
         public static void SaveSelectedCharacterId(string characterId)
         {
             PlayerPrefs.SetString(KEY_SELECTED_CHARACTER, characterId);
-            PlayerPrefs.Save();
+            SaveAll();
         }
 
         private const string KEY_OUTFIT_ENABLED = "ZiplaKac_OutfitEnabled";
@@ -73,7 +239,7 @@ namespace ZiplaKac.Core
             if (amount <= 0) return;
             int total = GetTotalGold() + amount;
             PlayerPrefs.SetInt(KEY_TOTAL_GOLD, total);
-            PlayerPrefs.Save();
+            SaveAll();
         }
 
         public static bool SpendGold(int amount)
@@ -82,7 +248,7 @@ namespace ZiplaKac.Core
             if (total >= amount)
             {
                 PlayerPrefs.SetInt(KEY_TOTAL_GOLD, total - amount);
-                PlayerPrefs.Save();
+                SaveAll();
                 return true;
             }
             return false;
@@ -111,7 +277,7 @@ namespace ZiplaKac.Core
 
                 // Satın alınınca otomatik olarak giyilsin
                 SetOutfitEquipped(characterId, outfitType, true);
-                PlayerPrefs.Save();
+                SaveAll();
                 return true;
             }
             return false;
@@ -143,7 +309,7 @@ namespace ZiplaKac.Core
             }
 
             PlayerPrefs.SetString(KEY_EQUIPPED_OUTFITS, string.Join(",", list));
-            PlayerPrefs.Save();
+            SaveAll();
         }
 
         public static bool ToggleOutfitEquipped(string characterId, string outfitType)
@@ -161,7 +327,7 @@ namespace ZiplaKac.Core
         public static void SetOutfitEnabled(bool enabled)
         {
             PlayerPrefs.SetInt(KEY_OUTFIT_ENABLED, enabled ? 1 : 0);
-            PlayerPrefs.Save();
+            SaveAll();
         }
 
         public static List<int> GetLastFiveScores()
@@ -219,7 +385,7 @@ namespace ZiplaKac.Core
         {
             int current = GetConsumableCount(consumableId);
             PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + consumableId, current + count);
-            PlayerPrefs.Save();
+            SaveAll();
             OnConsumablesChanged?.Invoke();
         }
 
@@ -229,7 +395,7 @@ namespace ZiplaKac.Core
             if (current > 0)
             {
                 PlayerPrefs.SetInt(KEY_CONSUMABLE_PREFIX + consumableId, current - 1);
-                PlayerPrefs.Save();
+                SaveAll();
                 OnConsumablesChanged?.Invoke();
                 return true;
             }
@@ -255,7 +421,7 @@ namespace ZiplaKac.Core
         public static void SetUpgradeLevel(string characterId, string upgradeId, int level)
         {
             PlayerPrefs.SetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", level);
-            PlayerPrefs.Save();
+            SaveAll();
         }
 
         public static bool PurchaseUpgrade(string characterId, string upgradeId, int price, int maxLevel = 1)
@@ -315,7 +481,7 @@ namespace ZiplaKac.Core
 
             int goldBonus = (currentStreak == 1) ? 20 : (currentStreak == 2) ? 25 : (currentStreak == 3) ? 30 : (currentStreak == 4) ? 35 : 50;
             AddGold(goldBonus);
-            PlayerPrefs.Save();
+            SaveAll();
             return goldBonus;
         }
 
@@ -397,7 +563,7 @@ namespace ZiplaKac.Core
             if (score > currentHigh)
             {
                 PlayerPrefs.SetInt($"ZiplaKac_CharHighScore_{canonical}", score);
-                PlayerPrefs.Save();
+                SaveAll();
                 return true;
             }
             return false;
@@ -424,7 +590,7 @@ namespace ZiplaKac.Core
                 {
                     SaveSelectedCharacterId("classic");
                 }
-                PlayerPrefs.Save();
+                SaveAll();
             }
         }
 
@@ -465,7 +631,7 @@ namespace ZiplaKac.Core
                 unlocked += "," + canonical;
                 PlayerPrefs.SetString(KEY_UNLOCKED_CHARACTERS, unlocked);
             }
-            PlayerPrefs.Save();
+            SaveAll();
         }
 
         /// <summary>

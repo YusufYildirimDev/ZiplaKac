@@ -128,6 +128,7 @@ namespace ZiplaKac.Core
                 case "iap_no_ads":
                     PlayerPrefs.SetInt("no_ads", 1);
                     PlayerPrefs.Save();
+                    SaveSystem.BackupToKeychain();
                     break;
 
                 default:
