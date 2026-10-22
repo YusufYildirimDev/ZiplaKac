@@ -1024,29 +1024,55 @@ namespace ZiplaKac.Utils
                 new Color(1.0f, 0.78f, 0.20f, 0.95f),
                 2.5f, 22, 230, 62);
 
-            // Kupa İkonu
+            // İçerik Taşıyıcı (Kupa + Metin Birlikte Tam Ortalanır)
+            GameObject lbContent = new GameObject("Content");
+            lbContent.transform.SetParent(lbBadge.transform, false);
+            RectTransform lbContentRt = lbContent.AddComponent<RectTransform>();
+            lbContentRt.anchorMin = new Vector2(0.5f, 0.5f);
+            lbContentRt.anchorMax = new Vector2(0.5f, 0.5f);
+            lbContentRt.pivot = new Vector2(0.5f, 0.5f);
+            lbContentRt.anchoredPosition = Vector2.zero;
+
+            HorizontalLayoutGroup lbHlg = lbContent.AddComponent<HorizontalLayoutGroup>();
+            lbHlg.childAlignment = TextAnchor.MiddleCenter;
+            lbHlg.spacing = 8f;
+            lbHlg.childControlWidth = false;
+            lbHlg.childControlHeight = false;
+            lbHlg.childForceExpandWidth = false;
+            lbHlg.childForceExpandHeight = false;
+
+            ContentSizeFitter lbCsf = lbContent.AddComponent<ContentSizeFitter>();
+            lbCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            lbCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // Kupa İkonu (Vektörel prosedürel sprite - 30x30)
             GameObject lbIconObj = new GameObject("TrophyIcon");
-            lbIconObj.transform.SetParent(lbBadge.transform, false);
+            lbIconObj.transform.SetParent(lbContent.transform, false);
             RectTransform lbIconRt = lbIconObj.AddComponent<RectTransform>();
-            lbIconRt.anchorMin = new Vector2(0f, 0.5f);
-            lbIconRt.anchorMax = new Vector2(0f, 0.5f);
-            lbIconRt.pivot = new Vector2(0f, 0.5f);
-            lbIconRt.anchoredPosition = new Vector2(16f, 0f);
-            lbIconRt.sizeDelta = new Vector2(36f, 36f);
-            Text lbIconTxt = lbIconObj.AddComponent<Text>();
-            lbIconTxt.font = GetSafeDefaultFont();
-            lbIconTxt.fontSize = 28;
-            lbIconTxt.alignment = TextAnchor.MiddleCenter;
-            lbIconTxt.text = "🏆";
+            lbIconRt.sizeDelta = new Vector2(30f, 30f);
+            Image lbIconImg = lbIconObj.AddComponent<Image>();
+            lbIconImg.sprite = ProceduralSpriteGenerator.CreateTrophyIconSprite(64);
+            lbIconImg.preserveAspect = true;
+            lbIconImg.raycastTarget = false;
 
             // Metin (SKORLAR / LEADERBOARD)
-            Text lbText = CreateText(lbBadge.transform, "LeaderboardText", LocalizationManager.Get("menu_leaderboard_label", "SKORLAR"), 22, new Vector2(24f, 0f), new Color(1.0f, 0.92f, 0.65f), false, FontStyle.Bold);
+            GameObject lbTextObj = new GameObject("LeaderboardText");
+            lbTextObj.transform.SetParent(lbContent.transform, false);
+            RectTransform lbTxtRt = lbTextObj.AddComponent<RectTransform>();
+            Text lbText = lbTextObj.AddComponent<Text>();
+            lbText.font = GetSafeDefaultFont();
+            lbText.fontSize = 22;
+            lbText.fontStyle = FontStyle.Bold;
             lbText.alignment = TextAnchor.MiddleCenter;
-            RectTransform lbTxtRt = lbText.GetComponent<RectTransform>();
-            lbTxtRt.anchorMin = new Vector2(0f, 0f);
-            lbTxtRt.anchorMax = new Vector2(1f, 1f);
-            lbTxtRt.offsetMin = new Vector2(52f, 4f);
-            lbTxtRt.offsetMax = new Vector2(-10f, -4f);
+            lbText.color = new Color(1.0f, 0.92f, 0.65f);
+            lbText.text = LocalizationManager.Get("menu_leaderboard_label", "SKORLAR");
+            lbText.raycastTarget = false;
+            lbText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            lbText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            ContentSizeFitter lbTxtCsf = lbTextObj.AddComponent<ContentSizeFitter>();
+            lbTxtCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            lbTxtCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             Button lbBtn = lbBadge.AddComponent<Button>();
             lbBtn.onClick.AddListener(() => {
@@ -1077,28 +1103,54 @@ namespace ZiplaKac.Utils
                 new Color(1.0f, 0.35f, 0.45f, 0.95f),
                 2.5f, 22, 230, 62);
 
-            // Kalp İkonu
+            // İçerik Taşıyıcı (Kalp + Metin Birlikte Tam Ortalanır)
+            GameObject lifeContent = new GameObject("Content");
+            lifeContent.transform.SetParent(lifeBadge.transform, false);
+            RectTransform lifeContentRt = lifeContent.AddComponent<RectTransform>();
+            lifeContentRt.anchorMin = new Vector2(0.5f, 0.5f);
+            lifeContentRt.anchorMax = new Vector2(0.5f, 0.5f);
+            lifeContentRt.pivot = new Vector2(0.5f, 0.5f);
+            lifeContentRt.anchoredPosition = Vector2.zero;
+
+            HorizontalLayoutGroup lifeHlg = lifeContent.AddComponent<HorizontalLayoutGroup>();
+            lifeHlg.childAlignment = TextAnchor.MiddleCenter;
+            lifeHlg.spacing = 8f;
+            lifeHlg.childControlWidth = false;
+            lifeHlg.childControlHeight = false;
+            lifeHlg.childForceExpandWidth = false;
+            lifeHlg.childForceExpandHeight = false;
+
+            ContentSizeFitter lifeCsf = lifeContent.AddComponent<ContentSizeFitter>();
+            lifeCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            lifeCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // Kalp İkonu (30x30)
             GameObject lifeIconObj = new GameObject("HeartIcon");
-            lifeIconObj.transform.SetParent(lifeBadge.transform, false);
+            lifeIconObj.transform.SetParent(lifeContent.transform, false);
             RectTransform lifeIconRt = lifeIconObj.AddComponent<RectTransform>();
-            lifeIconRt.anchorMin = new Vector2(0f, 0.5f);
-            lifeIconRt.anchorMax = new Vector2(0f, 0.5f);
-            lifeIconRt.pivot = new Vector2(0f, 0.5f);
-            lifeIconRt.anchoredPosition = new Vector2(16f, 0f);
-            lifeIconRt.sizeDelta = new Vector2(36f, 36f);
+            lifeIconRt.sizeDelta = new Vector2(30f, 30f);
             Image lifeIconImg = lifeIconObj.AddComponent<Image>();
             lifeIconImg.sprite = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
             lifeIconImg.preserveAspect = true;
             lifeIconImg.raycastTarget = false;
 
             // Metin (CAN / LIVES + Sayı)
-            Text menuLifeText = CreateText(lifeBadge.transform, "LifeText", "", 24, new Vector2(24f, 0f), Color.white, false, FontStyle.Bold);
+            GameObject lifeTextObj = new GameObject("LifeText");
+            lifeTextObj.transform.SetParent(lifeContent.transform, false);
+            RectTransform lifeTxtRt = lifeTextObj.AddComponent<RectTransform>();
+            Text menuLifeText = lifeTextObj.AddComponent<Text>();
+            menuLifeText.font = GetSafeDefaultFont();
+            menuLifeText.fontSize = 24;
+            menuLifeText.fontStyle = FontStyle.Bold;
             menuLifeText.alignment = TextAnchor.MiddleCenter;
-            RectTransform lifeTxtRt = menuLifeText.GetComponent<RectTransform>();
-            lifeTxtRt.anchorMin = new Vector2(0f, 0f);
-            lifeTxtRt.anchorMax = new Vector2(1f, 1f);
-            lifeTxtRt.offsetMin = new Vector2(52f, 4f);
-            lifeTxtRt.offsetMax = new Vector2(-10f, -4f);
+            menuLifeText.color = Color.white;
+            menuLifeText.raycastTarget = false;
+            menuLifeText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            menuLifeText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            ContentSizeFitter lifeTxtCsf = lifeTextObj.AddComponent<ContentSizeFitter>();
+            lifeTxtCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            lifeTxtCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             CanvasGroup lifeCg = lifeBadge.AddComponent<CanvasGroup>();
 
