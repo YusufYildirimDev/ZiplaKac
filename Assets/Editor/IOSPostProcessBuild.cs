@@ -26,19 +26,32 @@ namespace ZiplaKac.Editor
                 string targetGuid = proj.GetUnityMainTargetGuid();
                 string frameworkTargetGuid = proj.GetUnityFrameworkTargetGuid();
 
+                // StoreKit ana target'a (UnityMainTarget) bağlanırsa kişisel Apple Developer hesaplarında
+                // In-App Purchase capability hatası verir. Bu yüzden ana target'tan kaldırıyoruz.
+                if (proj.ContainsFramework(targetGuid, "StoreKit.framework"))
+                {
+                    proj.RemoveFrameworkFromProject(targetGuid, "StoreKit.framework");
+                }
+
                 proj.AddFrameworkToProject(targetGuid, "AppTrackingTransparency.framework", false);
                 proj.AddFrameworkToProject(targetGuid, "AdSupport.framework", false);
                 proj.AddFrameworkToProject(targetGuid, "Security.framework", false);
+                proj.SetBuildProperty(targetGuid, "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES", "YES");
 
                 if (!string.IsNullOrEmpty(frameworkTargetGuid))
                 {
                     proj.AddFrameworkToProject(frameworkTargetGuid, "AppTrackingTransparency.framework", false);
                     proj.AddFrameworkToProject(frameworkTargetGuid, "AdSupport.framework", false);
                     proj.AddFrameworkToProject(frameworkTargetGuid, "Security.framework", false);
+                    proj.AddFrameworkToProject(frameworkTargetGuid, "StoreKit.framework", false);
+                    proj.AddFrameworkToProject(frameworkTargetGuid, "JavaScriptCore.framework", false);
+
+                    proj.SetBuildProperty(frameworkTargetGuid, "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES", "NO");
+                    proj.SetBuildProperty(frameworkTargetGuid, "SWIFT_VERSION", "5.0");
                 }
 
                 proj.WriteToFile(projPath);
-                Debug.Log("[IOSPostProcessBuild] AppTrackingTransparency, AdSupport & Security frameworkleri bağlandı.");
+                Debug.Log("[IOSPostProcessBuild] AppTrackingTransparency, AdSupport, Security, JavaScriptCore & StoreKit frameworkleri bağlandı.");
 
                 // 2. Info.plist Güncellemesi
                 string plistPath = Path.Combine(pathToBuiltProject, "Info.plist");

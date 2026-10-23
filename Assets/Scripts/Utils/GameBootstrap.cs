@@ -1418,6 +1418,34 @@ namespace ZiplaKac.Utils
                 adBtnObj.GetComponent<Button>().onClick.AddListener(adRewardAction);
             }
 
+            // 7. Gizlilik Politikası / Privacy Policy Butonu (App Store & Google Play Store Kuralı)
+            GameObject privacyBtnObj = new GameObject("PrivacyPolicyButton");
+            privacyBtnObj.transform.SetParent(card.transform, false);
+            RectTransform privRt = privacyBtnObj.AddComponent<RectTransform>();
+            privRt.sizeDelta = new Vector2(400f, 44f);
+            privRt.anchoredPosition = new Vector2(0f, -425f);
+
+            Text privTxt = privacyBtnObj.AddComponent<Text>();
+            privTxt.font = GetSafeDefaultFont();
+            privTxt.fontSize = 20;
+            privTxt.fontStyle = FontStyle.Normal;
+            privTxt.alignment = TextAnchor.MiddleCenter;
+            privTxt.color = new Color(0.55f, 0.70f, 0.88f, 0.85f);
+            privTxt.raycastTarget = true;
+            privTxt.text = $"🔒  {LocalizationManager.Get("menu_privacy_policy", "Gizlilik Politikası")}";
+
+            Button privBtn = privacyBtnObj.AddComponent<Button>();
+            privBtn.targetGraphic = privTxt;
+            ColorBlock pcb = privBtn.colors;
+            pcb.normalColor = Color.white;
+            pcb.highlightedColor = new Color(1.2f, 1.2f, 1.2f);
+            pcb.pressedColor = new Color(0.7f, 0.8f, 1.0f);
+            privBtn.colors = pcb;
+            privBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
+                Application.OpenURL("https://github.com/YusufYildirimDev/ZiplaKac/blob/main/PRIVACY_POLICY.md");
+            });
+
             // Anında dil değiştiğinde ana menü görsellerini güncelle
             LocalizationManager.OnLanguageChanged += () => {
                 if (subImg != null) subImg.sprite = LoadMainMenuSprite("subtitle_hoppzy");
@@ -1429,6 +1457,7 @@ namespace ZiplaKac.Utils
                 if (rewardImg != null) rewardImg.sprite = LoadMainMenuSprite("btn_reward");
                 if (rulesImg != null) rulesImg.sprite = LoadMainMenuSprite("btn_rules");
                 if (adImg != null) adImg.sprite = LoadMainMenuSprite("btn_ad");
+                if (privTxt != null) privTxt.text = $"🔒  {LocalizationManager.Get("menu_privacy_policy", "Gizlilik Politikası")}";
             };
 
             if (UIManager.Instance != null) UIManager.Instance.mainMenuPanel = panel;

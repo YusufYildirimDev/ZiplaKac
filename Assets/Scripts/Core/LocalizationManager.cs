@@ -363,6 +363,12 @@ namespace ZiplaKac.Core
             { "item_iap_no_ads_desc", "Tüm reklamları kalıcı olarak kapat." },
             { "shop_toast_bought_iap", "🎉 Satın alım başarılı! Ödüller kasanıza eklendi." },
             { "shop_toast_error", "⚠️ Satın alma işlemi tamamlanamadı." },
+            { "shop_restore_purchases", "SATIN ALIMLARI GERİ YÜKLE" },
+            { "shop_restore_hint", "Daha önce aldığınız reklamsız paketi ve ürünleri bu cihaza yükler." },
+            { "shop_restore_in_progress", "⏳ Satın alımlar Apple / Google ile sorgulanıyor..." },
+            { "shop_restore_success", "🎉 Satın alımlarınız başarıyla geri yüklendi!" },
+            { "shop_restore_none", "ℹ️ Geri yüklenecek geçerli bir satın alım bulunamadı." },
+            { "menu_privacy_policy", "Gizlilik Politikası" },
 
             // Gardırop Kıyafetleri
             { "outfit_pelerin_name", "Pelerin" },
@@ -564,6 +570,12 @@ namespace ZiplaKac.Core
             { "item_iap_no_ads_desc", "Remove all ads permanently." },
             { "shop_toast_bought_iap", "🎉 Purchase successful! Rewards added to your vault." },
             { "shop_toast_error", "⚠️ Purchase could not be completed." },
+            { "shop_restore_purchases", "RESTORE PURCHASES" },
+            { "shop_restore_hint", "Restores non-consumable items and No-Ads previously purchased on this Apple / Google account." },
+            { "shop_restore_in_progress", "⏳ Querying Apple / Google stores for purchases..." },
+            { "shop_restore_success", "🎉 Your purchases have been successfully restored!" },
+            { "shop_restore_none", "ℹ️ No previous purchases found to restore." },
+            { "menu_privacy_policy", "Privacy Policy" },
 
             // Wardrobe Outfits
             { "outfit_pelerin_name", "Cape" },

@@ -1,60 +1,50 @@
-# Hoppzy - Gizlilik Politikası (Privacy Policy)
+# Gizlilik Politikası (Privacy Policy) - Hoppzy (ZıplaKaç)
 
-**Son Güncelleme:** 22 Ekim 2026  
-**Geliştirici:** Yusuf Yıldırım  
-**Uygulama:** Hoppzy (com.yusufyldrm.ziplakac)  
+**Son Güncelleme:** 23 Ekim 2026
 
-Hoppzy ("Oyun", "Uygulama", "biz"), kullanıcılarımızın gizliliğine en üst düzeyde önem vermektedir. Bu Gizlilik Politikası, Hoppzy mobil oyununu kullandığınızda verilerinizin nasıl işlendiğini, saklandığını ve korunduğunu açıklar.
+Bu Gizlilik Politikası, **Yusuf Muhammet Yıldırım** ("Geliştirici", "biz", "bizim") tarafından geliştirilen ve Apple App Store ile Google Play Store üzerinde sunulan **ZıplaKaç (Hoppzy)** mobil oyununun ("Uygulama") kullanıcılarının gizliliğini koruma taahhüdünü açıklamaktadır.
 
 ---
 
-## 1. Toplanan Bilgiler ve Veri Kullanımı
+### 1. Toplanan Bilgiler ve Kullanım Amaçları
 
-Hoppzy, temel oyun deneyimini sunarken kullanıcıların kişisel kimlik bilgilerini (ad, soyad, e-posta adresi, telefon numarası veya konum) doğrudan **toplamaz, kaydetmez veya üçüncü taraflarla paylaşmaz**.
+ZıplaKaç (Hoppzy), kullanıcıların doğrudan ad, soyad, e-posta adresi, telefon numarası gibi kişisel kimlik bilgilerini **toplamaz** ve kendi sunucularında **saklamaz**.
 
-### A. Yerel Cihaz Verileri (Local Data)
-- Oyun içi en yüksek skorunuz, toplanan altın miktarı, açılan kıyafet/karakter skinleri, ses tercihleri ve envanter verileri **yalnızca yerel cihazınızda (PlayerPrefs)** şifreli/güvenli olarak saklanır.
-- Bu veriler geliştiricinin harici sunucularına aktarılmaz. Oyunu sildiğinizde cihazınızdaki yerel veriler de silinir.
+Uygulamada kullanılan güvenilir üçüncü taraf platformları tarafından anonim olarak işlenebilecek veriler:
 
-### B. Apple Game Center (Liderlik Tablosu)
-- Oyun içinde skorlarınızı dünya çapındaki diğer oyuncularla karşılaştırmak için Apple Game Center servisi kullanılır.
-- Bu servis doğrudan Apple altyapısı tarafından işletilir ve Apple Gizlilik Politikası'na tabidir. Oyunumuz Apple hesap şifrelerinize veya ödeme bilgilerinize asla erişemez.
-
-### C. Reklam Hizmetleri (Google AdMob) ve ATT İzni
-- Hoppzy, ücretsiz bir oyun deneyimi sunabilmek ve ödüllü can/altın hakları sağlayabilmek amacıyla **Google Mobile Ads (AdMob)** reklam ağını kullanır.
-- **iOS 14.5 ve Sonrası (App Tracking Transparency):** Oyun ilk açıldığında Apple'ın resmi ATT izin penceresi görüntülenir. Yalnızca kullanıcı izin verirse reklam ağı (IDFA) üzerinden kişiselleştirilmiş reklamlar sunulur. Kullanıcı izin vermediği takdirde kişiselleştirilmemiş, genel reklamlar gösterilir.
-- Google'ın veri işleme politikası hakkında detaylı bilgi için: [Google Gizlilik Politikası](https://policies.google.com/privacy).
-
-### D. Uygulama İçi Satın Alma (In-App Purchases)
-- Altın veya reklamsız paket satın alımları doğrudan Apple App Store / Google Play Store ödeme altyapısı üzerinden gerçekleştirilir.
-- Kredi kartı veya finansal bilgileriniz oyunumuz tarafından asla görüntülenemez ve işlenemez.
+* **Cihaz ve Reklam Tanımlayıcıları:** Apple IDFA (Identifier for Advertisers) ve Google Advertising ID (AAID). Bu tanımlayıcılar yalnızca kullanıcının izni (Apple App Tracking Transparency - ATT) dahilinde reklamların kişiselleştirilmesi ve sıklığının sınırlandırılması amacıyla kullanılır.
+* **Oyun İlerlemesi ve Skor Bilgileri:** Yüksek skor, kazanılan altınlar, açılan kostümler ve başarımlar yerel olarak cihazınızda ve Apple Game Center / Google Play Oyunlar profilinizde güvenle saklanır.
+* **Analitik ve Performans:** Oyun performansını optimize etmek ve çökmeleri önlemek amacıyla anonim sistem verileri kullanılır.
 
 ---
 
-## 2. Çocukların Gizliliği (COPPA & GDPR-K Uyumluluğu)
+### 2. Üçüncü Taraf Hizmet Sağlayıcıları
 
-Hoppzy, her yaştan kullanıcının (4+ Yaş Kategorisi) güvenle oynayabileceği aile dostu bir arcade oyunudur. 13 yaşın altındaki çocuklardan bilerek herhangi bir kişisel veri toplamıyoruz.
+Uygulamamız aşağıdaki platform servislerini kullanmaktadır:
 
----
-
-## 3. Üçüncü Taraf Bağlantıları ve Hizmetleri
-
-Uygulamamız aşağıdaki güvenilir üçüncü taraf platform servislerini kullanabilir:
-- **Apple Inc. (iOS & Game Center):** [Apple Privacy Policy](https://www.apple.com/legal/privacy/)
-- **Google LLC (Google Mobile Ads):** [Google Privacy Policy](https://policies.google.com/privacy)
+* **Google AdMob (Google Inc.):** Ödüllü ve geçiş reklamlarının sunulması için kullanılır. Google Gizlilik Politikası: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **Apple Game Center (Apple Inc.):** Skor tablosu ve başarımların eşitlenmesi için kullanılır. Apple Gizlilik Politikası: [https://www.apple.com/legal/privacy/](https://www.apple.com/legal/privacy/)
+* **Apple In-App Purchase & Google Play Billing:** Oyun içi satın alımların (altın paketleri, reklamsız mod) güvenli şekilde faturalandırılması için kullanılır. Ödeme ve kart bilgileriniz geliştirici tarafından asla görülmez veya kaydedilmez; tüm ödemeler doğrudan Apple ve Google tarafından işlenir.
 
 ---
 
-## 4. Değişiklikler ve Güncellemeler
+### 3. Çocukların Gizliliği (COPPA ve Aile Politikası)
 
-Bu Gizlilik Politikası zaman zaman güncellenebilir. Herhangi bir değişiklik durumunda güncellenmiş politika bu sayfada ve mağaza bağlantılarında yayınlanacaktır.
+ZıplaKaç (Hoppzy) her yaştan kullanıcıya ve ailelere uygun genel kitleye hitap eden bir oyundur. 13 yaşın altındaki çocuklardan bilerek ve isteyerek kişisel bilgi toplamayız. Çocuklara yönelik uygunsuz reklam içerikleri filtrelenmektedir.
 
 ---
 
-## 5. İletişim
+### 4. Kullanıcı Hakları ve Takip İzinleri (GDPR, KVKK ve ATT)
 
-Gizlilik politikamız veya Hoppzy oyunuyla ilgili sorularınız, geri bildirimleriniz ya da veri talepleriniz için bizimle iletişime geçebilirsiniz:
+* **Apple ATT (App Tracking Transparency):** iOS 14.5 ve üzeri cihazlarda, oyun açılışında kişiselleştirilmiş reklam izni sorulur. İzni istediğiniz zaman cihazınızın *Ayarlar > Gizlilik ve Güvenlik > Takip* menüsünden değiştirebilirsiniz.
+* **Veri Sıfırlama:** Oyun verilerinizi sıfırlamak isterseniz uygulamayı cihazınızdan kaldırarak yerel verileri silebilirsiniz.
 
-- **Geliştirici:** Yusuf Yıldırım
-- **E-posta:** yusufmuhammetyildirim@gmail.com
-- **Web Sitesi:** https://yusufyldrm.github.io/Hoppzy/
+---
+
+### 5. İletişim
+
+Bu Gizlilik Politikası ile ilgili her türlü soru, geri bildirim veya talepleriniz için bizimle iletişime geçebilirsiniz:
+
+* **Geliştirici:** Yusuf Muhammet Yıldırım
+* **E-Posta:** yusufyldrm1625@icloud.com
+* **GitHub Reposu:** [https://github.com/YusufYildirimDev/ZiplaKac](https://github.com/YusufYildirimDev/ZiplaKac)
