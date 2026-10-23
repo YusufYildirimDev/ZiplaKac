@@ -24,7 +24,7 @@ namespace ZiplaKac.Core
         public string interstitialAdUnitId = "ca-app-pub-3940256099942544/1033173712";
         public string rewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917";
 #elif UNITY_IOS
-        public string appId = "ca-app-pub-3940256099942544~145869519";
+        public string appId = "ca-app-pub-3940256099942544~1458002511";
         public string interstitialAdUnitId = "ca-app-pub-3940256099942544/4411468910";
         public string rewardedAdUnitId = "ca-app-pub-3940256099942544/1712485313";
 #else

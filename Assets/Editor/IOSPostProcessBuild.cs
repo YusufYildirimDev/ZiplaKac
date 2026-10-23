@@ -69,7 +69,8 @@ namespace ZiplaKac.Editor
                     "Bu izin, ilgi alanlarınıza özel ödüllü reklamlar sunmak ve oyun deneyiminizi geliştirmek için kullanılır.");
 
                 // AdMob Uygulama Kimliği (GADApplicationIdentifier)
-                rootDict.SetString("GADApplicationIdentifier", "ca-app-pub-3940256099942544~145869519");
+                rootDict.SetString("GADApplicationIdentifier", "ca-app-pub-3940256099942544~1458002511");
+                rootDict.SetBoolean("GADShouldSkipSetupChecks", true);
 
                 // SKAdNetwork Tanımlayıcıları
                 PlistElementArray skAdNetworkItems = rootDict.CreateArray("SKAdNetworkItems");
