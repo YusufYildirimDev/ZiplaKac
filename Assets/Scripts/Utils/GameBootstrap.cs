@@ -998,42 +998,52 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
-            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst Köşe - Estetik Cam Dairesel Buton)
-            GameObject soundBtnObj = CreateCardContainer(card.transform, "MainMenuSoundButton", new Vector2(60f, 60f));
-            RectTransform soundRt = soundBtnObj.GetComponent<RectTransform>();
-            soundRt.anchoredPosition = new Vector2(385f, 435f);
+            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst - 76x76 Neon Çerçeveli Cam Buton)
+            GameObject soundBtnObj = new GameObject("MainMenuSoundButton");
+            soundBtnObj.transform.SetParent(card.transform, false);
+            RectTransform soundRt = soundBtnObj.AddComponent<RectTransform>();
+            soundRt.sizeDelta = new Vector2(76f, 76f);
+            soundRt.anchoredPosition = new Vector2(365f, 432f);
 
-            Image soundBg = soundBtnObj.GetComponent<Image>();
+            Image soundBg = soundBtnObj.AddComponent<Image>();
             soundBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.10f, 0.18f, 0.32f, 0.90f),
-                new Color(0.35f, 0.55f, 0.85f, 0.70f),
-                2f, 30, 64, 64);
+                new Color(0.10f, 0.18f, 0.35f, 0.95f),
+                new Color(0.30f, 0.65f, 1.0f, 0.90f),
+                2.5f, 38, 96, 96);
+            soundBg.type = Image.Type.Sliced;
+            soundBg.raycastTarget = true;
 
-            GameObject soundTxtObj = new GameObject("IconText");
-            soundTxtObj.transform.SetParent(soundBtnObj.transform, false);
-            RectTransform soundTxtRt = soundTxtObj.AddComponent<RectTransform>();
-            soundTxtRt.anchorMin = Vector2.zero;
-            soundTxtRt.anchorMax = Vector2.one;
-            soundTxtRt.offsetMin = Vector2.zero;
-            soundTxtRt.offsetMax = Vector2.zero;
+            // Vektörel Prosedürel Hoparlör İkonu (Emoji yerine %100 her ekranda garantili net çizim)
+            GameObject soundIconObj = new GameObject("Icon");
+            soundIconObj.transform.SetParent(soundBtnObj.transform, false);
+            RectTransform iconRt = soundIconObj.AddComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRt.pivot = new Vector2(0.5f, 0.5f);
+            iconRt.anchoredPosition = Vector2.zero;
+            iconRt.sizeDelta = new Vector2(50f, 50f);
 
-            Text soundTxt = soundTxtObj.AddComponent<Text>();
-            soundTxt.font = GetSafeDefaultFont();
-            soundTxt.fontSize = 28;
-            soundTxt.alignment = TextAnchor.MiddleCenter;
-            soundTxt.raycastTarget = false;
+            Image iconImg = soundIconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
 
             System.Action updateSoundIcon = () => {
                 bool isMuted = AudioManager.Instance != null && AudioManager.Instance.IsMuted;
-                soundTxt.text = isMuted ? "🔇" : "🔊";
+                iconImg.sprite = ProceduralSpriteGenerator.CreateSpeakerIconSprite(isMuted, 96);
                 if (soundBg != null)
                 {
-                    soundBg.color = isMuted ? new Color(0.85f, 0.85f, 0.85f, 0.65f) : Color.white;
+                    soundBg.color = isMuted ? new Color(0.65f, 0.70f, 0.80f, 0.85f) : Color.white;
                 }
             };
             updateSoundIcon();
 
             Button soundBtn = soundBtnObj.AddComponent<Button>();
+            ColorBlock scb = soundBtn.colors;
+            scb.normalColor = Color.white;
+            scb.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            scb.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            soundBtn.colors = scb;
+
             soundBtn.onClick.AddListener(() => {
                 if (AudioManager.Instance != null)
                 {
