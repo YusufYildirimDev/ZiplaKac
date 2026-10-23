@@ -998,42 +998,23 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
-            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst - 76x76 Şeffaf Buzlu Cam Çerçeveli Müzik Notası Butonu)
+            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst - 3D Beveled Squircle Buton, Birebir Kullanıcı Referansı)
             GameObject soundBtnObj = new GameObject("MainMenuSoundButton");
             soundBtnObj.transform.SetParent(card.transform, false);
             RectTransform soundRt = soundBtnObj.AddComponent<RectTransform>();
-            soundRt.sizeDelta = new Vector2(76f, 76f);
+            soundRt.sizeDelta = new Vector2(80f, 80f);
             soundRt.anchoredPosition = new Vector2(365f, 432f);
 
-            Image soundBg = soundBtnObj.AddComponent<Image>();
-            soundBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.13f, 0.24f, 0.92f),
-                new Color(1f, 1f, 1f, 0.35f),
-                1.8f, 38, 96, 96);
-            soundBg.type = Image.Type.Sliced;
-            soundBg.raycastTarget = true;
-
-            // Vektörel Müzik Notası İkonu (Açıkken ♫, Kapalıyken çizgili ♫)
-            GameObject soundIconObj = new GameObject("Icon");
-            soundIconObj.transform.SetParent(soundBtnObj.transform, false);
-            RectTransform iconRt = soundIconObj.AddComponent<RectTransform>();
-            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
-            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
-            iconRt.pivot = new Vector2(0.5f, 0.5f);
-            iconRt.anchoredPosition = Vector2.zero;
-            iconRt.sizeDelta = new Vector2(50f, 50f);
-
-            Image iconImg = soundIconObj.AddComponent<Image>();
-            iconImg.preserveAspect = true;
-            iconImg.raycastTarget = false;
+            Image soundImg = soundBtnObj.AddComponent<Image>();
+            soundImg.preserveAspect = true;
+            soundImg.raycastTarget = true;
 
             System.Action updateSoundIcon = () => {
                 bool isMuted = AudioManager.Instance != null && AudioManager.Instance.IsMuted;
-                iconImg.sprite = ProceduralSpriteGenerator.CreateMusicNoteIconSprite(isMuted, 128);
-                if (soundBg != null)
-                {
-                    soundBg.color = isMuted ? new Color(0.75f, 0.75f, 0.80f, 0.85f) : Color.white;
-                }
+                string path = isMuted ? "Sprites/UI/btn_sound_off" : "Sprites/UI/btn_sound_on";
+                Sprite sp = Resources.Load<Sprite>(path);
+                if (sp == null) sp = ProceduralSpriteGenerator.CreateSpeakerIconSprite(isMuted, 128);
+                soundImg.sprite = sp;
             };
             updateSoundIcon();
 
