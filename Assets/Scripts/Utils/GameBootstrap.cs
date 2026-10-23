@@ -1029,7 +1029,7 @@ namespace ZiplaKac.Utils
 
             System.Action updateSoundIcon = () => {
                 bool isMuted = AudioManager.Instance != null && AudioManager.Instance.IsMuted;
-                iconImg.sprite = ProceduralSpriteGenerator.CreateSpeakerIconSprite(isMuted, 96);
+                iconImg.sprite = ProceduralSpriteGenerator.CreateSpeakerIconSprite(isMuted, 128);
                 if (soundBg != null)
                 {
                     soundBg.color = isMuted ? new Color(0.65f, 0.70f, 0.80f, 0.85f) : Color.white;

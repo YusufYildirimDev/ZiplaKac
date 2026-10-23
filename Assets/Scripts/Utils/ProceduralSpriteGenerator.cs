@@ -963,108 +963,119 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
-        public static Sprite CreateSpeakerIconSprite(bool isMuted, int resolution = 96)
+        public static Sprite CreateSpeakerIconSprite(bool isMuted, int resolution = 128)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            float scale = resolution / 96f;
+            float s = resolution / 128f;
             float cy = resolution * 0.5f;
 
-            Color bodyCol = isMuted ? new Color(0.75f, 0.82f, 0.92f, 0.75f) : Color.white;
-            Color waveCol = new Color(0.20f, 0.85f, 1.0f, 1f); // Vibrant Cyan
-            Color muteRed = new Color(1.0f, 0.28f, 0.35f, 1f); // Vibrant Coral Red
+            // Slash coordinates for mute
+            float slashAx = 28f * s;
+            float slashAy = cy - 28f * s;
+            float slashBx = 86f * s;
+            float slashBy = cy + 28f * s;
+            float slashT = 5.5f * s;
+            float gap = 3.2f * s;
 
-            // Speaker bounds scaled
-            float rectX1 = 16f * scale;
-            float rectX2 = 34f * scale;
-            float coneX2 = 54f * scale;
-            float hRect = 14f * scale;
-            float hCone = 30f * scale;
-
-            // X center for mute
-            float crossCx = 68f * scale;
-            float crossR = 12f * scale;
-            float crossThick = 3.2f * scale;
+            Color bodyCol = new Color(1f, 1f, 1f, 1f);
+            Color waveCol = new Color(0.22f, 0.74f, 0.97f, 1f); // #38BDF8 Modern Cyan
+            Color muteRed = new Color(0.96f, 0.25f, 0.37f, 1f); // #F43F5E Modern Rose Red
 
             for (int y = 0; y < resolution; y++)
             {
-                float dy = y + 0.5f - cy;
+                float py = y + 0.5f;
+                float dy = py - cy;
                 float absDy = Mathf.Abs(dy);
 
                 for (int x = 0; x < resolution; x++)
                 {
                     float px = x + 0.5f;
-                    bool fillBody = false;
 
-                    // 1. Sol Kutu (Back box)
-                    if (px >= rectX1 && px <= rectX2 && absDy <= hRect)
+                    // Slash distance if muted
+                    float dSlash = isMuted ? DistToSegment2D(px, py, slashAx, slashAy, slashBx, slashBy) : 999f;
+
+                    // Speaker Box: x in [26*s, 44*s], absDy <= 14*s
+                    // Cone: x in [44*s, 66*s], absDy <= lerp(14*s, 28*s)
+                    bool inBody = false;
+                    float dBodyEdge = 999f;
+
+                    if (px >= 26f * s && px <= 44f * s && absDy <= 14f * s)
                     {
-                        fillBody = true;
+                        inBody = true;
+                        dBodyEdge = Mathf.Min(px - 26f * s, 44f * s - px, 14f * s - absDy);
                     }
-                    // 2. Koni (Cone trapezoid)
-                    else if (px > rectX2 && px <= coneX2)
+                    else if (px > 44f * s && px <= 66f * s)
                     {
-                        float t = (px - rectX2) / (coneX2 - rectX2);
-                        float currentH = Mathf.Lerp(hRect, hCone, t);
-                        if (absDy <= currentH) fillBody = true;
+                        float t = (px - 44f * s) / (22f * s);
+                        float maxH = 14f * s + (28f * s - 14f * s) * t;
+                        if (absDy <= maxH)
+                        {
+                            inBody = true;
+                            dBodyEdge = Mathf.Min(maxH - absDy, 66f * s - px);
+                        }
                     }
 
-                    if (fillBody)
+                    if (inBody)
                     {
-                        tex.SetPixel(x, y, bodyCol);
-                        continue;
+                        float alpha = Mathf.Clamp01(dBodyEdge + 0.5f);
+                        if (isMuted && dSlash <= (slashT * 0.5f + gap))
+                        {
+                            float gapD = dSlash - slashT * 0.5f;
+                            if (gapD < gap)
+                            {
+                                alpha *= Mathf.Clamp01(gapD / gap);
+                            }
+                        }
+
+                        if (alpha > 0.01f)
+                        {
+                            tex.SetPixel(x, y, new Color(bodyCol.r, bodyCol.g, bodyCol.b, alpha));
+                        }
                     }
 
                     if (!isMuted)
                     {
-                        // 3. Ses Dalgaları (2 Adet Kavisli Çember Yayı)
-                        float arcCx = 38f * scale;
-                        float arcDx = px - arcCx;
-
-                        if (arcDx > 0f)
+                        // Sound wave arcs
+                        float arcCx = 52f * s;
+                        float adx = px - arcCx;
+                        if (adx > 0f)
                         {
-                            float dist = Mathf.Sqrt(arcDx * arcDx + dy * dy);
-                            float angleRatio = absDy / arcDx;
-
-                            // İç Dalga
-                            float r1 = 28f * scale;
-                            float d1 = Mathf.Abs(dist - r1);
-                            if (d1 <= 2.8f * scale && angleRatio <= 0.85f)
+                            float dist = Mathf.Sqrt(adx * adx + dy * dy);
+                            float angle = Mathf.Abs(Mathf.Atan2(dy, adx) * Mathf.Rad2Deg);
+                            if (angle <= 45f)
                             {
-                                float a = Mathf.Clamp01(1f - (d1 / (2.8f * scale)));
-                                tex.SetPixel(x, y, new Color(waveCol.r, waveCol.g, waveCol.b, a));
-                                continue;
-                            }
-
-                            // Dış Dalga
-                            float r2 = 40f * scale;
-                            float d2 = Mathf.Abs(dist - r2);
-                            if (d2 <= 2.8f * scale && angleRatio <= 0.75f)
-                            {
-                                float a = Mathf.Clamp01(1f - (d2 / (2.8f * scale)));
-                                tex.SetPixel(x, y, new Color(waveCol.r, waveCol.g, waveCol.b, a));
-                                continue;
+                                float[] radii = new float[] { 28f * s, 44f * s };
+                                for (int i = 0; i < radii.Length; i++)
+                                {
+                                    float r = radii[i];
+                                    float dArc = Mathf.Abs(dist - r);
+                                    float thick = 5.2f * s;
+                                    if (dArc <= thick * 0.5f + 0.5f)
+                                    {
+                                        float a = Mathf.Clamp01((thick * 0.5f + 0.5f) - dArc);
+                                        float capDist = 45f - angle;
+                                        if (capDist < 4f)
+                                        {
+                                            a *= (capDist / 4f);
+                                        }
+                                        if (a > 0.01f)
+                                        {
+                                            tex.SetPixel(x, y, new Color(waveCol.r, waveCol.g, waveCol.b, a));
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                     else
                     {
-                        // 4. Sessiz Modu: Sağ tarafta parlak kırmızı 'X' işareti
-                        float cdx = px - crossCx;
-                        float cdy = dy;
-
-                        if (Mathf.Abs(cdx) <= crossR && Mathf.Abs(cdy) <= crossR)
+                        // Draw red slash
+                        if (dSlash <= slashT * 0.5f + 0.5f)
                         {
-                            float dist1 = Mathf.Abs(cdy - cdx) * 0.7071f;
-                            float dist2 = Mathf.Abs(cdy + cdx) * 0.7071f;
-
-                            float minDist = Mathf.Min(dist1, dist2);
-                            if (minDist <= crossThick)
-                            {
-                                float a = Mathf.Clamp01(1f - (minDist / crossThick));
-                                tex.SetPixel(x, y, new Color(muteRed.r, muteRed.g, muteRed.b, a));
-                            }
+                            float a = Mathf.Clamp01((slashT * 0.5f + 0.5f) - dSlash);
+                            tex.SetPixel(x, y, new Color(muteRed.r, muteRed.g, muteRed.b, a));
                         }
                     }
                 }
@@ -1072,6 +1083,17 @@ namespace ZiplaKac.Utils
 
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        private static float DistToSegment2D(float px, float py, float ax, float ay, float bx, float by)
+        {
+            float pax = px - ax, pay = py - ay;
+            float bax = bx - ax, bay = by - ay;
+            float ba2 = bax * bax + bay * bay;
+            float h = Mathf.Clamp01((pax * bax + pay * bay) / ba2);
+            float dx = pax - bax * h;
+            float dy = pay - bay * h;
+            return Mathf.Sqrt(dx * dx + dy * dy);
         }
 
         public static Sprite CreateTitleAccentSprite(bool isLeft, int w = 48, int h = 36)
