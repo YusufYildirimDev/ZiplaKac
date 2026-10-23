@@ -22,6 +22,26 @@ namespace ZiplaKac.Core
         public AudioClip newRecordClip;
 
         private AudioSource audioSource;
+        private const string PREF_SOUND_MUTED = "hoppzy_sound_muted";
+        public event System.Action<bool> OnMuteStateChanged;
+
+        public bool IsMuted
+        {
+            get => PlayerPrefs.GetInt(PREF_SOUND_MUTED, 0) == 1;
+            private set
+            {
+                PlayerPrefs.SetInt(PREF_SOUND_MUTED, value ? 1 : 0);
+                PlayerPrefs.Save();
+                if (audioSource != null) audioSource.mute = value;
+                OnMuteStateChanged?.Invoke(value);
+            }
+        }
+
+        public bool ToggleMute()
+        {
+            IsMuted = !IsMuted;
+            return IsMuted;
+        }
 
         // Prosedürel sentezlenmiş önbellek klipleri
         private AudioClip synthJump;
@@ -47,6 +67,7 @@ namespace ZiplaKac.Core
 
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
+            audioSource.mute = IsMuted;
 
             GenerateProceduralSounds();
         }
@@ -102,6 +123,7 @@ namespace ZiplaKac.Core
 
         private void PlayClipOrSynth(AudioClip customClip, AudioClip synthClip, float volume)
         {
+            if (IsMuted) return;
             AudioClip target = customClip != null ? customClip : synthClip;
             if (target != null && audioSource != null)
             {

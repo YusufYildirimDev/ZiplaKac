@@ -142,6 +142,58 @@ namespace ZiplaKac.Core
                 OnPurchaseSuccess?.Invoke(productId);
             }
         }
+
+        /// <summary>
+        /// Apple App Store Kuralı (Guideline 3.1.1):
+        /// Kullanıcının daha önce satın aldığı tek seferlik (non-consumable) ürünleri (ör. iap_no_ads)
+        /// Keychain ve Store altyapısı üzerinden geri yükler.
+        /// </summary>
+        public void RestorePurchases(Action<bool, string> onComplete)
+        {
+            Debug.Log("[MonetizationManager] RestorePurchases çağrıldı.");
+
+            // 1. Keychain ve yerel verileri tazele
+            SaveSystem.InitializePersistence();
+
+            bool restored = false;
+            if (PlayerPrefs.GetInt("no_ads", 0) == 1)
+            {
+                restored = true;
+            }
+            else
+            {
+                string kcJson = Utils.IOSKeychainBridge.GetString("hoppzy_persistent_save", "");
+                if (!string.IsNullOrEmpty(kcJson))
+                {
+                    try
+                    {
+                        var data = JsonUtility.FromJson<PersistentSaveData>(kcJson);
+                        if (data != null && data.noAds == 1)
+                        {
+                            PlayerPrefs.SetInt("no_ads", 1);
+                            PlayerPrefs.Save();
+                            restored = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogWarning($"[MonetizationManager] Keychain parse hatası: {ex.Message}");
+                    }
+                }
+            }
+
+            if (restored)
+            {
+                SaveSystem.BackupToKeychain();
+                string msg = LocalizationManager.Get("shop_restore_success", "Satın alımlarınız başarıyla geri yüklendi!");
+                onComplete?.Invoke(true, msg);
+            }
+            else
+            {
+                string msg = LocalizationManager.Get("shop_restore_none", "Geri yüklenecek satın alım bulunamadı.");
+                onComplete?.Invoke(false, msg);
+            }
+        }
         #endregion
     }
 }

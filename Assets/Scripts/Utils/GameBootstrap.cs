@@ -998,7 +998,60 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
+            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst Köşe - Estetik Cam Dairesel Buton)
+            GameObject soundBtnObj = CreateCardContainer(card.transform, "MainMenuSoundButton", new Vector2(60f, 60f));
+            RectTransform soundRt = soundBtnObj.GetComponent<RectTransform>();
+            soundRt.anchoredPosition = new Vector2(385f, 435f);
 
+            Image soundBg = soundBtnObj.GetComponent<Image>();
+            soundBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.10f, 0.18f, 0.32f, 0.90f),
+                new Color(0.35f, 0.55f, 0.85f, 0.70f),
+                2f, 30, 64, 64);
+
+            GameObject soundTxtObj = new GameObject("IconText");
+            soundTxtObj.transform.SetParent(soundBtnObj.transform, false);
+            RectTransform soundTxtRt = soundTxtObj.AddComponent<RectTransform>();
+            soundTxtRt.anchorMin = Vector2.zero;
+            soundTxtRt.anchorMax = Vector2.one;
+            soundTxtRt.offsetMin = Vector2.zero;
+            soundTxtRt.offsetMax = Vector2.zero;
+
+            Text soundTxt = soundTxtObj.AddComponent<Text>();
+            soundTxt.font = GetSafeDefaultFont();
+            soundTxt.fontSize = 28;
+            soundTxt.alignment = TextAnchor.MiddleCenter;
+            soundTxt.raycastTarget = false;
+
+            System.Action updateSoundIcon = () => {
+                bool isMuted = AudioManager.Instance != null && AudioManager.Instance.IsMuted;
+                soundTxt.text = isMuted ? "🔇" : "🔊";
+                if (soundBg != null)
+                {
+                    soundBg.color = isMuted ? new Color(0.85f, 0.85f, 0.85f, 0.65f) : Color.white;
+                }
+            };
+            updateSoundIcon();
+
+            Button soundBtn = soundBtnObj.AddComponent<Button>();
+            soundBtn.onClick.AddListener(() => {
+                if (AudioManager.Instance != null)
+                {
+                    bool nowMuted = AudioManager.Instance.ToggleMute();
+                    updateSoundIcon();
+                    AudioManager.Instance.TriggerHapticFeedback();
+                    string toastMsg = LocalizationManager.Get(nowMuted ? "menu_sound_off" : "menu_sound_on", nowMuted ? "Ses: Kapalı" : "Ses: Açık");
+                    if (Instance != null)
+                    {
+                        Instance.ShowRewardToast(card.transform, toastMsg);
+                    }
+                }
+            });
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.OnMuteStateChanged += (muted) => updateSoundIcon();
+            }
 
             // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");

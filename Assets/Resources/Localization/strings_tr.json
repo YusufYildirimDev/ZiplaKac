@@ -173,5 +173,12 @@
   "onb_s3_r2_title": "Altın Toplama & Yeni Rekorlar",
   "onb_s3_r2_desc": "Engelleri aştıkça, kombo yaptıkça ve rekor kırdıkça altın topla. Her koşu sonunda kasan zenginleşir!",
   "onb_s3_r3_title": "Gardırop & Kostümler",
-  "onb_s3_r3_desc": "Topladığın altınlarla kahramanlarına süper kahraman pelerini, havalı güneş gözlükleri ve maskeler satın al!"
+  "onb_s3_r3_desc": "Topladığın altınlarla kahramanlarına süper kahraman pelerini, havalı güneş gözlükleri ve maskeler satın al!",
+  "menu_sound_on": "Ses: Açık",
+  "menu_sound_off": "Ses: Kapalı",
+  "shop_restore_purchases": "Satın Alımları Geri Yükle",
+  "shop_restore_hint": "Daha önce aldığınız reklamsız paketi bu cihaza geri yükler",
+  "shop_restore_success": "Satın alımlarınız başarıyla geri yüklendi!",
+  "shop_restore_none": "Geri yüklenecek aktif satın alım bulunamadı.",
+  "shop_restore_in_progress": "Satın alımlar kontrol ediliyor..."
 }

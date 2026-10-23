@@ -173,5 +173,12 @@
   "onb_s3_r2_title": "Collect Gold & Break Records",
   "onb_s3_r2_desc": "Earn gold by dodging obstacles, building combos, and setting new personal bests!",
   "onb_s3_r3_title": "Wardrobe & Outfits",
-  "onb_s3_r3_desc": "Use your gold to equip superhero capes, stylish sunglasses, and party hats for your runners!"
+  "onb_s3_r3_desc": "Use your gold to equip superhero capes, stylish sunglasses, and party hats for your runners!",
+  "menu_sound_on": "Sound: On",
+  "menu_sound_off": "Sound: Off",
+  "shop_restore_purchases": "Restore Purchases",
+  "shop_restore_hint": "Restores your previously purchased ad-free pack to this device",
+  "shop_restore_success": "Your purchases were restored successfully!",
+  "shop_restore_none": "No previous purchases found to restore.",
+  "shop_restore_in_progress": "Restoring purchases..."
 }

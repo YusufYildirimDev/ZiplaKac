@@ -432,8 +432,9 @@ namespace ZiplaKac.UI
             float rowHeight = 175f;
             float spacing = 16f;
             float topPadding = 16f;
+            float restoreBtnHeight = 90f;
             int totalItems = goldPackConfigs.Count;
-            float totalHeight = topPadding + (totalItems * (rowHeight + spacing));
+            float totalHeight = topPadding + (totalItems * (rowHeight + spacing)) + restoreBtnHeight + 25f;
 
             RectTransform containerRt = itemsContainer.GetComponent<RectTransform>();
             if (containerRt != null)
@@ -492,6 +493,72 @@ namespace ZiplaKac.UI
 
                 spawnedRows.Add(row);
             }
+
+            // Apple App Store Kuralı (Guideline 3.1.1): Satın Alımları Geri Yükle (Restore Purchases)
+            float restoreYPos = -topPadding - (goldPackConfigs.Count * (rowHeight + spacing)) - (restoreBtnHeight / 2f);
+            GameObject restoreRow = new GameObject("Row_RestorePurchases");
+            restoreRow.transform.SetParent(itemsContainer, false);
+            RectTransform restoreRt = restoreRow.AddComponent<RectTransform>();
+            restoreRt.anchorMin = new Vector2(0.5f, 1f);
+            restoreRt.anchorMax = new Vector2(0.5f, 1f);
+            restoreRt.pivot = new Vector2(0.5f, 0.5f);
+            restoreRt.anchoredPosition = new Vector2(0f, restoreYPos);
+            restoreRt.sizeDelta = new Vector2(850f, restoreBtnHeight);
+
+            Image restoreBg = restoreRow.AddComponent<Image>();
+            restoreBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.08f, 0.14f, 0.26f, 0.95f),
+                new Color(0.22f, 0.38f, 0.62f, 0.60f),
+                1.5f, 18, 128, 128);
+            restoreBg.type = Image.Type.Sliced;
+
+            Button restoreBtn = restoreRow.AddComponent<Button>();
+            ColorBlock rcb = restoreBtn.colors;
+            rcb.normalColor = Color.white;
+            rcb.highlightedColor = new Color(1.1f, 1.1f, 1.1f);
+            rcb.pressedColor = new Color(0.85f, 0.85f, 0.85f);
+            restoreBtn.colors = rcb;
+
+            GameObject restoreTextObj = new GameObject("Text");
+            restoreTextObj.transform.SetParent(restoreRow.transform, false);
+            RectTransform rTextRt = restoreTextObj.AddComponent<RectTransform>();
+            rTextRt.anchorMin = Vector2.zero;
+            rTextRt.anchorMax = Vector2.one;
+            rTextRt.offsetMin = new Vector2(20f, 0f);
+            rTextRt.offsetMax = new Vector2(-20f, 0f);
+
+            Text restoreText = restoreTextObj.AddComponent<Text>();
+            restoreText.font = font;
+            restoreText.fontSize = 24;
+            restoreText.fontStyle = FontStyle.Bold;
+            restoreText.alignment = TextAnchor.MiddleCenter;
+            restoreText.color = new Color(0.82f, 0.92f, 1.0f);
+            restoreText.raycastTarget = false;
+            restoreText.text = $"🔄  {LocalizationManager.Get("shop_restore_purchases")}\n<size=18><color=#94A3B8>{LocalizationManager.Get("shop_restore_hint")}</color></size>";
+
+            restoreBtn.onClick.AddListener(() => {
+                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                ShowStatus(LocalizationManager.Get("shop_restore_in_progress"), new Color(0.12f, 0.55f, 0.88f));
+
+                if (MonetizationManager.Instance != null)
+                {
+                    MonetizationManager.Instance.RestorePurchases((success, msg) => {
+                        if (success)
+                        {
+                            AudioManager.Instance?.PlayNewRecordSound();
+                            ShowStatus(msg, new Color(0.06f, 0.84f, 0.58f));
+                            RefreshUI();
+                        }
+                        else
+                        {
+                            ShowStatus(msg, new Color(0.95f, 0.75f, 0.20f));
+                        }
+                    });
+                }
+            });
+
+            spawnedRows.Add(restoreRow);
         }
 
         private GameObject CreateRowObject(string name, float yPos, float rowHeight, string title, string subtitle, int price, string btnText, Font font, UnityEngine.Events.UnityAction onClick, Color? btnColor = null, string outfitType = null, string charKey = null, string iconEmoji = null, string shopItemId = null)
