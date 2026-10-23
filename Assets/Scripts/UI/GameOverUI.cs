@@ -179,6 +179,9 @@ namespace ZiplaKac.UI
                 if (badgeText != null) badgeText.text = LocalizationManager.Get("go_new_record");
             }
 
+            // Mağaza Puanlama Tetikleyicisi (Yüksek skor veya aralıklı oynanış)
+            Utils.StoreReviewManager.Instance?.CheckAndPromptReview(finalScore, isNewRecord);
+
             if (isNewRecord)
             {
                 AudioManager.Instance?.PlayNewRecordSound();

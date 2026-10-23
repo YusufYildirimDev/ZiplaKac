@@ -138,6 +138,18 @@ namespace ZiplaKac.Utils
                 GameObject gcm = new GameObject("GameCenterManager");
                 gcm.AddComponent<GameCenterManager>();
             }
+
+            if (StoreReviewManager.Instance == null)
+            {
+                GameObject srm = new GameObject("StoreReviewManager");
+                srm.AddComponent<StoreReviewManager>();
+            }
+
+            if (NotificationManager.Instance == null)
+            {
+                GameObject nm = new GameObject("NotificationManager");
+                nm.AddComponent<NotificationManager>();
+            }
         }
 
         private static Material s_safeSpriteMat;

@@ -45,6 +45,7 @@ namespace ZiplaKac.Editor
                     proj.AddFrameworkToProject(frameworkTargetGuid, "Security.framework", false);
                     proj.AddFrameworkToProject(frameworkTargetGuid, "StoreKit.framework", false);
                     proj.AddFrameworkToProject(frameworkTargetGuid, "JavaScriptCore.framework", false);
+                    proj.AddFrameworkToProject(frameworkTargetGuid, "UserNotifications.framework", false);
 
                     proj.SetBuildProperty(frameworkTargetGuid, "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES", "NO");
                     proj.SetBuildProperty(frameworkTargetGuid, "SWIFT_VERSION", "5.0");

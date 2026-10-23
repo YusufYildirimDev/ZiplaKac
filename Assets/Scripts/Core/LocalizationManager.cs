@@ -369,6 +369,8 @@ namespace ZiplaKac.Core
             { "shop_restore_success", "🎉 Satın alımlarınız başarıyla geri yüklendi!" },
             { "shop_restore_none", "ℹ️ Geri yüklenecek geçerli bir satın alım bulunamadı." },
             { "menu_privacy_policy", "Gizlilik Politikası" },
+            { "notif_reward_title", "🎁 Günlük Ödülün Hazır!" },
+            { "notif_reward_msg", "Altınların seni bekliyor! Hemen gel ve ödülünü topla!" },
 
             // Gardırop Kıyafetleri
             { "outfit_pelerin_name", "Pelerin" },
@@ -576,6 +578,8 @@ namespace ZiplaKac.Core
             { "shop_restore_success", "🎉 Your purchases have been successfully restored!" },
             { "shop_restore_none", "ℹ️ No previous purchases found to restore." },
             { "menu_privacy_policy", "Privacy Policy" },
+            { "notif_reward_title", "🎁 Daily Reward Ready!" },
+            { "notif_reward_msg", "Your coins are waiting! Claim your reward now!" },
 
             // Wardrobe Outfits
             { "outfit_pelerin_name", "Cape" },
