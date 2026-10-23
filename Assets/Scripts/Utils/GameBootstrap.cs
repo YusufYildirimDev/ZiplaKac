@@ -998,26 +998,7 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
-            // 1.5. Dil Değiştirici Butonu (Sağ Üst Rozet - 🇹🇷 TR / 🇬🇧 EN)
-            Color langBg = new Color(0.12f, 0.17f, 0.30f, 0.95f);
-            Color langBorder = new Color(0.24f, 0.38f, 0.60f, 0.70f);
-            string initialLangDisplay = LocalizationManager.Get("lang_display", "🇹🇷 TR");
-            GameObject langBtnObj = CreatePillButton(card.transform, "LanguageSwitchButton", initialLangDisplay, new Vector2(365f, 440f), new Vector2(116f, 50f), langBg, Color.white, 20, langBorder, 1.5f, 25);
-            Text langTxt = langBtnObj.GetComponentInChildren<Text>();
-            Button langBtn = langBtnObj.GetComponent<Button>();
-            langBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
-                AudioManager.Instance?.TriggerHapticFeedback();
-                LocalizationManager.ToggleLanguage();
-                SaveSystem.BackupToKeychain();
-            });
 
-            LocalizationManager.OnLanguageChanged += () => {
-                if (langTxt != null)
-                {
-                    langTxt.text = LocalizationManager.Get("lang_display", "🇹🇷 TR");
-                }
-            };
 
             // 2. Alt Başlık "tek dokunuş, sonsuz kaçış" (#9DBCE0)
             Sprite subSp = LoadMainMenuSprite("subtitle_hoppzy");

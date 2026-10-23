@@ -22,6 +22,11 @@ namespace ZiplaKac.Core
         private static string currentLanguage = LANG_TR;
         public static string CurrentLanguage => currentLanguage;
 
+#if UNITY_IOS && !UNITY_EDITOR
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern string _GetIOSDeviceLanguage();
+#endif
+
         private static readonly Dictionary<string, string> localizedStrings = new Dictionary<string, string>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -44,8 +49,63 @@ namespace ZiplaKac.Core
             }
         }
 
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus)
+            {
+                SyncWithSystemLanguage();
+            }
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (!pauseStatus)
+            {
+                SyncWithSystemLanguage();
+            }
+        }
+
+        /// <summary>
+        /// Cihaz dilini dinamik olarak kontrol edip arayüzü anında eşitler.
+        /// Kullanıcı oyunu alta alıp iOS Ayarları'ndan dili değiştirse bile oyuna döndüğünde dil otomatik değişir.
+        /// </summary>
+        public static void SyncWithSystemLanguage()
+        {
+            string systemLang = GetDeviceSystemLanguage();
+            if (currentLanguage != systemLang)
+            {
+                Debug.Log($"[LocalizationManager] Telefon dili ile eşitleniyor: {currentLanguage} -> {systemLang}");
+                currentLanguage = systemLang;
+                LoadLanguageStrings(currentLanguage);
+                OnLanguageChanged?.Invoke();
+            }
+        }
+
         public static string GetDeviceSystemLanguage()
         {
+#if UNITY_IOS && !UNITY_EDITOR
+            try
+            {
+                string iosLang = _GetIOSDeviceLanguage();
+                if (!string.IsNullOrEmpty(iosLang))
+                {
+                    Debug.Log($"[LocalizationManager] iOS Native Tercih Edilen Sistem Dili: {iosLang}");
+                    if (iosLang.StartsWith("tr", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return LANG_TR;
+                    }
+                    if (iosLang.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return LANG_EN;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LocalizationManager] iOS Native Dil algılanırken hata: {ex.Message}");
+            }
+#endif
+
             try
             {
                 if (Application.systemLanguage == SystemLanguage.Turkish)
@@ -87,17 +147,9 @@ namespace ZiplaKac.Core
 
         public static void InitializeLanguage()
         {
-            // Önce kayıtlı dil tercihine bak (Türkçe veya İngilizce)
-            string saved = PlayerPrefs.GetString(PREF_KEY_LANGUAGE, null);
-            if (!string.IsNullOrEmpty(saved) && (saved == LANG_TR || saved == LANG_EN))
-            {
-                currentLanguage = saved;
-            }
-            else
-            {
-                // Tercih yoksa cihazın sistem dilinden otomatik olarak çek
-                currentLanguage = GetDeviceSystemLanguage();
-            }
+            // Kullanıcı kuralı: Uygulama dili ve telefon dili birebir aynı olmalı.
+            // Telefon Türkçe ise uygulama Türkçe, İngilizce ise uygulama İngilizce olur.
+            currentLanguage = GetDeviceSystemLanguage();
             LoadLanguageStrings(currentLanguage);
         }
 
@@ -107,8 +159,6 @@ namespace ZiplaKac.Core
             if (currentLanguage == langCode && localizedStrings.Count > 0) return;
 
             currentLanguage = langCode;
-            PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
-            PlayerPrefs.Save();
             LoadLanguageStrings(currentLanguage);
             OnLanguageChanged?.Invoke();
         }

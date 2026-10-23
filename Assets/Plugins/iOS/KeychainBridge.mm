@@ -72,4 +72,18 @@ extern "C" {
         };
         SecItemDelete((__bridge CFDictionaryRef)query);
     }
+
+    char* _GetIOSDeviceLanguage() {
+        NSArray *languages = [NSLocale preferredLanguages];
+        if (languages != nil && [languages count] > 0) {
+            NSString *preferredLang = [languages objectAtIndex:0];
+            if (preferredLang != nil) {
+                const char* utf8 = [preferredLang UTF8String];
+                char* res = (char*)malloc(strlen(utf8) + 1);
+                strcpy(res, utf8);
+                return res;
+            }
+        }
+        return strdup("en");
+    }
 }

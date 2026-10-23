@@ -46,6 +46,11 @@ namespace ZiplaKac.Editor
                 plist.ReadFromFile(plistPath);
                 PlistElementDict rootDict = plist.root;
 
+                // Desteklenen Diller (CFBundleLocalizations)
+                PlistElementArray localizations = rootDict.CreateArray("CFBundleLocalizations");
+                localizations.AddString("tr");
+                localizations.AddString("en");
+
                 // ATT İzin Açıklaması (App Store Zorunlu)
                 rootDict.SetString("NSUserTrackingUsageDescription",
                     "Bu izin, ilgi alanlarınıza özel ödüllü reklamlar sunmak ve oyun deneyiminizi geliştirmek için kullanılır.");
