@@ -998,7 +998,7 @@ namespace ZiplaKac.Utils
                 CreateText(card.transform, "TitleText", "= HOPPZY =", 84, new Vector2(0f, 432f), new Color(1.0f, 0.74f, 0.08f), false, FontStyle.Bold);
             }
 
-            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst - 76x76 Neon Çerçeveli Cam Buton)
+            // 1.5. Ses Aç/Kapat Butonu (Sağ Üst - 76x76 Şeffaf Buzlu Cam Çerçeveli Müzik Notası Butonu)
             GameObject soundBtnObj = new GameObject("MainMenuSoundButton");
             soundBtnObj.transform.SetParent(card.transform, false);
             RectTransform soundRt = soundBtnObj.AddComponent<RectTransform>();
@@ -1007,13 +1007,13 @@ namespace ZiplaKac.Utils
 
             Image soundBg = soundBtnObj.AddComponent<Image>();
             soundBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.10f, 0.18f, 0.35f, 0.95f),
-                new Color(0.30f, 0.65f, 1.0f, 0.90f),
-                2.5f, 38, 96, 96);
+                new Color(0.08f, 0.13f, 0.24f, 0.92f),
+                new Color(1f, 1f, 1f, 0.35f),
+                1.8f, 38, 96, 96);
             soundBg.type = Image.Type.Sliced;
             soundBg.raycastTarget = true;
 
-            // Vektörel Prosedürel Hoparlör İkonu (Emoji yerine %100 her ekranda garantili net çizim)
+            // Vektörel Müzik Notası İkonu (Açıkken ♫, Kapalıyken çizgili ♫)
             GameObject soundIconObj = new GameObject("Icon");
             soundIconObj.transform.SetParent(soundBtnObj.transform, false);
             RectTransform iconRt = soundIconObj.AddComponent<RectTransform>();
@@ -1029,10 +1029,10 @@ namespace ZiplaKac.Utils
 
             System.Action updateSoundIcon = () => {
                 bool isMuted = AudioManager.Instance != null && AudioManager.Instance.IsMuted;
-                iconImg.sprite = ProceduralSpriteGenerator.CreateSpeakerIconSprite(isMuted, 128);
+                iconImg.sprite = ProceduralSpriteGenerator.CreateMusicNoteIconSprite(isMuted, 128);
                 if (soundBg != null)
                 {
-                    soundBg.color = isMuted ? new Color(0.65f, 0.70f, 0.80f, 0.85f) : Color.white;
+                    soundBg.color = isMuted ? new Color(0.75f, 0.75f, 0.80f, 0.85f) : Color.white;
                 }
             };
             updateSoundIcon();

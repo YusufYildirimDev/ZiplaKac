@@ -1085,6 +1085,108 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
+        public static Sprite CreateMusicNoteIconSprite(bool isMuted, int resolution = 128)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            float s = resolution / 128f;
+
+            // Music note geometry (Upright ♫)
+            float h1x = 40f * s, h1y = 86f * s;
+            float rx = 12f * s, ry = 9f * s;
+            float angle = -25f;
+
+            float h2x = 78f * s, h2y = 76f * s;
+
+            // Stems
+            float stemW = 4.8f * s;
+            float s1ax = h1x + 9f * s, s1ay = h1y - 2f * s;
+            float s1bx = h1x + 9f * s, s1by = 38f * s;
+
+            float s2ax = h2x + 9f * s, s2ay = h2y - 2f * s;
+            float s2bx = h2x + 9f * s, s2by = 28f * s;
+
+            // Beam
+            float beamT = 8.5f * s;
+
+            // Mute slash
+            float slashAx = 24f * s, slashAy = 26f * s;
+            float slashBx = 104f * s, slashBy = 102f * s;
+            float slashT = 5.5f * s;
+            float gap = 3.2f * s;
+
+            Color noteCol = Color.white;
+            Color muteRed = new Color(0.96f, 0.25f, 0.37f, 1f); // #F43F5E Rose Red
+
+            for (int y = 0; y < resolution; y++)
+            {
+                float py = y + 0.5f;
+                for (int x = 0; x < resolution; x++)
+                {
+                    float px = x + 0.5f;
+
+                    float dSlash = isMuted ? DistToSegment2D(px, py, slashAx, slashAy, slashBx, slashBy) : 999f;
+
+                    // 1. Note heads
+                    float e1 = DistEllipse(px, py, h1x, h1y, rx, ry, angle);
+                    float e2 = DistEllipse(px, py, h2x, h2y, rx, ry, angle);
+                    // 2. Stems
+                    float dS1 = DistToSegment2D(px, py, s1ax, s1ay, s1bx, s1by);
+                    float dS2 = DistToSegment2D(px, py, s2ax, s2ay, s2bx, s2by);
+                    // 3. Beam
+                    float dBeam = DistToSegment2D(px, py, s1bx, s1by, s2bx, s2by);
+
+                    float alpha = 0f;
+                    if (e1 <= 1.05f) alpha = Mathf.Max(alpha, Mathf.Clamp01((1.05f - e1) * 6f));
+                    if (e2 <= 1.05f) alpha = Mathf.Max(alpha, Mathf.Clamp01((1.05f - e2) * 6f));
+                    if (dS1 <= stemW * 0.5f + 0.5f) alpha = Mathf.Max(alpha, Mathf.Clamp01((stemW * 0.5f + 0.5f) - dS1));
+                    if (dS2 <= stemW * 0.5f + 0.5f) alpha = Mathf.Max(alpha, Mathf.Clamp01((stemW * 0.5f + 0.5f) - dS2));
+                    if (dBeam <= beamT * 0.5f + 0.5f) alpha = Mathf.Max(alpha, Mathf.Clamp01((beamT * 0.5f + 0.5f) - dBeam));
+
+                    if (alpha > 0.01f)
+                    {
+                        if (isMuted && dSlash <= (slashT * 0.5f + gap))
+                        {
+                            float gapD = dSlash - slashT * 0.5f;
+                            if (gapD < gap)
+                            {
+                                alpha *= Mathf.Clamp01(gapD / gap);
+                            }
+                        }
+
+                        if (alpha > 0.01f)
+                        {
+                            tex.SetPixel(x, y, new Color(noteCol.r, noteCol.g, noteCol.b, alpha));
+                        }
+                    }
+
+                    if (isMuted)
+                    {
+                        if (dSlash <= slashT * 0.5f + 0.5f)
+                        {
+                            float a = Mathf.Clamp01((slashT * 0.5f + 0.5f) - dSlash);
+                            tex.SetPixel(x, y, new Color(muteRed.r, muteRed.g, muteRed.b, a));
+                        }
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        private static float DistEllipse(float px, float py, float cx, float cy, float rx, float ry, float angleDeg)
+        {
+            float rad = -angleDeg * Mathf.Deg2Rad;
+            float cosA = Mathf.Cos(rad), sinA = Mathf.Sin(rad);
+            float dx = px - cx;
+            float dy = py - cy;
+            float nx = cosA * dx - sinA * dy;
+            float ny = sinA * dx + cosA * dy;
+            return Mathf.Sqrt((nx * nx) / (rx * rx) + (ny * ny) / (ry * ry));
+        }
+
         private static float DistToSegment2D(float px, float py, float ax, float ay, float bx, float by)
         {
             float pax = px - ax, pay = py - ay;
