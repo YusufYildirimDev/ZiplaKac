@@ -36,3 +36,4 @@ Thumbs.db
 iOS_Build/
 iOS_Build_BackUpThisFolder_ButDontShipItWithYourGame/
 *.log
+.utmp/
