@@ -184,6 +184,22 @@ namespace ZiplaKac.Editor
                     System.IO.File.Copy(sourceImg, targetiPhone, true);
                     System.IO.File.Copy(sourceImg, targetiPad, true);
                     Debug.Log($"[BuildPipelineScript] Successfully synced LaunchScreen to {targetiPhone}");
+
+                    // Storyboard dosyalarını koyu temayla (#0b0f1e) güncelle ve Xcode derlemesini tetikle
+                    string[] sbFiles = new string[] {
+                        System.IO.Path.Combine(buildPath, "LaunchScreen-iPhone.storyboard"),
+                        System.IO.Path.Combine(buildPath, "LaunchScreen-iPad.storyboard")
+                    };
+                    foreach (var sbPath in sbFiles)
+                    {
+                        if (System.IO.File.Exists(sbPath))
+                        {
+                            string content = System.IO.File.ReadAllText(sbPath);
+                            content = content.Replace("red=\"1\" green=\"1\" blue=\"1\" alpha=\"1\"", "red=\"0.043\" green=\"0.059\" blue=\"0.118\" alpha=\"1\"");
+                            System.IO.File.WriteAllText(sbPath, content);
+                            System.IO.File.SetLastWriteTime(sbPath, System.DateTime.Now);
+                        }
+                    }
                 }
             }
             catch (System.Exception ex)

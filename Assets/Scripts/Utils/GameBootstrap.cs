@@ -580,6 +580,9 @@ namespace ZiplaKac.Utils
                 {
                     UIManager.Instance.mainMenuPanel.SetActive(false);
                 }
+
+                // 7. Hoppzy Açılış & Splash Screen Katmanı (Animasyonlu Kararma & Dokunarak Geçme)
+                CreateSplashScreenOverlay(canvasObj.transform);
             }
 
             // EventSystem Kontrolü (iOS & New Input System tam uyumluluk)
@@ -2769,6 +2772,58 @@ namespace ZiplaKac.Utils
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
             return CreatePillButton(parent, name, label, position, size, mintColor, darkNavy, 32);
+        }
+
+        private void CreateSplashScreenOverlay(Transform parent)
+        {
+            GameObject splashObj = new GameObject("SplashScreenOverlay");
+            splashObj.transform.SetParent(parent, false);
+            splashObj.transform.SetAsLastSibling();
+
+            RectTransform rt = splashObj.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            // Arka plan derin gece rengi (#0b0f1e)
+            Image bg = splashObj.AddComponent<Image>();
+            bg.color = new Color(0.043f, 0.059f, 0.118f, 1f);
+            bg.raycastTarget = true;
+
+            // Açılış görseli (Launch Screen Sprite)
+            GameObject imgObj = new GameObject("SplashArt");
+            imgObj.transform.SetParent(splashObj.transform, false);
+            RectTransform imgRt = imgObj.AddComponent<RectTransform>();
+            imgRt.anchorMin = Vector2.zero;
+            imgRt.anchorMax = Vector2.one;
+            imgRt.offsetMin = Vector2.zero;
+            imgRt.offsetMax = Vector2.zero;
+
+            Image splashImg = imgObj.AddComponent<Image>();
+            splashImg.raycastTarget = false;
+
+            Sprite splashSprite = Resources.Load<Sprite>("Sprites/launch_screen");
+            if (splashSprite == null)
+            {
+                Texture2D tex = Resources.Load<Texture2D>("Sprites/launch_screen");
+                if (tex != null)
+                {
+                    splashSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                }
+            }
+
+            if (splashSprite != null)
+            {
+                splashImg.sprite = splashSprite;
+                splashImg.preserveAspect = true;
+            }
+
+            // Dokunarak geçiş (Skip) butonu ve kararma denetleyicisi
+            Button btn = splashObj.AddComponent<Button>();
+            btn.transition = Selectable.Transition.None;
+            splashObj.AddComponent<CanvasGroup>();
+            splashObj.AddComponent<UI.SplashScreenController>();
         }
     }
 }
