@@ -2786,9 +2786,9 @@ namespace ZiplaKac.Utils
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
 
-            // Arka plan derin gece rengi (#070b16)
+            // Arka plan gökyüzü mavisi (#66b3f0)
             Image bg = splashObj.AddComponent<Image>();
-            bg.color = new Color(0.027f, 0.043f, 0.086f, 1f);
+            bg.color = new Color(0.40f, 0.70f, 0.94f, 1f);
             bg.raycastTarget = true;
 
             // Açılış görseli (Launch Screen Sprite)

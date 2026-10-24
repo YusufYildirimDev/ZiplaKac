@@ -197,7 +197,8 @@ namespace ZiplaKac.Editor
                         if (System.IO.File.Exists(sbPath))
                         {
                             string content = System.IO.File.ReadAllText(sbPath);
-                            content = content.Replace("red=\"1\" green=\"1\" blue=\"1\" alpha=\"1\"", "red=\"0.043\" green=\"0.059\" blue=\"0.118\" alpha=\"1\"");
+                            content = content.Replace("red=\"1\" green=\"1\" blue=\"1\" alpha=\"1\"", "red=\"0.40\" green=\"0.70\" blue=\"0.94\" alpha=\"1\"")
+                                             .Replace("red=\"0.043\" green=\"0.059\" blue=\"0.118\" alpha=\"1\"", "red=\"0.40\" green=\"0.70\" blue=\"0.94\" alpha=\"1\"");
                             System.IO.File.WriteAllText(sbPath, content);
                             System.IO.File.SetLastWriteTime(sbPath, System.DateTime.Now);
                         }
