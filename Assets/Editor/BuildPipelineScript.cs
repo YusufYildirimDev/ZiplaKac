@@ -26,6 +26,7 @@ namespace ZiplaKac.Editor
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = true;
             PlayerSettings.allowedAutorotateToLandscapeLeft = false;
             PlayerSettings.allowedAutorotateToLandscapeRight = false;
+            PlayerSettings.SplashScreen.show = false;
 
             ConfigureAppIcons();
 
@@ -77,6 +78,7 @@ namespace ZiplaKac.Editor
             PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
             EditorUserBuildSettings.buildAppBundle = true;
+            PlayerSettings.SplashScreen.show = false;
 
             ConfigureAppIcons();
 

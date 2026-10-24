@@ -1,28 +1,31 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace ZiplaKac.UI
 {
     /// <summary>
-    /// Uygulama ilk açıldığında Hoppzy Açılış Ekranını (Launch Screen / Splash Screen)
-    /// ekranda gösterip ardından yumuşak bir kararma (fade-out) efektiyle ana menüye aktaran denetleyici.
-    /// Ekrana dokunulduğunda beklemeden anında geçişi sağlar.
+    /// Hoppzy Açılış Ekranı (Launch Screen) Denetleyicisi.
+    /// Gerçek zamanlı ilerleme çubuğu animasyonu, yumuşak kararma geçişi ve
+    /// tek dokunuşla atlama (Tap-to-Skip) desteği sunar.
     /// </summary>
-    public class SplashScreenController : MonoBehaviour
+    public class SplashScreenController : MonoBehaviour, IPointerDownHandler, IPointerClickHandler
     {
-        [Header("Zaman Ayarları")]
-        [Tooltip("Açılış ekranının ekranda net kalma süresi (saniye)")]
-        [SerializeField] private float displayDuration = 1.8f;
+        [Header("Zamanlama Ayarları")]
+        [Tooltip("Açılış ekranının kalma süresi (saniye)")]
+        [SerializeField] private float displayDuration = 1.4f;
 
-        [Tooltip("Ana menüye yumuşak geçiş süresi (saniye)")]
-        [SerializeField] private float fadeDuration = 0.45f;
+        [Tooltip("Ana menüye geçiş kararma süresi (saniye)")]
+        [SerializeField] private float fadeDuration = 0.35f;
 
         [Header("Bileşenler")]
-        [SerializeField] private CanvasGroup canvasGroup;
-        [SerializeField] private Button skipButton;
+        public CanvasGroup canvasGroup;
+        public Image progressBarFill;
+        public Text loadingText;
 
         private bool isDismissing = false;
+        private Coroutine activeRoutine;
 
         private void Awake()
         {
@@ -34,49 +37,100 @@ namespace ZiplaKac.UI
                     canvasGroup = gameObject.AddComponent<CanvasGroup>();
                 }
             }
-
-            if (skipButton == null)
-            {
-                skipButton = GetComponent<Button>();
-            }
-
-            if (skipButton != null)
-            {
-                skipButton.onClick.AddListener(Skip);
-            }
         }
 
         private void Start()
         {
-            StartCoroutine(DisplayAndFadeRoutine());
+            activeRoutine = StartCoroutine(SplashSequence());
+        }
+
+        private void Update()
+        {
+            if (!isDismissing)
+            {
+                // Yeni veya eski girdi sistemi fark etmeksizin dokunmayı yakala
+                if (Input.anyKeyDown || Input.touchCount > 0 || Input.GetMouseButtonDown(0))
+                {
+                    Skip();
+                }
+            }
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            Skip();
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Skip();
         }
 
         public void Skip()
         {
             if (isDismissing) return;
-            StopAllCoroutines();
-            StartCoroutine(FadeOutRoutine());
-        }
-
-        private IEnumerator DisplayAndFadeRoutine()
-        {
-            // Belirlenen süre boyunca açılış görselini tam parlaklıkta tut
-            yield return new WaitForSeconds(displayDuration);
-            yield return FadeOutRoutine();
-        }
-
-        private IEnumerator FadeOutRoutine()
-        {
             isDismissing = true;
+            // Çubuğu anında doldur
+            if (progressBarFill != null)
+            {
+                progressBarFill.fillAmount = 1f;
+            }
+        }
+
+        private IEnumerator SplashSequence()
+        {
             float elapsed = 0f;
+
+            // 1. İlerleme Çubuğu ve Görsel Gösterim Döngüsü (Unscaled time ile timescale'e bağımsız)
+            while (elapsed < displayDuration && !isDismissing)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = Mathf.Clamp01(elapsed / displayDuration);
+
+                if (progressBarFill != null)
+                {
+                    progressBarFill.fillAmount = progress;
+                }
+
+                if (loadingText != null)
+                {
+                    int pct = Mathf.RoundToInt(progress * 100f);
+                    loadingText.text = $"{pct}%";
+                }
+
+                yield return null;
+            }
+
+            // Tamamlandı
+            isDismissing = true;
+            if (progressBarFill != null)
+            {
+                progressBarFill.fillAmount = 1f;
+            }
+
+            if (loadingText != null)
+            {
+                loadingText.text = "100%";
+            }
+
+            // Kısa bir bekleme (0.15s)
+            float pause = 0f;
+            while (pause < 0.15f)
+            {
+                pause += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            // 2. Yumuşak Kararma (Fade Out) Döngüsü
+            float fadeElapsed = 0f;
             float startAlpha = canvasGroup != null ? canvasGroup.alpha : 1f;
 
-            while (elapsed < fadeDuration)
+            while (fadeElapsed < fadeDuration)
             {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / fadeDuration);
-                // Yumuşak geçiş eğrisi (Ease Out)
+                fadeElapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(fadeElapsed / fadeDuration);
                 float smoothT = Mathf.SmoothStep(0f, 1f, t);
+
                 if (canvasGroup != null)
                 {
                     canvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, smoothT);
@@ -84,6 +138,7 @@ namespace ZiplaKac.UI
                 yield return null;
             }
 
+            // 3. Temizlik
             if (canvasGroup != null)
             {
                 canvasGroup.alpha = 0f;
@@ -92,14 +147,6 @@ namespace ZiplaKac.UI
             }
 
             Destroy(gameObject);
-        }
-
-        private void OnDestroy()
-        {
-            if (skipButton != null)
-            {
-                skipButton.onClick.RemoveListener(Skip);
-            }
         }
     }
 }
