@@ -377,9 +377,15 @@ namespace ZiplaKac.UI
                 bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, cfg.outfitType);
 
                 string itemName = LocalizationManager.Get($"outfit_{cfg.outfitType}_name", cfg.displayName);
-                string subtitle = isPurchased 
-                    ? $"<color=#10B981>{LocalizationManager.Get("shop_owned")}</color>" 
-                    : LocalizationManager.GetFormat("shop_price_label", cfg.price);
+                string perkDesc = LocalizationManager.Get($"outfit_{cfg.outfitType}_perk", "");
+
+                string statusText = isPurchased 
+                    ? $"<color=#10B981>● {LocalizationManager.Get("shop_owned")}</color>" 
+                    : $"<color=#94A3B8>{LocalizationManager.GetFormat("shop_price_label", cfg.price)}</color>";
+
+                string subtitle = !string.IsNullOrEmpty(perkDesc) 
+                    ? $"<color=#FBBF24>{perkDesc}</color>\n{statusText}" 
+                    : statusText;
 
                 string btnLabel = !isPurchased 
                     ? LocalizationManager.Get("shop_btn_buy") 

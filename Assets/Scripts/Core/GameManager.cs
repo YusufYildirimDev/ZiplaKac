@@ -52,6 +52,7 @@ namespace ZiplaKac.Core
         public bool isDoubleScoreActive = false;
         public bool hasSecondChance = false;
         public bool hasUsedLifeThisRun = false;
+        public bool hasFireReviveUsed = false;
         public bool isTemporaryInvulnerable = false;
         private float invulnerabilityTimer = 0f;
 
@@ -160,6 +161,7 @@ namespace ZiplaKac.Core
                     Obstacles.Obstacle.ClearAllActiveObstacles();
                     PowerUps.PowerUp.ClearAllActivePowerUps();
                     hasUsedLifeThisRun = false;
+                    hasFireReviveUsed = false;
 
                     // --- Tek Kullanımlık (Consumable) Güçlendirmeleri Uygula ---
                     ApplyConsumablesAtStart();
@@ -211,9 +213,16 @@ namespace ZiplaKac.Core
 
         private void ApplyConsumablesAtStart()
         {
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+
             // 1. Başlangıç Kalkanı (Varsa tüket ve aç)
             if (SaveSystem.UseConsumable("shield"))
             {
+                ActivateShield();
+            }
+            else if (SaveSystem.IsOutfitEnabled() && SaveSystem.IsOutfitEquipped(charKey, "ozel_aksesuar") && UnityEngine.Random.value < 0.35f)
+            {
+                // Özel Aksesuar (Taç) Gücü: %35 şansla oyuna ücretsiz Kalkan ile başla
                 ActivateShield();
             }
 
@@ -356,6 +365,28 @@ namespace ZiplaKac.Core
                 return;
             }
 
+            // Ateş Karakteri İmza Yeteneği: Alev Patlaması (Turda 1 kez ilk çarpmada engeli yakıp yok eder)
+            if (charKey == "ates" && hasSignature && !hasFireReviveUsed)
+            {
+                hasFireReviveUsed = true;
+                TriggerTemporaryInvulnerability(1.8f);
+                Obstacles.Obstacle.ClearAllActiveObstacles();
+                if (hasComboMemory)
+                {
+                    comboCount = Mathf.FloorToInt(comboCount / 2f);
+                    consecutivePassedObstacles = comboCount * 5;
+                }
+                else
+                {
+                    comboCount = 0;
+                    consecutivePassedObstacles = 0;
+                }
+                AudioManager.Instance?.PlayPowerUpSound();
+                AudioManager.Instance?.TriggerHapticFeedback();
+                UI.UIManager.Instance?.TriggerCameraShake(0.25f, 0.15f);
+                return;
+            }
+
             // Gece Karakteri İmza Yeteneği: %28 Otomatik Sıyrılma Şansı
             if (charKey == "gece" && hasSignature && UnityEngine.Random.value < 0.28f)
             {
@@ -385,8 +416,18 @@ namespace ZiplaKac.Core
         {
             if (State != GameState.Playing) return;
 
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+
             // Her geçilen engel için altın kazanılır (x2 puan varsa +2 altın)
             int goldEarned = isDoubleScoreActive ? 2 : 1;
+
+            // Güneş Gözlüğü Gücü: Altın Gözü (Kazanılan altınlara +%25~50 bonus şansı)
+            bool hasGlasses = SaveSystem.IsOutfitEnabled() && SaveSystem.IsOutfitEquipped(charKey, "gunes_gozlugu");
+            if (hasGlasses && (consecutivePassedObstacles % 2 == 0))
+            {
+                goldEarned += 1;
+            }
+
             RunObstacleGold += goldEarned;
             CurrentRunGold += goldEarned;
 
@@ -401,7 +442,6 @@ namespace ZiplaKac.Core
             else if (consecutivePassedObstacles > 40 && consecutivePassedObstacles % 10 == 0) comboGoldBonus = 10;
 
             // Zehir Karakteri İmza Yeteneği: Kombo ödülleri x1.25 katına çıkar
-            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
             if (charKey == "zehir" && SaveSystem.GetUpgradeLevel(charKey, "signature") > 0 && comboGoldBonus > 0)
             {
                 comboGoldBonus = Mathf.RoundToInt(comboGoldBonus * 1.25f);
@@ -417,7 +457,10 @@ namespace ZiplaKac.Core
             {
                 comboCount++;
                 if (comboCount > maxComboInRun) maxComboInRun = comboCount;
-                int bonusPoints = 10;
+
+                // Parti Şapkası Gücü: Parti Coşkusu (Kombolarda +15 ekstra kombo puanı: 10 -> 25)
+                bool hasPartyHat = SaveSystem.IsOutfitEnabled() && SaveSystem.IsOutfitEquipped(charKey, "parti_sapkasi");
+                int bonusPoints = hasPartyHat ? 25 : 10;
                 CurrentScore += bonusPoints;
                 OnComboAchieved?.Invoke(comboCount, obstaclePosition);
                 AudioManager.Instance?.PlayComboSound();
@@ -444,7 +487,9 @@ namespace ZiplaKac.Core
         {
             string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
             int puLevel = SaveSystem.GetUpgradeLevel(charKey, "pu_duration");
-            float finalDuration = duration * (1f + 0.20f * puLevel);
+            bool hasCrown = SaveSystem.IsOutfitEnabled() && SaveSystem.IsOutfitEquipped(charKey, "ozel_aksesuar");
+            float crownMultiplier = hasCrown ? 1.25f : 1.0f; // Özel Aksesuar: +%25 süre
+            float finalDuration = duration * (1f + 0.20f * puLevel) * crownMultiplier;
 
             isSlowActive = true;
             slowTimer = finalDuration;
@@ -455,7 +500,9 @@ namespace ZiplaKac.Core
         {
             string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
             int puLevel = SaveSystem.GetUpgradeLevel(charKey, "pu_duration");
-            float finalDuration = duration * (1f + 0.20f * puLevel);
+            bool hasCrown = SaveSystem.IsOutfitEnabled() && SaveSystem.IsOutfitEquipped(charKey, "ozel_aksesuar");
+            float crownMultiplier = hasCrown ? 1.25f : 1.0f; // Özel Aksesuar: +%25 süre
+            float finalDuration = duration * (1f + 0.20f * puLevel) * crownMultiplier;
 
             isDoubleScoreActive = true;
             doubleScoreTimer = finalDuration;
@@ -527,7 +574,14 @@ namespace ZiplaKac.Core
 
         public float GetEffectiveSpeed()
         {
-            return isSlowActive ? CurrentSpeed * 0.5f : CurrentSpeed;
+            float speed = CurrentSpeed;
+            string charKey = WorldThemeManager.Instance != null ? WorldThemeManager.Instance.CurrentCharacterKey : "klasik";
+            bool hasSignature = SaveSystem.GetUpgradeLevel(charKey, "signature") > 0;
+            if (charKey == "buz" && hasSignature)
+            {
+                speed *= 0.90f; // Buz Karakteri İmza Yeteneği: Buzul Serinliği (%10 daha kontrollü akış hızı)
+            }
+            return isSlowActive ? speed * 0.5f : speed;
         }
     }
 }

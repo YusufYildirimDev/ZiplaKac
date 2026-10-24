@@ -372,27 +372,31 @@ namespace ZiplaKac.Core
             { "notif_reward_title", "🎁 Günlük Ödülün Hazır!" },
             { "notif_reward_msg", "Altınların seni bekliyor! Hemen gel ve ödülünü topla!" },
 
-            // Gardırop Kıyafetleri
-            { "outfit_pelerin_name", "Pelerin" },
-            { "outfit_gunes_gozlugu_name", "Güneş Gözlüğü" },
-            { "outfit_parti_sapkasi_name", "Parti Şapkası" },
-            { "outfit_ozel_aksesuar_name", "Özel Aksesuar" },
+            // Gardırop Kıyafetleri & Güçleri
+            { "outfit_pelerin_name", "Süper Kahraman Pelerini" },
+            { "outfit_pelerin_perk", "🪂 Hafif Süzülüş: Yerçekimi %12 hafifler, havada kalış artar" },
+            { "outfit_gunes_gozlugu_name", "Havalı Güneş Gözlüğü" },
+            { "outfit_gunes_gozlugu_perk", "🕶️ Altın Gözü: Engellerden kazanılan altına +%25 bonus" },
+            { "outfit_parti_sapkasi_name", "Eğlenceli Parti Şapkası" },
+            { "outfit_parti_sapkasi_perk", "🥳 Parti Ruhu: Kombolarda +15 ekstra skor desteği (25 puan)" },
+            { "outfit_ozel_aksesuar_name", "Kraliyet Tacı & Aksesuar" },
+            { "outfit_ozel_aksesuar_perk", "👑 Asil Güç: Güçlendirme süreleri +%25 uzar & %35 kalkan şansı" },
 
             // Karakterler
             { "char_classic_name", "Klasik" },
-            { "char_classic_ability", "Dengeli Koşucu" },
+            { "char_classic_ability", "Skor Ustası (+%15 Taban Skor)" },
             { "char_fire_name", "Ateş" },
-            { "char_fire_ability", "Alev İzi & Hız" },
+            { "char_fire_ability", "Alev Patlaması (1 Darbe Kalkanı)" },
             { "char_ice_name", "Buz" },
-            { "char_ice_ability", "Kayma & Yavaş Düşüş" },
+            { "char_ice_ability", "Buzul Serinliği (%10 Kontrollü Hız)" },
             { "char_poison_name", "Zehir" },
-            { "char_poison_ability", "Zehir Kalkanı" },
+            { "char_poison_ability", "Toksik Kombo (x1.25 Kombo Altını)" },
             { "char_toxic_name", "Zehir" },
-            { "char_toxic_ability", "Zehir Kalkanı" },
+            { "char_toxic_ability", "Toksik Kombo (x1.25 Kombo Altını)" },
             { "char_night_name", "Gece" },
-            { "char_night_ability", "Gölge Adımı & Çift Zıplama" },
+            { "char_night_ability", "Gölge Sıyrılışı (%28 Otomatik Kaçış)" },
             { "char_shadow_name", "Gece" },
-            { "char_shadow_ability", "Gölge Adımı & Çift Zıplama" },
+            { "char_shadow_ability", "Gölge Sıyrılışı (%28 Otomatik Kaçış)" },
             { "char_unlock_hint", "{0} Skora Ulaşarak Aç" },
             { "char_unlocked_toast", "🎉 YENİ KARAKTER AÇILDI: {0}! 🎉" },
             { "char_lock_badge", "{0} Skor" },
@@ -467,9 +471,8 @@ namespace ZiplaKac.Core
             { "onb_s3_r1_title", "Günlük Ödül Sandığı" },
             { "onb_s3_r1_desc", "Her gün oyuna girerek sandığını aç! Günlük seri yaptıkça (Streak) kazandığın altın miktarı 20'den 50'ye artar!" },
             { "onb_s3_r2_title", "Altın Toplama & Yeni Rekorlar" },
-            { "onb_s3_r2_desc", "Engelleri aştıkça, kombo yaptıkça ve rekor kırdıkça altın topla. Her koşu sonunda kasan zenginleşir!" },
-            { "onb_s3_r3_title", "Gardırop & Kostümler" },
-            { "onb_s3_r3_desc", "Topladığın altınlarla kahramanlarına süper kahraman pelerini, havalı güneş gözlükleri ve maskeler satın al!" }
+            { "onb_s3_r3_title", "Gardırop & Kostüm Güçleri" },
+            { "onb_s3_r3_desc", "Topladığın altınlarla kahramanlarına pelerin, güneş gözlüğü ve şapkalar al; her kıyafetin süzülme, ekstra altın ve kombo güçlerini kullan!" }
         };
 
         private static readonly Dictionary<string, string> EnglishDictionary = new Dictionary<string, string>
@@ -581,27 +584,31 @@ namespace ZiplaKac.Core
             { "notif_reward_title", "🎁 Daily Reward Ready!" },
             { "notif_reward_msg", "Your coins are waiting! Claim your reward now!" },
 
-            // Wardrobe Outfits
-            { "outfit_pelerin_name", "Cape" },
-            { "outfit_gunes_gozlugu_name", "Sunglasses" },
-            { "outfit_parti_sapkasi_name", "Party Hat" },
-            { "outfit_ozel_aksesuar_name", "Royal Crown" },
+            // Wardrobe Outfits & Perks
+            { "outfit_pelerin_name", "Superhero Cape" },
+            { "outfit_pelerin_perk", "🪂 Glider: Reduces gravity by 12% for gentler air float" },
+            { "outfit_gunes_gozlugu_name", "Cool Sunglasses" },
+            { "outfit_gunes_gozlugu_perk", "🕶️ Gold Eye: +25% bonus gold from cleared obstacles" },
+            { "outfit_parti_sapkasi_name", "Fun Party Hat" },
+            { "outfit_parti_sapkasi_perk", "🥳 Party Spirit: +15 extra score on combos (25 pts)" },
+            { "outfit_ozel_aksesuar_name", "Royal Crown & Accessory" },
+            { "outfit_ozel_aksesuar_perk", "👑 Royal Might: +25% power-up duration & 35% shield chance" },
 
             // Characters
             { "char_classic_name", "Classic" },
-            { "char_classic_ability", "Balanced Runner" },
+            { "char_classic_ability", "Score Master (+15% Base Score)" },
             { "char_fire_name", "Blaze" },
-            { "char_fire_ability", "Fire Trail & Speed" },
+            { "char_fire_ability", "Flame Burst (1 Crash Shield)" },
             { "char_ice_name", "Frost" },
-            { "char_ice_ability", "Glide & Slow Fall" },
+            { "char_ice_ability", "Glacial Chill (10% Slower Speed)" },
             { "char_poison_name", "Venom" },
-            { "char_poison_ability", "Poison Shield" },
+            { "char_poison_ability", "Toxic Combo (x1.25 Combo Gold)" },
             { "char_toxic_name", "Venom" },
-            { "char_toxic_ability", "Poison Shield" },
+            { "char_toxic_ability", "Toxic Combo (x1.25 Combo Gold)" },
             { "char_night_name", "Shadow" },
-            { "char_night_ability", "Shadow Step & Double Jump" },
+            { "char_night_ability", "Shadow Step (28% Auto Dodge)" },
             { "char_shadow_name", "Shadow" },
-            { "char_shadow_ability", "Shadow Step & Double Jump" },
+            { "char_shadow_ability", "Shadow Step (28% Auto Dodge)" },
             { "char_unlock_hint", "Reach {0} Score to Unlock" },
             { "char_unlocked_toast", "🎉 NEW CHARACTER UNLOCKED: {0}! 🎉" },
             { "char_lock_badge", "{0} Score" },
@@ -676,9 +683,8 @@ namespace ZiplaKac.Core
             { "onb_s3_r1_title", "Daily Reward Chest" },
             { "onb_s3_r1_desc", "Open your chest every day! Keep your daily login streak alive to earn larger gold rewards!" },
             { "onb_s3_r2_title", "Collect Gold & Break Records" },
-            { "onb_s3_r2_desc", "Earn gold by dodging obstacles, building combos, and setting new personal bests!" },
-            { "onb_s3_r3_title", "Wardrobe & Outfits" },
-            { "onb_s3_r3_desc", "Use your gold to equip superhero capes, stylish sunglasses, and party hats for your runners!" }
+            { "onb_s3_r3_title", "Wardrobe & Outfit Powers" },
+            { "onb_s3_r3_desc", "Unlock capes, sunglasses, and hats with your coins; enjoy gliding, bonus coins, and combo boosts with every outfit!" }
         };
 
         #endregion

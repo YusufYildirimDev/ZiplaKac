@@ -454,6 +454,12 @@ namespace ZiplaKac.UI
 
             // Dünya temasını anında güncelle
             WorldThemeManager.Instance?.SetCharacter(characterId);
+
+            string ability = LocalizationManager.Get($"char_{characterId}_ability", "");
+            if (!string.IsNullOrEmpty(ability))
+            {
+                ShowLockNotice($"✨ {ability}");
+            }
         }
 
         private void ShowLockNotice(string message)

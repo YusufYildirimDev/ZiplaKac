@@ -257,12 +257,13 @@ namespace ZiplaKac.Core
 
         public static bool IsOutfitPurchased(string characterId, string outfitType)
         {
-            // Klasik pelerin başlangıçta hediye olarak açıktır
-            if (characterId == "klasik" && outfitType == "pelerin") return true;
+            // Pelerin tüm karakterlere başlangıç hediyesi olarak açıktır
+            if (outfitType == "pelerin") return true;
 
-            string key = $"{characterId}_{outfitType}".ToLowerInvariant();
-            string purchased = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "klasik_pelerin");
-            return purchased.Contains(key);
+            string purchased = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "pelerin,klasik_pelerin");
+            string oType = outfitType.ToLowerInvariant();
+            string cKey = $"{characterId}_{outfitType}".ToLowerInvariant();
+            return purchased.Contains(oType) || purchased.Contains(cKey);
         }
 
         public static bool PurchaseOutfit(string characterId, string outfitType, int cost)
@@ -271,9 +272,10 @@ namespace ZiplaKac.Core
 
             if (SpendGold(cost))
             {
-                string key = $"{characterId}_{outfitType}".ToLowerInvariant();
-                string purchased = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "klasik_pelerin");
-                purchased += "," + key;
+                string oType = outfitType.ToLowerInvariant();
+                string cKey = $"{characterId}_{outfitType}".ToLowerInvariant();
+                string purchased = PlayerPrefs.GetString(KEY_PURCHASED_OUTFITS, "pelerin,klasik_pelerin");
+                purchased += $",{oType},{cKey}";
                 PlayerPrefs.SetString(KEY_PURCHASED_OUTFITS, purchased);
 
                 // Satın alınınca otomatik olarak giyilsin
@@ -416,12 +418,27 @@ namespace ZiplaKac.Core
         // Upgrades: "pu_duration", "double_jump", "combo_memory", "signature"
         public static int GetUpgradeLevel(string characterId, string upgradeId)
         {
+            if (upgradeId == "signature")
+            {
+                return PlayerPrefs.GetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", 0);
+            }
+            // Genel yükseltmeler (pu_duration, double_jump, combo_memory) tüm karakterler için ortaktır
+            int globalVal = PlayerPrefs.GetInt($"{KEY_UPGRADE_PREFIX}global_{upgradeId}", -1);
+            if (globalVal >= 0) return globalVal;
             return PlayerPrefs.GetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", 0);
         }
 
         public static void SetUpgradeLevel(string characterId, string upgradeId, int level)
         {
-            PlayerPrefs.SetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", level);
+            if (upgradeId == "signature")
+            {
+                PlayerPrefs.SetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", level);
+            }
+            else
+            {
+                PlayerPrefs.SetInt($"{KEY_UPGRADE_PREFIX}global_{upgradeId}", level);
+                PlayerPrefs.SetInt($"{KEY_UPGRADE_PREFIX}{characterId}_{upgradeId}", level);
+            }
             SaveAll();
         }
 

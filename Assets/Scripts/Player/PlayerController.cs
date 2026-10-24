@@ -395,9 +395,11 @@ namespace ZiplaKac.Player
                 obj = new GameObject(childName);
                 obj.transform.SetParent(transform, false);
                 obj.transform.localPosition = Vector3.zero;
-                obj.transform.localScale = Vector3.one;
                 obj.transform.localRotation = Quaternion.identity;
             }
+
+            // 512x512 kıyafet dokusunun 256x256 karakter sprite'ına piksel piksel 1:1 tam oturması için 0.5 ölçeği
+            obj.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
 
             SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
             if (sr == null) sr = obj.AddComponent<SpriteRenderer>();
@@ -417,14 +419,19 @@ namespace ZiplaKac.Player
             string charKey = WorldThemeManager.NormalizeCharacterKey(characterId);
             bool outfitEnabled = SaveSystem.IsOutfitEnabled();
 
-            // 1. Pelerin (Cape)
+            // 1. Pelerin (Cape) - Güç: Hafif Süzülüş (Yerçekimini %12 hafifletir)
+            bool isCapeEquipped = SaveSystem.IsOutfitEquipped(charKey, "pelerin");
+            if (rb != null)
+            {
+                rb.gravityScale = (outfitEnabled && isCapeEquipped) ? gravityScale * 0.88f : gravityScale;
+            }
+
             if (capeSpriteRenderer != null)
             {
                 Sprite sp = Resources.Load<Sprite>($"Sprites/Kiyafetler/kiyafet_{charKey}_pelerin");
                 capeSpriteRenderer.sprite = sp;
                 capeSpriteRenderer.color = Color.white;
-                bool isEquipped = SaveSystem.IsOutfitEquipped(charKey, "pelerin");
-                capeSpriteRenderer.gameObject.SetActive(outfitEnabled && isEquipped && sp != null);
+                capeSpriteRenderer.gameObject.SetActive(outfitEnabled && isCapeEquipped && sp != null);
             }
 
             // 2. Güneş Gözlüğü (Glasses)
