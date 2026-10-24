@@ -581,18 +581,21 @@ namespace ZiplaKac.Utils
                     UIManager.Instance.mainMenuPanel.SetActive(false);
                 }
 
-                // 7. Hoppzy Açılış & Splash Screen Katmanı (Animasyonlu Kararma & Dokunarak Geçme)
+                // 7. Oyun İçi Duraklatma (Pause) Modalı
+                CreatePauseModal(canvasObj.transform);
+
+                // 8. Hoppzy Açılış & Splash Screen Katmanı (Animasyonlu Kararma & Dokunarak Geçme)
                 CreateSplashScreenOverlay(canvasObj.transform);
             }
 
             // EventSystem Kontrolü (iOS & New Input System tam uyumluluk)
-            foreach (var mod in FindObjectsOfType<UnityEngine.EventSystems.StandaloneInputModule>())
+            foreach (var mod in UnityEngine.Object.FindObjectsByType<UnityEngine.EventSystems.StandaloneInputModule>(FindObjectsSortMode.None))
             {
                 mod.enabled = false;
                 DestroyImmediate(mod);
             }
 
-            UnityEngine.EventSystems.EventSystem es = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+            UnityEngine.EventSystems.EventSystem es = UnityEngine.Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
             if (es == null)
             {
                 GameObject esObj = new GameObject("EventSystem");
@@ -1137,7 +1140,7 @@ namespace ZiplaKac.Utils
 
             Button lbBtn = lbBadge.AddComponent<Button>();
             lbBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
                 if (GameCenterManager.Instance != null)
                 {
                     GameCenterManager.Instance.ShowLeaderboardUI(() => {
@@ -1228,7 +1231,7 @@ namespace ZiplaKac.Utils
 
             Button lifeBtn = lifeBadge.AddComponent<Button>();
             lifeBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
                 int currentLives = SaveSystem.GetConsumableCount("second_chance");
                 string info = LocalizationManager.GetFormat("menu_life_toast_info", currentLives);
                 if (Instance != null)
@@ -1270,7 +1273,7 @@ namespace ZiplaKac.Utils
             if (oynaSp != null)
             {
                 GameObject playBtnObj = CreateSpriteButton(card.transform, "PlayButton", oynaSp, new Vector2(0f, -5f), new Vector2(800f, 110f), () => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
                 playImg = playBtnObj.GetComponent<Image>();
@@ -1283,7 +1286,7 @@ namespace ZiplaKac.Utils
                 playTxt = btnObj.GetComponentInChildren<Text>();
                 Button btn = btnObj.GetComponent<Button>();
                 btn.onClick.AddListener(() => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (GameManager.Instance != null) GameManager.Instance.StartGame();
                 });
             }
@@ -1303,7 +1306,7 @@ namespace ZiplaKac.Utils
             if (wardrobeSp != null)
             {
                 GameObject wardObj = CreateSpriteButton(card.transform, "WardrobeGridButton", wardrobeSp, new Vector2(colLeftX, row1Y), gridSize, () => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (UI.WardrobeModalUI.Instance != null)
                     {
                         UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
@@ -1317,7 +1320,7 @@ namespace ZiplaKac.Utils
                 Color purpleHighlight = new Color(0.70f, 0.45f, 1.0f, 0.35f);
                 GameObject wardrobeBtnObj = CreateMenuGridButton(card.transform, "WardrobeGridButton", "🛍️", LocalizationManager.Get("menu_shop_line1"), LocalizationManager.Get("menu_shop_line2"), new Vector2(colLeftX, row1Y), gridSize, purpleBg, purpleHighlight);
                 wardrobeBtnObj.GetComponent<Button>().onClick.AddListener(() => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (UI.WardrobeModalUI.Instance != null) UI.WardrobeModalUI.Instance.gameObject.SetActive(true);
                 });
             }
@@ -1328,7 +1331,7 @@ namespace ZiplaKac.Utils
             if (rewardSp != null)
             {
                 GameObject rewObj = CreateSpriteButton(card.transform, "DailyRewardGridButton", rewardSp, new Vector2(colRightX, row1Y), gridSize, () => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (DailyRewardModalUI.Instance != null)
                     {
                         DailyRewardModalUI.Instance.gameObject.SetActive(true);
@@ -1342,7 +1345,7 @@ namespace ZiplaKac.Utils
                 Color goldHighlight = new Color(1.0f, 0.80f, 0.40f, 0.35f);
                 GameObject rewardBtnObj = CreateMenuGridButton(card.transform, "DailyRewardGridButton", "🎁", LocalizationManager.Get("menu_reward_line1"), LocalizationManager.Get("menu_reward_line2"), new Vector2(colRightX, row1Y), gridSize, goldBg, goldHighlight);
                 rewardBtnObj.GetComponent<Button>().onClick.AddListener(() => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (DailyRewardModalUI.Instance != null) DailyRewardModalUI.Instance.gameObject.SetActive(true);
                 });
             }
@@ -1353,14 +1356,14 @@ namespace ZiplaKac.Utils
             if (rulesSp != null)
             {
                 GameObject rulesObj = CreateSpriteButton(card.transform, "RulesGridButton", rulesSp, new Vector2(colLeftX, row2Y), gridSize, () => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (UI.OnboardingModalUI.Instance != null)
                     {
                         UI.OnboardingModalUI.Instance.OpenModal();
                     }
                     else
                     {
-                        var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true);
+                        var found = UnityEngine.Object.FindFirstObjectByType<UI.OnboardingModalUI>();
                         if (found != null) found.OpenModal();
                     }
                 });
@@ -1372,15 +1375,15 @@ namespace ZiplaKac.Utils
                 Color tealHighlight = new Color(0.40f, 0.85f, 1.0f, 0.35f);
                 GameObject rulesBtnObj = CreateMenuGridButton(card.transform, "RulesGridButton", "📖", LocalizationManager.Get("menu_rules_line1"), LocalizationManager.Get("menu_rules_line2"), new Vector2(colLeftX, row2Y), gridSize, tealBg, tealHighlight);
                 rulesBtnObj.GetComponent<Button>().onClick.AddListener(() => {
-                    AudioManager.Instance?.PlayJumpSound();
+                    AudioManager.Instance?.PlayButtonClickSound();
                     if (UI.OnboardingModalUI.Instance != null) UI.OnboardingModalUI.Instance.OpenModal();
-                    else { var found = Object.FindObjectOfType<UI.OnboardingModalUI>(true); if (found != null) found.OpenModal(); }
+                    else { var found = UnityEngine.Object.FindFirstObjectByType<UI.OnboardingModalUI>(); if (found != null) found.OpenModal(); }
                 });
             }
 
             // Buton 4 (Sağ Alt): 🎬 Reklam İzle Can Al ❤️ (Yeşil Klaket İllüstrasyonlu Buton)
             UnityEngine.Events.UnityAction adRewardAction = () => {
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
                 if (MonetizationManager.Instance != null)
                 {
                     MonetizationManager.Instance.ShowRewardedAd(
@@ -1457,7 +1460,7 @@ namespace ZiplaKac.Utils
             pcb.pressedColor = new Color(0.7f, 0.8f, 1.0f);
             privBtn.colors = pcb;
             privBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
                 Application.OpenURL("https://github.com/YusufYildirimDev/ZiplaKac/blob/main/PRIVACY_POLICY.md");
             });
 
@@ -1507,18 +1510,61 @@ namespace ZiplaKac.Utils
 
             // 3. En İyi Skor (Sağ Üst — Parlak Altın Kupa / Rekor Rozeti)
             Sprite trophyIcon = ProceduralSpriteGenerator.CreateTrophyIconSprite();
-            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(340f, 96f), new Vector2(-30f, -28f),
+            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(320f, 96f), new Vector2(-128f, -28f),
                 new Color(0.08f, 0.07f, 0.16f, 0.94f), new Color(0.98f, 0.75f, 0.18f, 0.95f), 3.0f,
                 trophyIcon, "<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
                 Color.white, 24, out hud.highScoreText, new Vector2(1f, 1f), new Vector2(1f, 1f));
 
             // 4. Can Rozeti (Sağ Üst En İyi Skorun altında — Pembe/Kırmızı Kalp Rozeti)
             Sprite heartIcon = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
-            GameObject lifeBadgeObj = CreateHUDBadge(safeArea.transform, "LifePill", new Vector2(280f, 86f), new Vector2(-30f, -136f),
+            GameObject lifeBadgeObj = CreateHUDBadge(safeArea.transform, "LifePill", new Vector2(280f, 86f), new Vector2(-128f, -136f),
                 new Color(0.14f, 0.06f, 0.09f, 0.94f), new Color(1.0f, 0.35f, 0.45f, 0.95f), 3.0f,
                 heartIcon, "<size=18><color=#ff6b81>CAN</color></size>\n<size=38><color=#ffffff><b>0</b></color></size>",
                 new Color(1.0f, 0.85f, 0.90f), 22, out hud.lifeText, new Vector2(1f, 1f), new Vector2(1f, 1f));
             hud.lifeBadgeObject = lifeBadgeObj;
+
+            // 5. Duraklatma (Pause) Butonu (Sağ Üst Köşede — Geniş Dokunmatik Alan)
+            GameObject pauseBtnObj = new GameObject("PauseButton");
+            pauseBtnObj.transform.SetParent(safeArea.transform, false);
+            RectTransform pauseRt = pauseBtnObj.AddComponent<RectTransform>();
+            pauseRt.anchorMin = new Vector2(1f, 1f);
+            pauseRt.anchorMax = new Vector2(1f, 1f);
+            pauseRt.pivot = new Vector2(1f, 1f);
+            pauseRt.anchoredPosition = new Vector2(-28f, -34f);
+            pauseRt.sizeDelta = new Vector2(84f, 84f);
+
+            Image pauseBg = pauseBtnObj.AddComponent<Image>();
+            pauseBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.08f, 0.12f, 0.24f, 0.94f),
+                new Color(0.22f, 0.74f, 0.97f, 0.90f),
+                3.0f, 24, 84, 84);
+
+            Button pauseBtn = pauseBtnObj.AddComponent<Button>();
+            ColorBlock cb = pauseBtn.colors;
+            cb.normalColor = Color.white;
+            cb.highlightedColor = new Color(0.9f, 0.95f, 1.0f);
+            cb.pressedColor = new Color(0.7f, 0.85f, 1.0f);
+            pauseBtn.colors = cb;
+
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(pauseBtnObj.transform, false);
+            RectTransform iconRt = iconObj.AddComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRt.pivot = new Vector2(0.5f, 0.5f);
+            iconRt.sizeDelta = new Vector2(44f, 44f);
+            iconRt.anchoredPosition = Vector2.zero;
+
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.sprite = ProceduralSpriteGenerator.CreatePauseIconSprite(64);
+            iconImg.color = Color.white;
+            iconImg.raycastTarget = false;
+
+            pauseBtn.onClick.AddListener(() =>
+            {
+                AudioManager.Instance?.PlayButtonClickSound();
+                GameManager.Instance?.PauseGame();
+            });
 
             // Active PowerUp Badges Bar (Üst Orta - İki rozet arası)
             GameObject badgeBar = new GameObject("PowerUpBadgeBar");
@@ -2772,6 +2818,75 @@ namespace ZiplaKac.Utils
             Color mintColor = new Color(0.024f, 0.839f, 0.627f);
             Color darkNavy = new Color(0.05f, 0.07f, 0.13f);
             return CreatePillButton(parent, name, label, position, size, mintColor, darkNavy, 32);
+        }
+
+        private void CreatePauseModal(Transform parent)
+        {
+            GameObject modalObj = new GameObject("PauseModal");
+            modalObj.transform.SetParent(parent, false);
+            RectTransform rt = modalObj.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            Image bg = modalObj.AddComponent<Image>();
+            bg.color = new Color(0.02f, 0.04f, 0.08f, 0.82f);
+            bg.raycastTarget = true;
+
+            UI.PauseModalUI pauseUI = modalObj.AddComponent<UI.PauseModalUI>();
+
+            // Modal Kartı (760 x 780 px)
+            GameObject card = new GameObject("PauseCard");
+            card.transform.SetParent(modalObj.transform, false);
+            RectTransform cardRt = card.AddComponent<RectTransform>();
+            cardRt.anchorMin = new Vector2(0.5f, 0.5f);
+            cardRt.anchorMax = new Vector2(0.5f, 0.5f);
+            cardRt.pivot = new Vector2(0.5f, 0.5f);
+            cardRt.sizeDelta = new Vector2(760f, 780f);
+            cardRt.anchoredPosition = Vector2.zero;
+
+            Image cardBg = card.AddComponent<Image>();
+            cardBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
+                new Color(0.07f, 0.10f, 0.20f, 0.98f),
+                new Color(0.22f, 0.74f, 0.97f, 0.95f),
+                3.5f, 32, 128, 128);
+
+            // Başlık
+            pauseUI.titleText = CreateText(card.transform, "TitleText", LocalizationManager.Get("pause_title"), 48, new Vector2(0f, 280f), new Color(0.22f, 0.74f, 0.97f), false, FontStyle.Bold);
+
+            // Koşu Skor & Altın Özeti
+            pauseUI.scoreSummaryText = CreateText(card.transform, "ScoreSummaryText", "SKOR: 0   •   ALTIN: 0", 28, new Vector2(0f, 215f), new Color(0.85f, 0.92f, 1.0f), false, FontStyle.Bold);
+
+            // Buton 1: Devam Et (Yeşil Kapsül)
+            GameObject resumeObj = CreatePillButton(card.transform, "ResumeButton", LocalizationManager.Get("pause_btn_resume"),
+                new Vector2(0f, 110f), new Vector2(560f, 84f),
+                new Color(0.05f, 0.65f, 0.45f), Color.white, 34, new Color(0.25f, 0.88f, 0.65f), 3f, 30);
+            pauseUI.resumeButton = resumeObj.GetComponent<Button>();
+            pauseUI.resumeButtonText = resumeObj.transform.Find("Label")?.GetComponent<Text>();
+
+            // Buton 2: Yeniden Başla (Turuncu/Sarı Kapsül)
+            GameObject restartObj = CreatePillButton(card.transform, "RestartButton", LocalizationManager.Get("pause_btn_restart"),
+                new Vector2(0f, 4f), new Vector2(560f, 84f),
+                new Color(0.85f, 0.50f, 0.08f), Color.white, 32, new Color(1.0f, 0.75f, 0.25f), 3f, 30);
+            pauseUI.restartButton = restartObj.GetComponent<Button>();
+            pauseUI.restartButtonText = restartObj.transform.Find("Label")?.GetComponent<Text>();
+
+            // Buton 3: Ses Aç / Kapat (Koyu Mavi Kapsül)
+            GameObject soundObj = CreatePillButton(card.transform, "SoundButton", LocalizationManager.Get("pause_sound_on"),
+                new Vector2(0f, -102f), new Vector2(560f, 84f),
+                new Color(0.12f, 0.17f, 0.32f), new Color(0.85f, 0.92f, 1.0f), 30, new Color(0.35f, 0.50f, 0.75f), 2.5f, 30);
+            pauseUI.soundButton = soundObj.GetComponent<Button>();
+            pauseUI.soundButtonText = soundObj.transform.Find("Label")?.GetComponent<Text>();
+
+            // Buton 4: Ana Menü (Kırmızı / Mor Kapsül)
+            GameObject menuObj = CreatePillButton(card.transform, "MainMenuButton", LocalizationManager.Get("pause_btn_menu"),
+                new Vector2(0f, -208f), new Vector2(560f, 84f),
+                new Color(0.55f, 0.10f, 0.20f), Color.white, 30, new Color(0.85f, 0.25f, 0.35f), 2.5f, 30);
+            pauseUI.mainMenuButton = menuObj.GetComponent<Button>();
+            pauseUI.mainMenuButtonText = menuObj.transform.Find("Label")?.GetComponent<Text>();
+
+            modalObj.SetActive(false);
         }
 
         private void CreateSplashScreenOverlay(Transform parent)

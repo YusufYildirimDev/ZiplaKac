@@ -107,7 +107,7 @@ namespace ZiplaKac.UI
             PlayerPrefs.SetInt(KEY_ONBOARDING_SEEN, 1);
             PlayerPrefs.Save();
             gameObject.SetActive(false);
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
         }
 
         public void NextSlide()
@@ -117,7 +117,7 @@ namespace ZiplaKac.UI
             {
                 currentSlideIndex++;
                 UpdateSlideDisplay();
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
             }
             else
             {
@@ -125,7 +125,7 @@ namespace ZiplaKac.UI
                 PlayerPrefs.SetInt(KEY_ONBOARDING_SEEN, 1);
                 PlayerPrefs.Save();
                 gameObject.SetActive(false);
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
 
                 if (GameManager.Instance != null && GameManager.Instance.State == GameState.MainMenu)
                 {
@@ -140,7 +140,7 @@ namespace ZiplaKac.UI
             {
                 currentSlideIndex--;
                 UpdateSlideDisplay();
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
             }
         }
 

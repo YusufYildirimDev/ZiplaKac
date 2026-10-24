@@ -203,7 +203,7 @@ namespace ZiplaKac.UI
 
         public void CloseModal()
         {
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
             gameObject.SetActive(false);
         }
 

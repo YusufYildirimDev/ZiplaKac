@@ -157,7 +157,7 @@ namespace ZiplaKac.UI
         public void SwitchTab(ShopTab tab)
         {
             currentTab = tab;
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
             RefreshUI();
             if (itemsScrollRect != null) itemsScrollRect.verticalNormalizedPosition = 1f;
         }
@@ -417,7 +417,7 @@ namespace ZiplaKac.UI
                     else
                     {
                         bool nowEq = SaveSystem.ToggleOutfitEquipped(charKey, currentType);
-                        AudioManager.Instance?.PlayJumpSound();
+                        AudioManager.Instance?.PlayButtonClickSound();
                         AudioManager.Instance?.TriggerHapticFeedback();
                         ShowStatus(nowEq ? LocalizationManager.Get("shop_toast_equipped") : LocalizationManager.Get("shop_toast_unequipped"), nowEq ? new Color(0.06f, 0.84f, 0.58f) : new Color(0.7f, 0.8f, 0.9f));
                         PlayerController.Instance?.UpdateCharacterAppearance();
@@ -543,7 +543,7 @@ namespace ZiplaKac.UI
             restoreText.text = $"🔄  {LocalizationManager.Get("shop_restore_purchases")}\n<size=18><color=#94A3B8>{LocalizationManager.Get("shop_restore_hint")}</color></size>";
 
             restoreBtn.onClick.AddListener(() => {
-                AudioManager.Instance?.PlayJumpSound();
+                AudioManager.Instance?.PlayButtonClickSound();
                 AudioManager.Instance?.TriggerHapticFeedback();
                 ShowStatus(LocalizationManager.Get("shop_restore_in_progress"), new Color(0.12f, 0.55f, 0.88f));
 
@@ -777,7 +777,7 @@ namespace ZiplaKac.UI
 
         public void CloseModal()
         {
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
             gameObject.SetActive(false);
         }
 

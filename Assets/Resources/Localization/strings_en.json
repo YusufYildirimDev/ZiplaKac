@@ -180,5 +180,11 @@
   "shop_restore_hint": "Restores your previously purchased ad-free pack to this device",
   "shop_restore_success": "Your purchases were restored successfully!",
   "shop_restore_none": "No previous purchases found to restore.",
-  "shop_restore_in_progress": "Restoring purchases..."
+  "shop_restore_in_progress": "Restoring purchases...",
+  "pause_title": "PAUSED",
+  "pause_btn_resume": "▶ RESUME",
+  "pause_btn_restart": "↻ RESTART",
+  "pause_btn_menu": "⌂ MAIN MENU",
+  "pause_sound_on": "SOUND: ON",
+  "pause_sound_off": "SOUND: OFF"
 }

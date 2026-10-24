@@ -309,6 +309,14 @@ namespace ZiplaKac.Core
             { "menu_leaderboard_label", "SKORLAR" },
             { "menu_leaderboard_toast_not_auth", "⚠️ Apple Game Center'a bağlanılamadı. Lütfen Ayarlar'dan Game Center'a giriş yapın." },
 
+            // Pause Menüsü
+            { "pause_title", "DURAKLATILDI" },
+            { "pause_btn_resume", "▶ DEVAM ET" },
+            { "pause_btn_restart", "↻ YENİDEN BAŞLA" },
+            { "pause_btn_menu", "⌂ ANA MENÜ" },
+            { "pause_sound_on", "SES: AÇIK" },
+            { "pause_sound_off", "SES: KAPALI" },
+
             // Mağaza & Gardırop
             { "shop_title_upgrades", "GÜÇLER &\nYÜKSELTMELER" },
             { "shop_title_wardrobe", "GARDIROP\n(KIYAFETLER)" },
@@ -520,6 +528,14 @@ namespace ZiplaKac.Core
             { "menu_life_toast_info", "❤️ Extra Life ({0}): Saves your run and lets you keep running after a crash!" },
             { "menu_leaderboard_label", "SCORES" },
             { "menu_leaderboard_toast_not_auth", "⚠️ Could not connect to Apple Game Center. Please sign in via iOS Settings." },
+
+            // Pause Menu
+            { "pause_title", "PAUSED" },
+            { "pause_btn_resume", "▶ RESUME" },
+            { "pause_btn_restart", "↻ RESTART" },
+            { "pause_btn_menu", "⌂ MAIN MENU" },
+            { "pause_sound_on", "SOUND: ON" },
+            { "pause_sound_off", "SOUND: OFF" },
 
             // Shop & Wardrobe
             { "shop_title_upgrades", "POWERS &\nUPGRADES" },

@@ -856,6 +856,47 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
+        public static Sprite CreatePauseIconSprite(int resolution = 64)
+        {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            ClearTexture(tex);
+
+            float w = resolution * 0.16f;
+            float h = resolution * 0.50f;
+            float gap = resolution * 0.14f;
+            float cy = resolution * 0.50f;
+
+            float bar1_minX = resolution * 0.5f - gap * 0.5f - w;
+            float bar1_maxX = resolution * 0.5f - gap * 0.5f;
+            float bar2_minX = resolution * 0.5f + gap * 0.5f;
+            float bar2_maxX = resolution * 0.5f + gap * 0.5f + w;
+            float minY = cy - h * 0.5f;
+            float maxY = cy + h * 0.5f;
+            float corner = w * 0.4f;
+
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
+                    float d1 = SignedDistanceRoundedRect(pt, new Vector2(bar1_minX, minY), new Vector2(bar1_maxX, maxY), corner);
+                    float d2 = SignedDistanceRoundedRect(pt, new Vector2(bar2_minX, minY), new Vector2(bar2_maxX, maxY), corner);
+                    float d = Mathf.Min(d1, d2);
+                    if (d <= 0f)
+                    {
+                        tex.SetPixel(x, y, Color.white);
+                    }
+                    else if (d < 1.2f)
+                    {
+                        tex.SetPixel(x, y, new Color(1f, 1f, 1f, 1f - d / 1.2f));
+                    }
+                }
+            }
+
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+        }
+
         public static Sprite CreateHeartIconSprite(int resolution = 64)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);

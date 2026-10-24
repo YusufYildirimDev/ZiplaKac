@@ -442,14 +442,14 @@ namespace ZiplaKac.UI
             }
             else
             {
-                Player.PlayerController player = FindObjectOfType<Player.PlayerController>();
+                Player.PlayerController player = UnityEngine.Object.FindFirstObjectByType<Player.PlayerController>();
                 if (player != null)
                 {
                     player.UpdateCharacterAppearance();
                 }
             }
 
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
             AudioManager.Instance?.TriggerHapticFeedback();
 
             // Dünya temasını anında güncelle

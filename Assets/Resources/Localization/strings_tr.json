@@ -180,5 +180,11 @@
   "shop_restore_hint": "Daha önce aldığınız reklamsız paketi bu cihaza geri yükler",
   "shop_restore_success": "Satın alımlarınız başarıyla geri yüklendi!",
   "shop_restore_none": "Geri yüklenecek aktif satın alım bulunamadı.",
-  "shop_restore_in_progress": "Satın alımlar kontrol ediliyor..."
+  "shop_restore_in_progress": "Satın alımlar kontrol ediliyor...",
+  "pause_title": "DURAKLATILDI",
+  "pause_btn_resume": "▶ DEVAM ET",
+  "pause_btn_restart": "↻ YENİDEN BAŞLA",
+  "pause_btn_menu": "⌂ ANA MENÜ",
+  "pause_sound_on": "SES: AÇIK",
+  "pause_sound_off": "SES: KAPALI"
 }

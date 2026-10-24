@@ -64,6 +64,10 @@ namespace ZiplaKac.Core
         public int consecutivePassedObstacles = 0;
         public int maxComboInRun = 0;
 
+        // Duraklatma (Pause) Sistemi
+        public bool IsPaused { get; private set; } = false;
+        public event Action<bool> OnGamePaused;
+
         // Event'ler
         public event Action<GameState> OnGameStateChanged;
         public event Action<int> OnTierChanged;
@@ -124,6 +128,12 @@ namespace ZiplaKac.Core
 
         public void SetState(GameState newState)
         {
+            if (IsPaused)
+            {
+                IsPaused = false;
+                OnGamePaused?.Invoke(false);
+            }
+
             State = newState;
 
             switch (newState)
@@ -235,7 +245,7 @@ namespace ZiplaKac.Core
             // 3. Şanslı Güçlendirme (İlk güçlendirme 3. saniyede çıkar)
             if (SaveSystem.UseConsumable("lucky_pu"))
             {
-                PowerUps.PowerUpSpawner spawner = FindObjectOfType<PowerUps.PowerUpSpawner>();
+                PowerUps.PowerUpSpawner spawner = UnityEngine.Object.FindFirstObjectByType<PowerUps.PowerUpSpawner>();
                 if (spawner != null) spawner.SetNextSpawnTime(3.0f);
             }
 
@@ -245,7 +255,49 @@ namespace ZiplaKac.Core
 
         public void StartGame()
         {
+            if (IsPaused)
+            {
+                ResumeGame();
+            }
             SetState(GameState.Playing);
+        }
+
+        public void PauseGame()
+        {
+            if (State != GameState.Playing || IsPaused) return;
+
+            IsPaused = true;
+            Time.timeScale = 0f;
+            OnGamePaused?.Invoke(true);
+        }
+
+        public void ResumeGame()
+        {
+            if (!IsPaused) return;
+
+            IsPaused = false;
+            Time.timeScale = 1.0f;
+            OnGamePaused?.Invoke(false);
+        }
+
+        public void TogglePause()
+        {
+            if (IsPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus && State == GameState.Playing && !IsPaused)
+            {
+                PauseGame();
+            }
         }
 
         public void TriggerTemporaryInvulnerability(float duration = 1.5f)
@@ -430,6 +482,7 @@ namespace ZiplaKac.Core
 
             RunObstacleGold += goldEarned;
             CurrentRunGold += goldEarned;
+            AudioManager.Instance?.PlayCoinSound();
 
             consecutivePassedObstacles++;
 

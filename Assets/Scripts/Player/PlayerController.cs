@@ -111,7 +111,7 @@ namespace ZiplaKac.Player
 
         private void Update()
         {
-            if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
+            if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing || GameManager.Instance.IsPaused)
             {
                 return;
             }
@@ -286,12 +286,25 @@ namespace ZiplaKac.Player
             }
             catch { }
 
+            // UI butonlarına basıldığında zıplamayı engelle
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                {
+                    return false;
+                }
+                if (Input.touchCount > 0 && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                {
+                    return false;
+                }
+            }
+
             return false;
         }
 
         public void PerformJump()
         {
-            if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
+            if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing || GameManager.Instance.IsPaused)
             {
                 return;
             }

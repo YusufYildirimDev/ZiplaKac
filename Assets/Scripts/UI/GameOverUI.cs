@@ -332,7 +332,7 @@ namespace ZiplaKac.UI
 
         private void OnRestartButtonClicked()
         {
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
             MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
             if (GameManager.Instance != null)
             {
@@ -342,7 +342,7 @@ namespace ZiplaKac.UI
 
         private void OnMainMenuButtonClicked()
         {
-            AudioManager.Instance?.PlayJumpSound();
+            AudioManager.Instance?.PlayButtonClickSound();
             MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
             if (GameManager.Instance != null)
             {
