@@ -595,8 +595,8 @@ namespace ZiplaKac.UI
             iconRt.anchorMin = new Vector2(0f, 0.5f);
             iconRt.anchorMax = new Vector2(0f, 0.5f);
             iconRt.pivot = new Vector2(0f, 0.5f);
-            iconRt.anchoredPosition = new Vector2(22f, 0f);
-            iconRt.sizeDelta = new Vector2(125f, 125f);
+            iconRt.anchoredPosition = new Vector2(14f, 0f);
+            iconRt.sizeDelta = new Vector2(150f, 150f);
 
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
@@ -646,8 +646,8 @@ namespace ZiplaKac.UI
             labelRt.anchorMin = new Vector2(0f, 0.5f);
             labelRt.anchorMax = new Vector2(0f, 0.5f);
             labelRt.pivot = new Vector2(0f, 0.5f);
-            labelRt.anchoredPosition = new Vector2(165f, 0f);
-            labelRt.sizeDelta = new Vector2(430f, 160f);
+            labelRt.anchoredPosition = new Vector2(174f, 0f);
+            labelRt.sizeDelta = new Vector2(415f, 160f);
 
             Text labelText = labelObj.AddComponent<Text>();
             labelText.font = font;

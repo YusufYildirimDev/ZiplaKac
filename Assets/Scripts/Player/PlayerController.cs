@@ -377,22 +377,10 @@ namespace ZiplaKac.Player
             int bodyOrder = bodySpriteRenderer.sortingOrder;
             int bodyLayer = bodySpriteRenderer.sortingLayerID;
 
-            if (capeSpriteRenderer == null)
-            {
-                capeSpriteRenderer = GetOrCreateChildRenderer("Cape", bodyLayer, bodyOrder - 1);
-            }
-            if (glassesSpriteRenderer == null)
-            {
-                glassesSpriteRenderer = GetOrCreateChildRenderer("Glasses", bodyLayer, bodyOrder + 1);
-            }
-            if (accessorySpriteRenderer == null)
-            {
-                accessorySpriteRenderer = GetOrCreateChildRenderer("Accessory", bodyLayer, bodyOrder + 2);
-            }
-            if (hatSpriteRenderer == null)
-            {
-                hatSpriteRenderer = GetOrCreateChildRenderer("Hat", bodyLayer, bodyOrder + 3);
-            }
+            capeSpriteRenderer = GetOrCreateChildRenderer("Cape", bodyLayer, bodyOrder - 1);
+            glassesSpriteRenderer = GetOrCreateChildRenderer("Glasses", bodyLayer, bodyOrder + 1);
+            accessorySpriteRenderer = GetOrCreateChildRenderer("Accessory", bodyLayer, bodyOrder + 2);
+            hatSpriteRenderer = GetOrCreateChildRenderer("Hat", bodyLayer, bodyOrder + 3);
         }
 
         private SpriteRenderer GetOrCreateChildRenderer(string childName, int sortingLayerID, int sortingOrder)
@@ -407,12 +395,33 @@ namespace ZiplaKac.Player
             {
                 obj = new GameObject(childName);
                 obj.transform.SetParent(transform, false);
-                obj.transform.localPosition = Vector3.zero;
                 obj.transform.localRotation = Quaternion.identity;
             }
 
-            // 512x512 kıyafet dokusunun 256x256 karakter sprite'ına piksel piksel 1:1 tam oturması için 0.5 ölçeği
-            obj.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
+            // Her kostüm parçası için ideal anatomik pozisyon ve belirgin arcade ölçeği
+            switch (childName)
+            {
+                case "Glasses":
+                    obj.transform.localPosition = new Vector3(0.118f, 0.010f, 0f);
+                    obj.transform.localScale = new Vector3(0.48f, 0.48f, 1f);
+                    break;
+                case "Hat":
+                    obj.transform.localPosition = new Vector3(0.04f, 0.35f, 0f);
+                    obj.transform.localScale = new Vector3(0.44f, 0.44f, 1f);
+                    break;
+                case "Accessory": // Kral Tacı
+                    obj.transform.localPosition = new Vector3(0.02f, 0.28f, 0f);
+                    obj.transform.localScale = new Vector3(0.44f, 0.44f, 1f);
+                    break;
+                case "Cape":
+                    obj.transform.localPosition = new Vector3(-0.16f, -0.04f, 0f);
+                    obj.transform.localScale = new Vector3(0.50f, 0.50f, 1f);
+                    break;
+                default:
+                    obj.transform.localPosition = Vector3.zero;
+                    obj.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
+                    break;
+            }
 
             SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
             if (sr == null) sr = obj.AddComponent<SpriteRenderer>();
