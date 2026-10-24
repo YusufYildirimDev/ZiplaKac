@@ -20,6 +20,8 @@ namespace ZiplaKac.Editor
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.iOS, "com.yusufyldrm.ziplakac");
             PlayerSettings.iOS.appleDeveloperTeamID = "5A4A2VUMDM";
             PlayerSettings.iOS.appleEnableAutomaticSigning = true;
+            PlayerSettings.bundleVersion = "1.0.0";
+            PlayerSettings.iOS.buildNumber = "1";
 
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.allowedAutorotateToPortrait = true;
@@ -78,6 +80,8 @@ namespace ZiplaKac.Editor
             PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
             EditorUserBuildSettings.buildAppBundle = true;
+            PlayerSettings.bundleVersion = "1.0.0";
+            PlayerSettings.Android.bundleVersionCode = 1;
             PlayerSettings.SplashScreen.show = false;
 
             ConfigureAppIcons();
