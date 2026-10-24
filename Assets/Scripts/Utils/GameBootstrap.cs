@@ -2791,7 +2791,7 @@ namespace ZiplaKac.Utils
             bg.color = new Color(0.40f, 0.70f, 0.94f, 1f);
             bg.raycastTarget = true;
 
-            // Açılış görseli (Launch Screen Sprite)
+            // Açılış görseli (Launch Screen Sprite - Kenarsız / Tam Ekran Dolgu)
             GameObject imgObj = new GameObject("SplashArt");
             imgObj.transform.SetParent(splashObj.transform, false);
             RectTransform imgRt = imgObj.AddComponent<RectTransform>();
@@ -2799,6 +2799,7 @@ namespace ZiplaKac.Utils
             imgRt.anchorMax = Vector2.one;
             imgRt.offsetMin = Vector2.zero;
             imgRt.offsetMax = Vector2.zero;
+            imgRt.pivot = new Vector2(0.5f, 0.5f);
 
             Image splashImg = imgObj.AddComponent<Image>();
             splashImg.raycastTarget = false;
@@ -2816,51 +2817,12 @@ namespace ZiplaKac.Utils
             if (splashSprite != null)
             {
                 splashImg.sprite = splashSprite;
-                splashImg.preserveAspect = true;
+                splashImg.preserveAspect = false;
+
+                AspectRatioFitter fitter = imgObj.AddComponent<AspectRatioFitter>();
+                fitter.aspectRatio = splashSprite.rect.width / splashSprite.rect.height;
+                fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
             }
-
-            // İlerleme Çubuğu Çerçevesi (Alt kısımda parlayan modern loader)
-            GameObject barTrack = new GameObject("ProgressBarTrack");
-            barTrack.transform.SetParent(splashObj.transform, false);
-            RectTransform btRt = barTrack.AddComponent<RectTransform>();
-            btRt.anchorMin = new Vector2(0.5f, 0f);
-            btRt.anchorMax = new Vector2(0.5f, 0f);
-            btRt.pivot = new Vector2(0.5f, 0.5f);
-            btRt.anchoredPosition = new Vector2(0f, 160f);
-            btRt.sizeDelta = new Vector2(620f, 26f);
-
-            Image trackImg = barTrack.AddComponent<Image>();
-            trackImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.06f, 0.09f, 0.16f, 0.95f),
-                new Color(0.18f, 0.35f, 0.65f, 0.8f),
-                2f, 13, 128, 32);
-            trackImg.type = Image.Type.Sliced;
-            trackImg.raycastTarget = false;
-
-            // İlerleme Çubuğu Dolgusu (Canlı Cyan / Neon Altın Degrade)
-            GameObject barFill = new GameObject("ProgressBarFill");
-            barFill.transform.SetParent(barTrack.transform, false);
-            RectTransform bfRt = barFill.AddComponent<RectTransform>();
-            bfRt.anchorMin = Vector2.zero;
-            bfRt.anchorMax = Vector2.one;
-            bfRt.offsetMin = new Vector2(3f, 3f);
-            bfRt.offsetMax = new Vector2(-3f, -3f);
-
-            Image fillImg = barFill.AddComponent<Image>();
-            fillImg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.00f, 0.898f, 1.00f, 1f),
-                Color.clear, 0f, 10, 64, 32);
-            fillImg.type = Image.Type.Filled;
-            fillImg.fillMethod = Image.FillMethod.Horizontal;
-            fillImg.fillOrigin = 0;
-            fillImg.fillAmount = 0f;
-            fillImg.raycastTarget = false;
-
-            // Yükleniyor / Yüzde Yazısı
-            Text pctTxt = CreateText(splashObj.transform, "LoadingText", "0%", 24, new Vector2(0f, 205f), new Color(0.85f, 0.92f, 1.0f, 0.9f), false, FontStyle.Bold);
-            pctTxt.rectTransform.anchorMin = new Vector2(0.5f, 0f);
-            pctTxt.rectTransform.anchorMax = new Vector2(0.5f, 0f);
-            pctTxt.rectTransform.pivot = new Vector2(0.5f, 0.5f);
 
             // Dokunarak geçiş (Skip) butonu ve kararma denetleyicisi
             Button btn = splashObj.AddComponent<Button>();
@@ -2870,8 +2832,6 @@ namespace ZiplaKac.Utils
 
             UI.SplashScreenController controller = splashObj.AddComponent<UI.SplashScreenController>();
             controller.canvasGroup = cg;
-            controller.progressBarFill = fillImg;
-            controller.loadingText = pctTxt;
             btn.onClick.AddListener(controller.Skip);
         }
     }
