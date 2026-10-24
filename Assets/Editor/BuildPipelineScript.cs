@@ -46,6 +46,7 @@ namespace ZiplaKac.Editor
             {
                 Debug.Log("[BuildPipelineScript] iOS Build succeeded!");
                 SyncAppIconToXcodeBuild(buildPath);
+                SyncLaunchScreenToXcodeBuild(buildPath);
                 EditorApplication.Exit(0);
             }
             else
@@ -168,6 +169,26 @@ namespace ZiplaKac.Editor
             catch (System.Exception ex)
             {
                 Debug.LogError($"[BuildPipelineScript] Failed syncing AppIcon.appiconset: {ex.Message}");
+            }
+        }
+
+        private static void SyncLaunchScreenToXcodeBuild(string buildPath)
+        {
+            try
+            {
+                string sourceImg = "Assets/Art/LaunchScreen/LaunchScreen-iPhonePortrait.png";
+                if (System.IO.File.Exists(sourceImg))
+                {
+                    string targetiPhone = System.IO.Path.Combine(buildPath, "LaunchScreen-iPhonePortrait.png");
+                    string targetiPad = System.IO.Path.Combine(buildPath, "LaunchScreen-iPad.png");
+                    System.IO.File.Copy(sourceImg, targetiPhone, true);
+                    System.IO.File.Copy(sourceImg, targetiPad, true);
+                    Debug.Log($"[BuildPipelineScript] Successfully synced LaunchScreen to {targetiPhone}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[BuildPipelineScript] Failed syncing LaunchScreen: {ex.Message}");
             }
         }
 
