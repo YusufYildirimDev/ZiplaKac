@@ -118,6 +118,7 @@
   "go_gold_earned": "+<color=#f6c445><b>{0}</b></color> <color=#cbd5e1><b>GOLD EARNED</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>VAULT:</b></color> <color=#f6c445><b>{1}</b></color> <color=#cbd5e1><b>GOLD</b></color>",
   "go_last_scores": "Recent Scores: {0}",
   "go_btn_revive_life": "USE LIFE\nCONTINUE",
+  "go_btn_revive_ad": "WATCH AD\nREVIVE 🎬",
   "go_btn_revive_afford": "REVIVE &\nCONTINUE",
   "go_btn_revive_cost": "REVIVE\n(500 GOLD)",
   "go_btn_revive_used": "LIFE\nUSED",

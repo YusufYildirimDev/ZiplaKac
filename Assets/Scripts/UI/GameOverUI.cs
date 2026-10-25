@@ -247,37 +247,41 @@ namespace ZiplaKac.UI
 
             // Can Alma (Revive) Butonu Durumu
             int extraLives = SaveSystem.GetConsumableCount("second_chance");
-            int currentGold = SaveSystem.GetTotalGold();
-            bool canReviveWithLife = extraLives > 0;
-            bool canReviveWithGold = currentGold >= 500;
-            bool canRevive = canReviveWithLife || canReviveWithGold;
+            bool hasUsedAdRevive = GameManager.Instance != null && GameManager.Instance.hasRevivedWithAdThisRun;
 
             if (reviveButton != null)
             {
-                reviveButton.interactable = canRevive;
-
-                if (reviveButtonText != null)
+                if (extraLives > 0)
                 {
-                    if (canReviveWithLife)
+                    reviveButton.interactable = true;
+                    if (reviveButtonText != null)
                     {
                         reviveButtonText.text = LocalizationManager.Get("go_btn_revive_life", "CAN KULLAN\nDEVAM ET");
                         reviveButtonText.color = Color.white;
                     }
-                    else if (canReviveWithGold)
+                    if (reviveHeartIcon != null) reviveHeartIcon.color = Color.white;
+                }
+                else if (!hasUsedAdRevive)
+                {
+                    // "REKLAM İZLE CAN AL" - Uzun ödüllü video reklamı izleyerek bedava can alıp koşuya devam etme
+                    reviveButton.interactable = true;
+                    if (reviveButtonText != null)
                     {
-                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_afford", "CAN AL\nDEVAM ET");
+                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_ad", "REKLAM İZLE\nCAN AL 🎬");
                         reviveButtonText.color = Color.white;
                     }
-                    else
-                    {
-                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_cost", "CAN AL\n(500 ALTIN)");
-                        reviveButtonText.color = new Color(1f, 1f, 1f, 0.45f);
-                    }
+                    if (reviveHeartIcon != null) reviveHeartIcon.color = Color.white;
                 }
-
-                if (reviveHeartIcon != null)
+                else
                 {
-                    reviveHeartIcon.color = canRevive ? Color.white : new Color(1f, 1f, 1f, 0.40f);
+                    // Bu turda reklamla can alma hakkı kullanılmış
+                    reviveButton.interactable = false;
+                    if (reviveButtonText != null)
+                    {
+                        reviveButtonText.text = LocalizationManager.Get("go_btn_revive_used", "CAN\nKULLANILDI");
+                        reviveButtonText.color = new Color(1f, 1f, 1f, 0.40f);
+                    }
+                    if (reviveHeartIcon != null) reviveHeartIcon.color = new Color(1f, 1f, 1f, 0.35f);
                 }
             }
 
@@ -340,19 +344,54 @@ namespace ZiplaKac.UI
 
         private void OnReviveButtonClicked()
         {
-            if (GameManager.Instance != null && GameManager.Instance.RevivePlayer(500))
+            if (m_AutoInterstitialCoroutine != null)
             {
-                if (m_AutoInterstitialCoroutine != null)
-                {
-                    StopCoroutine(m_AutoInterstitialCoroutine);
-                    m_AutoInterstitialCoroutine = null;
-                }
-                gameObject.SetActive(false);
+                StopCoroutine(m_AutoInterstitialCoroutine);
+                m_AutoInterstitialCoroutine = null;
             }
-            else
+
+            int extraLives = SaveSystem.GetConsumableCount("second_chance");
+            if (extraLives > 0)
+            {
+                if (GameManager.Instance != null && GameManager.Instance.RevivePlayer(0))
+                {
+                    gameObject.SetActive(false);
+                    return;
+                }
+            }
+
+            // Ekstra can yoksa: "Reklam İzle Can Al" - Uzun ödüllü reklam gösterilir
+            if (GameManager.Instance != null && GameManager.Instance.hasRevivedWithAdThisRun)
             {
                 AudioManager.Instance?.PlayGameOverSound();
                 AudioManager.Instance?.TriggerHapticFeedback();
+                return;
+            }
+
+            if (MonetizationManager.Instance != null)
+            {
+                MonetizationManager.Instance.ShowRewardedAd(
+                    () => {
+                        // Uzun ödüllü reklam tamamlandı: Oyuncuya can ver ve oyunu devam ettir
+                        if (GameManager.Instance != null && GameManager.Instance.RevivePlayerWithAd())
+                        {
+                            gameObject.SetActive(false);
+                            AudioManager.Instance?.PlayPowerUpSound();
+                            AudioManager.Instance?.TriggerHapticFeedback();
+                        }
+                    },
+                    () => {
+                        Debug.Log("Can alma reklamı tamamlanamadı veya erken kapatıldı.");
+                        AudioManager.Instance?.PlayGameOverSound();
+                    }
+                );
+            }
+            else
+            {
+                if (GameManager.Instance != null && GameManager.Instance.RevivePlayerWithAd())
+                {
+                    gameObject.SetActive(false);
+                }
             }
         }
 

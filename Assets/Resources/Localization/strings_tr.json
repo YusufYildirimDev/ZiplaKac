@@ -118,6 +118,7 @@
   "go_gold_earned": "+<color=#f6c445><b>{0}</b></color> <color=#cbd5e1><b>ALTIN KAZANDIN</b></color>    <color=#334a66>|</color>    <color=#7e9ebc><b>KASA:</b></color> <color=#f6c445><b>{1}</b></color> <color=#cbd5e1><b>ALTIN</b></color>",
   "go_last_scores": "Son Skorlar: {0}",
   "go_btn_revive_life": "CAN KULLAN\nDEVAM ET",
+  "go_btn_revive_ad": "REKLAM İZLE\nCAN AL 🎬",
   "go_btn_revive_afford": "CAN AL\nDEVAM ET",
   "go_btn_revive_cost": "CAN AL\n(500 ALTIN)",
   "go_btn_revive_used": "CAN\nKULLANILDI",

@@ -53,6 +53,7 @@ namespace ZiplaKac.Core
         public bool hasSecondChance = false;
         public bool hasUsedLifeThisRun = false;
         public bool hasFireReviveUsed = false;
+        public bool hasRevivedWithAdThisRun = false;
         public bool isTemporaryInvulnerable = false;
         private float invulnerabilityTimer = 0f;
 
@@ -172,6 +173,7 @@ namespace ZiplaKac.Core
                     PowerUps.PowerUp.ClearAllActivePowerUps();
                     hasUsedLifeThisRun = false;
                     hasFireReviveUsed = false;
+                    hasRevivedWithAdThisRun = false;
 
                     // --- Tek Kullanımlık (Consumable) Güçlendirmeleri Uygula ---
                     ApplyConsumablesAtStart();
@@ -333,6 +335,18 @@ namespace ZiplaKac.Core
         public bool ReviveWithGold(int cost = 500)
         {
             return RevivePlayer(cost);
+        }
+
+        /// <summary>
+        /// Uzun ödüllü reklam izlenerek can alma ve oyuna kaldığı yerden devam etme.
+        /// Tur başına 1 kez kullanılabilir.
+        /// </summary>
+        public bool RevivePlayerWithAd()
+        {
+            if (State != GameState.GameOver) return false;
+            hasRevivedWithAdThisRun = true;
+            ExecuteRevive();
+            return true;
         }
 
         private void ExecuteRevive()

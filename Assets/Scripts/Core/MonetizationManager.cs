@@ -472,16 +472,17 @@ namespace ZiplaKac.Core
         }
 
         /// <summary>
-        /// Ödüllü reklam gösterimi (Oyun bitti ekranında can veya ana menüde ödül için).
+        /// Uzun ödüllü video reklam gösterimi (Oyun bitti ekranında can veya ana menüde ödül için).
+        /// Google AdMob Rewarded Video: 15-30 saniye uzunluğunda, atlanamayan tam ekran video reklam.
         /// </summary>
         public void ShowRewardedAd(Action onSuccess, Action onFailure)
         {
             if (m_RewardedAd != null && m_RewardedAd.CanShowAd())
             {
-                Debug.Log("[MonetizationManager] Ödüllü reklam gösteriliyor...");
+                Debug.Log("[MonetizationManager] Uzun ödüllü video reklamı gösteriliyor...");
                 m_RewardedAd.Show(reward =>
                 {
-                    Debug.Log($"[MonetizationManager] Kullanıcı ödülü kazandı: {reward.Type} - {reward.Amount}");
+                    Debug.Log($"[MonetizationManager] Kullanıcı uzun video reklamı sonuna kadar izledi, ödülü kazandı: {reward.Type} - {reward.Amount}");
                     onSuccess?.Invoke();
                     OnRewardedAdCompleted?.Invoke();
                 });
@@ -490,15 +491,22 @@ namespace ZiplaKac.Core
             {
                 Debug.LogWarning("[MonetizationManager] Ödüllü reklam hazır değil!");
 #if UNITY_EDITOR
-                Debug.Log("[MonetizationManager] Editör modunda ödüllü reklam simülasyonu çalıştırılıyor...");
-                onSuccess?.Invoke();
-                OnRewardedAdCompleted?.Invoke();
+                Debug.Log("[MonetizationManager] [Editor Simülasyonu] Uzun ödüllü video reklamı oynatılıyor (AdMob Rewarded Video - 15~30 saniye)...");
+                StartCoroutine(EditorSimulateRewardedAdRoutine(onSuccess));
 #else
                 onFailure?.Invoke();
                 OnRewardedAdFailed?.Invoke();
                 LoadRewardedAd();
 #endif
             }
+        }
+
+        private System.Collections.IEnumerator EditorSimulateRewardedAdRoutine(Action onSuccess)
+        {
+            yield return new WaitForSecondsRealtime(2.5f);
+            Debug.Log("[MonetizationManager] [Editor Simülasyonu] Uzun ödüllü video reklamı tamamlandı! Ödül verildi.");
+            onSuccess?.Invoke();
+            OnRewardedAdCompleted?.Invoke();
         }
         #endregion
     }
