@@ -42,9 +42,18 @@ namespace ZiplaKac.UI
         public Text rewardedAdButtonText;
         public GameObject rewardedAdBadge;
 
+        private Coroutine m_AutoInterstitialCoroutine;
+
         private void OnEnable()
         {
             LocalizationManager.OnLanguageChanged += RefreshGameOverStats;
+
+            if (m_AutoInterstitialCoroutine != null)
+            {
+                StopCoroutine(m_AutoInterstitialCoroutine);
+                m_AutoInterstitialCoroutine = null;
+            }
+            m_AutoInterstitialCoroutine = StartCoroutine(AutoShowInterstitialRoutine());
 
             if (reviveButton != null)
             {
@@ -81,11 +90,23 @@ namespace ZiplaKac.UI
 
         private void OnDisable()
         {
+            if (m_AutoInterstitialCoroutine != null)
+            {
+                StopCoroutine(m_AutoInterstitialCoroutine);
+                m_AutoInterstitialCoroutine = null;
+            }
+
             LocalizationManager.OnLanguageChanged -= RefreshGameOverStats;
         }
 
         private void OnRewardedAdButtonClicked()
         {
+            if (m_AutoInterstitialCoroutine != null)
+            {
+                StopCoroutine(m_AutoInterstitialCoroutine);
+                m_AutoInterstitialCoroutine = null;
+            }
+
             if (MonetizationManager.Instance != null)
             {
                 MonetizationManager.Instance.ShowRewardedAd(
@@ -321,6 +342,11 @@ namespace ZiplaKac.UI
         {
             if (GameManager.Instance != null && GameManager.Instance.RevivePlayer(500))
             {
+                if (m_AutoInterstitialCoroutine != null)
+                {
+                    StopCoroutine(m_AutoInterstitialCoroutine);
+                    m_AutoInterstitialCoroutine = null;
+                }
                 gameObject.SetActive(false);
             }
             else
@@ -333,7 +359,12 @@ namespace ZiplaKac.UI
         private void OnRestartButtonClicked()
         {
             AudioManager.Instance?.PlayButtonClickSound();
-            MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
+            if (m_AutoInterstitialCoroutine != null)
+            {
+                StopCoroutine(m_AutoInterstitialCoroutine);
+                m_AutoInterstitialCoroutine = null;
+                MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
+            }
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.StartGame();
@@ -343,11 +374,25 @@ namespace ZiplaKac.UI
         private void OnMainMenuButtonClicked()
         {
             AudioManager.Instance?.PlayButtonClickSound();
-            MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
+            if (m_AutoInterstitialCoroutine != null)
+            {
+                StopCoroutine(m_AutoInterstitialCoroutine);
+                m_AutoInterstitialCoroutine = null;
+                MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
+            }
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.SetState(GameState.MainMenu);
             }
+        }
+
+        private IEnumerator AutoShowInterstitialRoutine()
+        {
+            // Oyuncu öldükten ve Game Over paneli açıldıktan 0.7 saniye sonra (skorunu ve rozetini gördükten sonra)
+            // 5 oyunda bir otomatik geçiş reklamını göster
+            yield return new WaitForSecondsRealtime(0.7f);
+            m_AutoInterstitialCoroutine = null;
+            MonetizationManager.Instance?.CheckAndShowInterstitialOnGameOver();
         }
     }
 }

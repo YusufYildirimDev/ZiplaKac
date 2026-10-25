@@ -84,6 +84,18 @@ namespace ZiplaKac.Editor
             PlayerSettings.Android.bundleVersionCode = 1;
             PlayerSettings.SplashScreen.show = false;
 
+            // Google Play Console için Release Keystore İmzalaması
+            string keystorePath = "hoppzy-release.keystore";
+            if (System.IO.File.Exists(keystorePath))
+            {
+                PlayerSettings.Android.useCustomKeystore = true;
+                PlayerSettings.Android.keystoreName = System.IO.Path.GetFullPath(keystorePath);
+                PlayerSettings.Android.keystorePass = "Hoppzy2026!";
+                PlayerSettings.Android.keyaliasName = "hoppzy";
+                PlayerSettings.Android.keyaliasPass = "Hoppzy2026!";
+                Debug.Log("[BuildPipelineScript] Release Keystore configured for Google Play signing.");
+            }
+
             ConfigureAppIcons();
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions

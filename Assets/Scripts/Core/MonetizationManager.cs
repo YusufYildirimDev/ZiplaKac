@@ -35,8 +35,8 @@ namespace ZiplaKac.Core
 
         [Header("Geçiş Reklamı Sıklığı")]
         [Tooltip("Kaç oyun bittiğinde (GameOver) bir geçiş reklamı gösterilsin.")]
-        public int interstitialIntervalGames = 3;
-        private int gameOverCount = 0;
+        public int interstitialIntervalGames = 5;
+        private const string PREF_KEY_GAME_OVER_COUNT = "hoppzy_game_over_ad_count";
 
         [Header("IAP Ürün Kimlikleri")]
         public const string PRODUCT_GOLD_1000 = "iap_gold_1000";
@@ -394,13 +394,19 @@ namespace ZiplaKac.Core
         {
             if (IsNoAdsActive) return;
 
-            gameOverCount++;
-            Debug.Log($"[MonetizationManager] GameOver Sayacı: {gameOverCount}/{interstitialIntervalGames}");
+            int currentCount = PlayerPrefs.GetInt(PREF_KEY_GAME_OVER_COUNT, 0) + 1;
+            Debug.Log($"[MonetizationManager] GameOver Sayacı: {currentCount}/{interstitialIntervalGames}");
 
-            if (gameOverCount >= interstitialIntervalGames)
+            if (currentCount >= interstitialIntervalGames)
             {
-                gameOverCount = 0;
+                PlayerPrefs.SetInt(PREF_KEY_GAME_OVER_COUNT, 0);
+                PlayerPrefs.Save();
                 ShowInterstitialAd();
+            }
+            else
+            {
+                PlayerPrefs.SetInt(PREF_KEY_GAME_OVER_COUNT, currentCount);
+                PlayerPrefs.Save();
             }
         }
 
@@ -421,6 +427,9 @@ namespace ZiplaKac.Core
             {
                 Debug.Log("[MonetizationManager] Geçiş reklamı hazır değil, yeniden yükleniyor.");
                 LoadInterstitialAd();
+#if UNITY_EDITOR
+                Debug.Log("[MonetizationManager] [Editor Simülasyonu] 5 oyunda bir otomatik geçiş reklamı (Interstitial Ad) tetiklendi!");
+#endif
             }
         }
 
