@@ -186,5 +186,6 @@
   "pause_btn_restart": "↻ RESTART",
   "pause_btn_menu": "⌂ MAIN MENU",
   "pause_sound_on": "SOUND: ON",
-  "pause_sound_off": "SOUND: OFF"
+  "pause_sound_off": "SOUND: OFF",
+  "privacy_policy_btn": "Privacy Policy ↗"
 }

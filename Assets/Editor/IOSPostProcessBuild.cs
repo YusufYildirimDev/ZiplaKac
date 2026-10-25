@@ -69,6 +69,9 @@ namespace ZiplaKac.Editor
                 rootDict.SetString("NSUserTrackingUsageDescription",
                     "Bu izin, ilgi alanlarınıza özel ödüllü reklamlar sunmak ve oyun deneyiminizi geliştirmek için kullanılır.");
 
+                // Şifreleme/Kriptografi Bildirimi (App Store Connect Yüklemesinde Otomatik Onay)
+                rootDict.SetBoolean("ITSAppUsesNonExemptEncryption", false);
+
                 // AdMob Uygulama Kimliği (GADApplicationIdentifier)
                 rootDict.SetString("GADApplicationIdentifier", "ca-app-pub-3940256099942544~1458002511");
                 rootDict.SetBoolean("GADShouldSkipSetupChecks", true);

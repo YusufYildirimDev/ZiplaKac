@@ -32,6 +32,10 @@ namespace ZiplaKac.UI
         public Button mainMenuButton;
         public Text mainMenuButtonText;
 
+        public Button privacyButton;
+        public Text privacyButtonText;
+        public const string PRIVACY_POLICY_URL = "https://yusufyildirimdev.github.io/ZiplaKac/privacy_policy.html";
+
         private void Awake()
         {
             if (Instance == null)
@@ -111,6 +115,12 @@ namespace ZiplaKac.UI
                 mainMenuButton.onClick.RemoveAllListeners();
                 mainMenuButton.onClick.AddListener(OnMainMenuClicked);
             }
+
+            if (privacyButton != null)
+            {
+                privacyButton.onClick.RemoveAllListeners();
+                privacyButton.onClick.AddListener(OnPrivacyClicked);
+            }
         }
 
         private void HandleGamePaused(bool isPaused)
@@ -164,6 +174,11 @@ namespace ZiplaKac.UI
             if (mainMenuButtonText != null)
             {
                 mainMenuButtonText.text = LocalizationManager.Get("pause_btn_menu");
+            }
+
+            if (privacyButtonText != null)
+            {
+                privacyButtonText.text = LocalizationManager.Get("privacy_policy_btn");
             }
 
             UpdateSoundButtonText();
@@ -222,6 +237,12 @@ namespace ZiplaKac.UI
                 GameManager.Instance.SetState(GameState.MainMenu);
             }
             gameObject.SetActive(false);
+        }
+
+        private void OnPrivacyClicked()
+        {
+            AudioManager.Instance?.PlayButtonClickSound();
+            Application.OpenURL(PRIVACY_POLICY_URL);
         }
     }
 }

@@ -2886,6 +2886,13 @@ namespace ZiplaKac.Utils
             pauseUI.mainMenuButton = menuObj.GetComponent<Button>();
             pauseUI.mainMenuButtonText = menuObj.transform.Find("Label")?.GetComponent<Text>();
 
+            // Buton 5: Gizlilik Politikası (İnce ve şık hap buton)
+            GameObject privObj = CreatePillButton(card.transform, "PrivacyButton", LocalizationManager.Get("privacy_policy_btn"),
+                new Vector2(0f, -315f), new Vector2(460f, 62f),
+                new Color(0.08f, 0.12f, 0.22f, 0.75f), new Color(0.60f, 0.75f, 0.95f), 24, new Color(0.20f, 0.35f, 0.58f, 0.50f), 1.5f, 20);
+            pauseUI.privacyButton = privObj.GetComponent<Button>();
+            pauseUI.privacyButtonText = privObj.transform.Find("Label")?.GetComponent<Text>();
+
             modalObj.SetActive(false);
         }
 
