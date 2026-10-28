@@ -49,23 +49,27 @@ namespace ZiplaKac.UI
             }
 
             SetupButtons();
-        }
-
-        private void Start()
-        {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.OnGamePaused += HandleGamePaused;
-            }
-
+            TrySubscribeGameManager();
             LocalizationManager.OnLanguageChanged += RefreshTexts;
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.OnMuteStateChanged += HandleMuteChanged;
             }
-
             RefreshTexts();
-            gameObject.SetActive(false);
+        }
+
+        private void Start()
+        {
+            TrySubscribeGameManager();
+        }
+
+        private void TrySubscribeGameManager()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGamePaused -= HandleGamePaused;
+                GameManager.Instance.OnGamePaused += HandleGamePaused;
+            }
         }
 
         private void OnDestroy()
@@ -125,16 +129,9 @@ namespace ZiplaKac.UI
 
         private void HandleGamePaused(bool isPaused)
         {
-            if (isPaused)
-            {
-                UpdateScoreSummary();
-                RefreshTexts();
-                gameObject.SetActive(true);
-            }
-            else
-            {
-                gameObject.SetActive(false);
-            }
+            // Kullanıcı tercihi: Duraklatıldığında herhangi bir ekran/modal açılmayacak.
+            // Oyun sadece sağ üstteki buton ile doğrudan durdurulup devam ettirilir.
+            gameObject.SetActive(false);
         }
 
         private void HandleMuteChanged(bool isMuted)

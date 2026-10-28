@@ -814,56 +814,72 @@ namespace ZiplaKac.Utils
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
         }
 
-        public static Sprite CreatePlayIconSprite(int resolution = 64)
+        public static Sprite CreatePlayIconSprite(int resolution = 128)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            float cx = resolution * 0.48f;
+            float cx = resolution * 0.50f;
             float cy = resolution * 0.50f;
-            float size = resolution * 0.32f;
+            float w = resolution * 0.46f;
+            float h = resolution * 0.56f;
 
-            Vector2 p1 = new Vector2(cx - size * 0.65f, cy + size);
-            Vector2 p2 = new Vector2(cx - size * 0.65f, cy - size);
-            Vector2 p3 = new Vector2(cx + size * 0.85f, cy);
+            // Görsel ağırlık merkezini butonun tam ortasına oturtmak için sol kenarı dengeli konumlandırıyoruz
+            float xLeft = cx - w * 0.36f;
+            float xRight = cx + w * 0.64f;
+            float halfH = h * 0.50f;
+
+            float slantLen = Mathf.Sqrt(halfH * halfH + w * w);
+            float cosTheta = w / slantLen;
 
             for (int y = 0; y < resolution; y++)
             {
+                float py = y + 0.5f;
+                float dy = Mathf.Abs(py - cy);
+
                 for (int x = 0; x < resolution; x++)
                 {
-                    Vector2 pt = new Vector2(x + 0.5f, y + 0.5f);
-                    float d1 = (pt.x - p1.x) * (p2.y - p1.y) - (pt.y - p1.y) * (p2.x - p1.x);
-                    float d2 = (pt.x - p2.x) * (p3.y - p2.y) - (pt.y - p2.y) * (p3.x - p2.x);
-                    float d3 = (pt.x - p3.x) * (p1.y - p3.y) - (pt.y - p3.y) * (p1.x - p3.x);
+                    float px = x + 0.5f;
 
-                    if (d1 >= 0f && d2 >= 0f && d3 >= 0f)
+                    if (px < xLeft - 2.0f || px > xRight + 2.0f || dy > halfH + 2.0f)
+                    {
+                        continue;
+                    }
+
+                    float progress = Mathf.Clamp01((px - xLeft) / w);
+                    float halfHAtX = halfH * (1.0f - progress);
+
+                    float dLeft = px - xLeft;
+                    float dSlant = (halfHAtX - dy) * cosTheta;
+                    float dRight = (xRight - px) * cosTheta;
+
+                    float dist = Mathf.Min(dLeft, Mathf.Min(dSlant, dRight));
+
+                    if (dist >= 0.5f)
                     {
                         tex.SetPixel(x, y, Color.white);
                     }
-                    else
+                    else if (dist > -1.2f)
                     {
-                        float minD = Mathf.Min(Mathf.Min(d1, d2), d3);
-                        if (minD >= -1.2f)
-                        {
-                            float alpha = Mathf.Clamp01(1f + minD / 1.2f);
-                            tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
-                        }
+                        float alpha = Mathf.Clamp01((dist + 1.2f) / 1.7f);
+                        tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
                     }
                 }
             }
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
         }
 
-        public static Sprite CreatePauseIconSprite(int resolution = 64)
+        public static Sprite CreatePauseIconSprite(int resolution = 128)
         {
             Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             ClearTexture(tex);
 
-            float w = resolution * 0.16f;
-            float h = resolution * 0.50f;
-            float gap = resolution * 0.14f;
+            // Daha kalın, belirgin ve şık iki dikey çubuk
+            float w = resolution * 0.20f;
+            float h = resolution * 0.58f;
+            float gap = resolution * 0.16f;
             float cy = resolution * 0.50f;
 
             float bar1_minX = resolution * 0.5f - gap * 0.5f - w;
@@ -872,7 +888,7 @@ namespace ZiplaKac.Utils
             float bar2_maxX = resolution * 0.5f + gap * 0.5f + w;
             float minY = cy - h * 0.5f;
             float maxY = cy + h * 0.5f;
-            float corner = w * 0.4f;
+            float corner = w * 0.35f;
 
             for (int y = 0; y < resolution; y++)
             {
@@ -886,15 +902,15 @@ namespace ZiplaKac.Utils
                     {
                         tex.SetPixel(x, y, Color.white);
                     }
-                    else if (d < 1.2f)
+                    else if (d < 1.8f)
                     {
-                        tex.SetPixel(x, y, new Color(1f, 1f, 1f, 1f - d / 1.2f));
+                        tex.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Clamp01(1f - d / 1.8f)));
                     }
                 }
             }
 
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f);
+            return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
         }
 
         public static Sprite CreateHeartIconSprite(int resolution = 64)

@@ -231,6 +231,31 @@ namespace ZiplaKac.Player
 
         private bool IsJumpInputTriggered()
         {
+            // 0. Oyun duraklatılmışsa veya başlamadıysa zıplamayı engelle
+            if (GameManager.Instance == null || GameManager.Instance.IsPaused || GameManager.Instance.State != GameState.Playing)
+            {
+                return false;
+            }
+
+            // 0.1 UI butonlarına basıldığında zıplamayı kesinlikle engelle (Pause, ayarlar vb.)
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                {
+                    return false;
+                }
+                if (Input.touchCount > 0)
+                {
+                    for (int i = 0; i < Input.touchCount; i++)
+                    {
+                        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(i).fingerId))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
             // 1. New Input System Kontrolü (iOS Dokunma, Pointer, Klavye)
             try
             {
@@ -285,19 +310,6 @@ namespace ZiplaKac.Player
                 }
             }
             catch { }
-
-            // UI butonlarına basıldığında zıplamayı engelle
-            if (UnityEngine.EventSystems.EventSystem.current != null)
-            {
-                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
-                {
-                    return false;
-                }
-                if (Input.touchCount > 0 && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-                {
-                    return false;
-                }
-            }
 
             return false;
         }

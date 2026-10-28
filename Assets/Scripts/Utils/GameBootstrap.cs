@@ -1492,6 +1492,7 @@ namespace ZiplaKac.Utils
 
             // SafeArea Konteyneri (Çentik, Dynamic Island ve alt bar koruması)
             GameObject safeArea = UI.SafeAreaFitter.Create(panel.transform, "HUD_SafeArea");
+            Material safeMat = GetSafeSpriteMaterial();
 
             // Top Header Bar — Premium Arcade Glassmorphic Badges
             // 1. Anlık Skor (Sol Üst Neon Mint Badge - Güvenli Alan Köşesine Sabitli)
@@ -1508,36 +1509,37 @@ namespace ZiplaKac.Utils
                 coinIcon, "<size=18><color=#ffd166>ALTIN</color></size>\n<size=38><color=#ffea79><b>0</b></color></size>",
                 new Color(1.0f, 0.92f, 0.45f), 22, out hud.goldText, new Vector2(0f, 1f), new Vector2(0f, 1f));
 
-            // 3. En İyi Skor (Sağ Üst — Parlak Altın Kupa / Rekor Rozeti)
+            // 3. En İyi Skor (Sağ Üst — Pause Butonunun Solunda, 48px mesafe ile rahat ayrık)
             Sprite trophyIcon = ProceduralSpriteGenerator.CreateTrophyIconSprite();
-            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(320f, 96f), new Vector2(-128f, -28f),
+            CreateHUDBadge(safeArea.transform, "HighScorePill", new Vector2(300f, 96f), new Vector2(-144f, -24f),
                 new Color(0.08f, 0.07f, 0.16f, 0.94f), new Color(0.98f, 0.75f, 0.18f, 0.95f), 3.0f,
                 trophyIcon, "<size=20><color=#ffd166>EN İYİ</color></size>\n<size=42><color=#ffffff><b>0</b></color></size>",
                 Color.white, 24, out hud.highScoreText, new Vector2(1f, 1f), new Vector2(1f, 1f));
 
             // 4. Can Rozeti (Sağ Üst En İyi Skorun altında — Pembe/Kırmızı Kalp Rozeti)
             Sprite heartIcon = ProceduralSpriteGenerator.CreateHeartIconSprite(64);
-            GameObject lifeBadgeObj = CreateHUDBadge(safeArea.transform, "LifePill", new Vector2(280f, 86f), new Vector2(-128f, -136f),
+            GameObject lifeBadgeObj = CreateHUDBadge(safeArea.transform, "LifePill", new Vector2(280f, 86f), new Vector2(-144f, -132f),
                 new Color(0.14f, 0.06f, 0.09f, 0.94f), new Color(1.0f, 0.35f, 0.45f, 0.95f), 3.0f,
                 heartIcon, "<size=18><color=#ff6b81>CAN</color></size>\n<size=38><color=#ffffff><b>0</b></color></size>",
                 new Color(1.0f, 0.85f, 0.90f), 22, out hud.lifeText, new Vector2(1f, 1f), new Vector2(1f, 1f));
             hud.lifeBadgeObject = lifeBadgeObj;
 
-            // 5. Duraklatma (Pause) Butonu (Sağ Üst Köşede — Geniş Dokunmatik Alan)
+            // 5. Duraklatma (Pause / Play) Butonu (En Sağ Üst Köşede Bağımsız — 96x96px)
             GameObject pauseBtnObj = new GameObject("PauseButton");
             pauseBtnObj.transform.SetParent(safeArea.transform, false);
             RectTransform pauseRt = pauseBtnObj.AddComponent<RectTransform>();
             pauseRt.anchorMin = new Vector2(1f, 1f);
             pauseRt.anchorMax = new Vector2(1f, 1f);
             pauseRt.pivot = new Vector2(1f, 1f);
-            pauseRt.anchoredPosition = new Vector2(-28f, -34f);
-            pauseRt.sizeDelta = new Vector2(84f, 84f);
+            pauseRt.anchoredPosition = new Vector2(-24f, -24f);
+            pauseRt.sizeDelta = new Vector2(96f, 96f);
 
             Image pauseBg = pauseBtnObj.AddComponent<Image>();
             pauseBg.sprite = ProceduralSpriteGenerator.CreateRoundedRectSprite(
-                new Color(0.08f, 0.12f, 0.24f, 0.94f),
-                new Color(0.22f, 0.74f, 0.97f, 0.90f),
-                3.0f, 24, 84, 84);
+                new Color(0.08f, 0.12f, 0.24f, 0.95f),
+                new Color(0.22f, 0.74f, 0.97f, 0.95f),
+                3.5f, 26, 96, 96);
+            // UI Image için özel materyal atanmaz (Default UI Material kullanılır)
 
             Button pauseBtn = pauseBtnObj.AddComponent<Button>();
             ColorBlock cb = pauseBtn.colors;
@@ -1552,18 +1554,36 @@ namespace ZiplaKac.Utils
             iconRt.anchorMin = new Vector2(0.5f, 0.5f);
             iconRt.anchorMax = new Vector2(0.5f, 0.5f);
             iconRt.pivot = new Vector2(0.5f, 0.5f);
-            iconRt.sizeDelta = new Vector2(44f, 44f);
             iconRt.anchoredPosition = Vector2.zero;
+            iconRt.sizeDelta = new Vector2(50f, 50f);
+
+            Sprite pauseSprite = ProceduralSpriteGenerator.CreatePauseIconSprite(128);
+            Sprite playSprite = ProceduralSpriteGenerator.CreatePlayIconSprite(128);
 
             Image iconImg = iconObj.AddComponent<Image>();
-            iconImg.sprite = ProceduralSpriteGenerator.CreatePauseIconSprite(64);
+            iconImg.sprite = pauseSprite;
             iconImg.color = Color.white;
+            iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGamePaused += (isPaused) =>
+                {
+                    if (iconImg != null)
+                    {
+                        iconImg.sprite = isPaused ? playSprite : pauseSprite;
+                    }
+                };
+            }
 
             pauseBtn.onClick.AddListener(() =>
             {
                 AudioManager.Instance?.PlayButtonClickSound();
-                GameManager.Instance?.PauseGame();
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.TogglePause();
+                }
             });
 
             // Active PowerUp Badges Bar (Üst Orta - İki rozet arası)
