@@ -123,6 +123,70 @@ namespace ZiplaKac.Editor
             }
         }
 
+        public static void BuildAndroidAPK()
+        {
+            EnsureWorldSpritesImported();
+
+            string[] scenes = new string[] { "Assets/Scenes/SampleScene.unity" };
+            string buildPath = "Builds/Android/Hoppzy.apk";
+            string dir = System.IO.Path.GetDirectoryName(buildPath);
+            if (!System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+
+            Debug.Log($"[BuildPipelineScript] Starting Android APK build to '{buildPath}'...");
+
+            PlayerSettings.companyName = "YusufYildirim";
+            PlayerSettings.productName = "Hoppzy";
+            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.yusufyldrm.ziplakac");
+            PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
+            EditorUserBuildSettings.buildAppBundle = false;
+            PlayerSettings.bundleVersion = "1.0.4";
+            PlayerSettings.Android.bundleVersionCode = 5;
+            PlayerSettings.SplashScreen.show = false;
+
+            // Release Keystore İmzalaması
+            string keystorePath = "hoppzy-release.keystore";
+            if (System.IO.File.Exists(keystorePath))
+            {
+                PlayerSettings.Android.useCustomKeystore = true;
+                PlayerSettings.Android.keystoreName = System.IO.Path.GetFullPath(keystorePath);
+                PlayerSettings.Android.keystorePass = "Hoppzy2026!";
+                PlayerSettings.Android.keyaliasName = "hoppzy";
+                PlayerSettings.Android.keyaliasPass = "Hoppzy2026!";
+                Debug.Log("[BuildPipelineScript] Release Keystore configured for APK signing.");
+            }
+
+            ConfigureAppIcons();
+
+            BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+            {
+                scenes = scenes,
+                locationPathName = buildPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.None
+            };
+
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
+
+            Debug.Log($"[BuildPipelineScript] Android APK Result: {summary.result}, Errors: {summary.totalErrors}");
+
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("[BuildPipelineScript] Android APK Build succeeded!");
+                EditorApplication.Exit(0);
+            }
+            else
+            {
+                Debug.LogError($"[BuildPipelineScript] Android APK Build failed with {summary.totalErrors} errors!");
+                EditorApplication.Exit(1);
+            }
+        }
+
         private static void ConfigureAppIcons()
         {
             string masterIconPath = "Assets/Art/AppIcon/app_icon_1024.png";
