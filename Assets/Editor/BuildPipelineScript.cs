@@ -80,8 +80,8 @@ namespace ZiplaKac.Editor
             PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
             EditorUserBuildSettings.buildAppBundle = true;
-            PlayerSettings.bundleVersion = "1.0.4";
-            PlayerSettings.Android.bundleVersionCode = 5;
+            PlayerSettings.bundleVersion = "1.0.5";
+            PlayerSettings.Android.bundleVersionCode = 6;
             PlayerSettings.SplashScreen.show = false;
 
             // Google Play Console için Release Keystore İmzalaması
@@ -144,8 +144,8 @@ namespace ZiplaKac.Editor
             PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7 | AndroidArchitecture.ARM64;
             EditorUserBuildSettings.buildAppBundle = false;
-            PlayerSettings.bundleVersion = "1.0.4";
-            PlayerSettings.Android.bundleVersionCode = 5;
+            PlayerSettings.bundleVersion = "1.0.5";
+            PlayerSettings.Android.bundleVersionCode = 6;
             PlayerSettings.SplashScreen.show = false;
 
             // Release Keystore İmzalaması
